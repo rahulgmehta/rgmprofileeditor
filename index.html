@@ -641,9 +641,11 @@
         category: 'Enterprise Apps',
         title: 'Google Chrome',
         payloadType: 'com.google.Chrome',
-        description: 'Configures Google Chrome enterprise policies: General, Content Settings, Extensions, DoH, ProxySettings, ManagedBookmarks, and Safe Browsing.',
+        description: 'Configures Google Chrome enterprise policies: General, Browser Sign-In & Domain Restrictions, Content Settings, Extensions, DoH, ProxySettings, and Safe Browsing.',
         supportedOS: 'macOS Application Policy (com.google.Chrome)',
         keys: [
+          { key: 'BrowserSignin', title: 'Browser Sign-In Requirement (0=Disabled, 1=Enable, 2=Force)', type: 'integer', rangelist: [0, 1, 2], default: 2 },
+          { key: 'RestrictSigninToPattern', title: 'Restrict Google Account Sign-In to Domain Regex Pattern', type: 'string', default: '^(.*@abc\\.com|.*@xyz\\.com)$' },
           { key: 'HomepageLocation', title: 'Homepage URL', type: 'string', default: 'www.apple.com' },
           { key: 'HomepageIsNewTabPage', title: 'Use New Tab Page as Homepage', type: 'boolean', default: false },
           { key: 'NewTabPageLocation', title: 'New Tab Page URL', type: 'string', default: 'www.apple.com' },
