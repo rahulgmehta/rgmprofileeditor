@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RGM Profile Editor</title>
+  <title>RGM Profile Editor — Apple MDM & Declarative DDM Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -22,50 +22,76 @@
   <!-- Top Bar -->
   <header class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shrink-0 z-10">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-sm">
-        <i data-lucide="shield-check" class="w-5 h-5 text-sky-400"></i>
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-600 to-indigo-700 text-white flex items-center justify-center shadow-sm font-bold text-sm tracking-tight">
+        RGM
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="text-sm font-bold tracking-tight text-slate-900">Apple MDM & DDM Studio</h1>
+          <h1 class="text-sm font-bold tracking-tight text-slate-900">RGM Profile Editor</h1>
           <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
-            MDM & DDM Engine
+            Apple MDM & DDM
           </span>
         </div>
-        <p class="text-xs text-slate-500">Configuration Profiles (.mobileconfig) + Enterprise App Policies + Declarative DDM (JSON)</p>
+        <p class="text-xs text-slate-500">Visual Configuration Profile (.mobileconfig) & Declarative DDM Builder</p>
       </div>
     </div>
 
     <!-- Protocol Mode Switcher -->
     <div class="hidden md:flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
       <button onclick="switchMode('mdm')" id="modeMdmBtn"
-        class="px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm">
+        class="px-3 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm">
         <i data-lucide="file-code-2" class="w-3.5 h-3.5 text-sky-600"></i>
-        MDM Profiles (.mobileconfig)
+        Standard Profile (.mobileconfig)
       </button>
       <button onclick="switchMode('ddm')" id="modeDdmBtn"
-        class="px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+        class="px-3 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
         <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-600"></i>
-        Declarative DDM (JSON)
+        Declarative DDM (JSON / .mobileconfig)
       </button>
     </div>
 
     <!-- Right Actions -->
     <div class="flex items-center gap-2">
-      <button onclick="loadEnterpriseAppsPreset()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 flex items-center gap-1.5 transition" title="Load Enterprise App Policies">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-600"></i>
-        <span>Enterprise Apps Preset</span>
+      <button onclick="openHelpModal()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition">
+        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-sky-600"></i>
+        <span>Quick Guide</span>
       </button>
       <button onclick="openRepoModal()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition">
-        <i data-lucide="git-branch" class="w-3.5 h-3.5 text-slate-500"></i>
-        <span>Load Schema / Policy</span>
+        <i data-lucide="plus-square" class="w-3.5 h-3.5 text-slate-500"></i>
+        <span>Add Custom Schema</span>
       </button>
       <button onclick="openImportModal()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 shadow-sm transition">
         <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-        <span>Import</span>
+        <span>Import File</span>
       </button>
     </div>
   </header>
+
+  <!-- First-Time User 3-Step Guided Strip -->
+  <div id="onboardingStrip" class="bg-gradient-to-r from-sky-50 via-indigo-50/70 to-sky-50 border-b border-sky-200/80 px-5 py-2 flex items-center justify-between text-xs shrink-0">
+    <div class="flex flex-wrap items-center gap-4 text-slate-700">
+      <span class="font-bold text-sky-800 flex items-center gap-1.5">
+        <i data-lucide="compass" class="w-3.5 h-3.5 text-sky-600"></i> New to MDM Profiles?
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="w-4 h-4 rounded-full bg-sky-600 text-white text-[10px] font-bold flex items-center justify-center">1</span>
+        Pick a setting from the left catalog
+      </span>
+      <span class="text-slate-300">→</span>
+      <span class="flex items-center gap-1.5">
+        <span class="w-4 h-4 rounded-full bg-sky-600 text-white text-[10px] font-bold flex items-center justify-center">2</span>
+        Fill out the form in the center
+      </span>
+      <span class="text-slate-300">→</span>
+      <span class="flex items-center gap-1.5">
+        <span class="w-4 h-4 rounded-full bg-sky-600 text-white text-[10px] font-bold flex items-center justify-center">3</span>
+        Click <strong>Download .mobileconfig</strong> on the right
+      </span>
+    </div>
+    <button onclick="document.getElementById('onboardingStrip').classList.add('hidden')" class="text-slate-400 hover:text-slate-700 text-xs font-medium ml-4">
+      Dismiss ✕
+    </button>
+  </div>
 
   <!-- Main 3-Column Workspace -->
   <div class="flex-1 flex overflow-hidden">
@@ -74,18 +100,18 @@
     <aside class="w-72 bg-white border-r border-slate-200 flex flex-col shrink-0">
       <div class="p-3 border-b border-slate-100 space-y-2">
         <div class="flex items-center justify-between">
-          <span id="catalogHeaderTitle" class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Schema Catalog</span>
-          <span id="schemaCountBadge" class="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">0</span>
+          <span id="catalogHeaderTitle" class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Step 1: Choose Settings</span>
+          <span id="schemaCountBadge" class="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-sky-50 text-sky-700">0</span>
         </div>
         <div class="relative">
           <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
-          <input id="schemaSearchInput" type="text" oninput="renderSchemaCatalog()" placeholder="Filter schemas or bundle IDs..."
+          <input id="schemaSearchInput" type="text" oninput="renderSchemaCatalog()" placeholder="Search Wi-Fi, Passcode, Chrome..."
             class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500" />
         </div>
         <div class="flex gap-1 overflow-x-auto pb-0.5" id="categoryFilterBar"></div>
       </div>
 
-      <div id="schemaList" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
+      <div id="schemaList" class="flex-1 overflow-y-auto p-2 space-y-1.5"></div>
     </aside>
 
     <!-- Center Column: Profile Metadata + Active Payloads / Declarations Form -->
@@ -94,37 +120,37 @@
       <div class="bg-white border-b border-slate-200 px-5 py-3.5 shrink-0">
         <div class="flex items-center justify-between mb-2.5">
           <div class="flex items-center gap-2">
-            <span id="activeProtocolBadge" class="text-[11px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800">MDM PROFILE</span>
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500" id="metaHeaderLabel">Configuration Profile Top-Level Metadata</h2>
+            <span id="activeProtocolBadge" class="text-[11px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800">STEP 2: PROFILE DETAILS</span>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500" id="metaHeaderLabel">General Profile Information</h2>
           </div>
           <div class="flex items-center gap-3">
             <button id="toggleAdvancedTopLevelBtn" onclick="toggleAdvancedTopLevel()" class="text-[11px] font-semibold text-sky-600 hover:text-sky-800 flex items-center gap-1">
-              <i data-lucide="sliders-horizontal" class="w-3 h-3"></i> Advanced Top-Level Options
+              <i data-lucide="sliders-horizontal" class="w-3 h-3"></i> Advanced Options
             </button>
             <button onclick="regenerateAllUUIDs()" class="text-[11px] font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1">
-              <i data-lucide="refresh-cw" class="w-3 h-3"></i> Regenerate UUIDs
+              <i data-lucide="refresh-cw" class="w-3 h-3"></i> New UUIDs
             </button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaNameLabel">PayloadDisplayName</label>
-            <input id="metaDisplayName" type="text" value="Corporate Enterprise Configuration" oninput="refreshOutput()"
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1" id="metaNameLabel">Profile Name (Shown on Device)</label>
+            <input id="metaDisplayName" type="text" value="Corporate Device Profile" oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaIdentLabel">PayloadIdentifier</label>
-            <input id="metaIdentifier" type="text" value="com.example.mdm.profile" oninput="refreshOutput()"
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1" id="metaIdentLabel">Unique Identifier (Reverse-DNS)</label>
+            <input id="metaIdentifier" type="text" value="com.rgm.mdm.profile" oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1">PayloadOrganization</label>
-            <input id="metaOrg" type="text" value="Enterprise IT" oninput="refreshOutput()"
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Organization Name</label>
+            <input id="metaOrg" type="text" value="RGM IT" oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaExtraLabel">PayloadScope (System / User)</label>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1" id="metaExtraLabel">Install Scope (System / User)</label>
             <input id="metaScopeOrActivation" type="text" value="System" oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
           </div>
@@ -133,9 +159,9 @@
         <!-- Collapsible Top-Level Options -->
         <div id="advancedTopLevelPanel" class="hidden mt-3 pt-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-3">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1">TargetDeviceType</label>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Target Device Platform</label>
             <select id="metaTargetDeviceType" onchange="refreshOutput()" class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white">
-              <option value="0">0 — Any / Unspecified</option>
+              <option value="0">0 — Any Apple Device</option>
               <option value="1">1 — iPhone / iPad</option>
               <option value="2">2 — Apple Watch</option>
               <option value="3">3 — HomePod</option>
@@ -145,27 +171,27 @@
             </select>
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1">PayloadDescription</label>
-            <input id="metaDescription" type="text" value="Generated by Apple MDM & DDM Studio" oninput="refreshOutput()"
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Profile Description</label>
+            <input id="metaDescription" type="text" value="Created with RGM Profile Editor" oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg" />
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1">RemovalDate / Expiration (ISO-8601)</label>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Auto-Removal Date (ISO-8601)</label>
             <input id="metaRemovalDate" type="text" placeholder="e.g. 2027-12-31T23:59:59Z" oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded-lg" />
           </div>
           <div class="flex flex-col justify-between">
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Profile Lock & Consent</label>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Removal Protection</label>
             <div class="flex items-center gap-3">
               <label class="inline-flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
                 <input id="metaRemovalDisallowed" type="checkbox" onchange="refreshOutput()" class="rounded border-slate-300 text-sky-600" />
-                <span>Disallow Removal</span>
+                <span>Prevent User Removal</span>
               </label>
             </div>
           </div>
           <div class="md:col-span-4">
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1">ConsentText (default / en agreement prompt shown before install)</label>
-            <input id="metaConsentText" type="text" placeholder="Optional end-user consent agreement text..." oninput="refreshOutput()"
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">User Consent Agreement Message (Optional)</label>
+            <input id="metaConsentText" type="text" placeholder="Shown to the user before installing the profile..." oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg" />
           </div>
         </div>
@@ -173,31 +199,54 @@
 
       <!-- Active Items Tabs + Dynamic Form Editor -->
       <div class="flex-1 overflow-y-auto p-5 space-y-4" id="editorContainer">
-        <div id="emptyEditorState" class="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto py-12">
-          <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
-            <i data-lucide="layers" class="w-6 h-6"></i>
+        <div id="emptyEditorState" class="h-full flex flex-col items-center justify-center text-center max-w-lg mx-auto py-8">
+          <div class="w-14 h-14 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mb-3 shadow-xs">
+            <i data-lucide="wand-2" class="w-7 h-7"></i>
           </div>
-          <h3 class="text-sm font-bold text-slate-800 mb-1">No Payloads or Declarations Added Yet</h3>
-          <p class="text-xs text-slate-500 leading-relaxed mb-4">
-            Select any MDM payload, enterprise application schema (Firefox, Chrome, Edge, AutoUpdate, Zoom, Okta), or Declarative DDM configuration from the left catalog.
+          <h3 class="text-base font-bold text-slate-900 mb-1">Start Building Your Apple Profile</h3>
+          <p class="text-xs text-slate-500 leading-relaxed mb-5">
+            Click any setting from the left panel to add it to your profile, or start right away with one of these ready-made templates:
           </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full text-left">
+            <button onclick="loadStarterEssentials()" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-xs transition group">
+              <div class="flex items-center gap-1.5 text-xs font-bold text-slate-800 group-hover:text-sky-700 mb-1">
+                <i data-lucide="wifi" class="w-3.5 h-3.5 text-sky-600"></i> Essentials Starter
+              </div>
+              <p class="text-[11px] text-slate-500">Adds Wi-Fi + Passcode Policy for first-time setup.</p>
+            </button>
+
+            <button onclick="loadEnterpriseAppsPreset()" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-indigo-400 hover:shadow-xs transition group">
+              <div class="flex items-center gap-1.5 text-xs font-bold text-slate-800 group-hover:text-indigo-700 mb-1">
+                <i data-lucide="app-window" class="w-3.5 h-3.5 text-indigo-600"></i> Enterprise Apps
+              </div>
+              <p class="text-[11px] text-slate-500">Configures Chrome, Edge, Firefox, Outlook, Drive & Claude.</p>
+            </button>
+
+            <button onclick="loadDdmStarterPreset()" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-emerald-400 hover:shadow-xs transition group">
+              <div class="flex items-center gap-1.5 text-xs font-bold text-slate-800 group-hover:text-emerald-700 mb-1">
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-emerald-600"></i> DDM Starter
+              </div>
+              <p class="text-[11px] text-slate-500">Creates a Declarative Passcode & DNS profile (.mobileconfig).</p>
+            </button>
+          </div>
         </div>
 
         <div id="activeItemsStack" class="space-y-4 hidden"></div>
       </div>
     </main>
 
-    <!-- Right Column: Live XML / JSON Output & Validation -->
-    <aside class="w-[430px] bg-slate-900 text-slate-100 flex flex-col shrink-0 border-l border-slate-800">
-      <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
-        <div class="flex items-center gap-1.5" id="outputFormatTabs">
+    <!-- Right Column: Live XML / JSON Output & Download -->
+    <aside class="w-[440px] bg-slate-900 text-slate-100 flex flex-col shrink-0 border-l border-slate-800">
+      <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-1" id="outputFormatTabs">
           <button onclick="setOutputFormat('primary')" id="outTabPrimary"
             class="px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400">
             .mobileconfig XML
           </button>
-          <button onclick="setOutputFormat('bridged')" id="outTabBridged"
+          <button onclick="setOutputFormat('ddm_mobileconfig')" id="outTabDdmMobileconfig"
             class="px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white hidden">
-            Bridged .mobileconfig
+            .mobileconfig (DDM)
           </button>
         </div>
 
@@ -206,19 +255,27 @@
             <i data-lucide="copy" class="w-3.5 h-3.5"></i>
             <span id="copyBtnText">Copy</span>
           </button>
-          <button onclick="downloadOutput()" class="px-2.5 py-1 rounded bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white flex items-center gap-1 transition">
+          <button onclick="downloadOutput()" class="px-3 py-1 rounded bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white flex items-center gap-1 shadow-xs transition">
             <i data-lucide="download" class="w-3.5 h-3.5"></i>
-            <span id="downloadBtnText">Download</span>
+            <span id="downloadBtnText">Download .mobileconfig</span>
           </button>
         </div>
+      </div>
+
+      <!-- Secondary Quick-Download Bar for Declarative DDM Mode -->
+      <div id="ddmMobileconfigBanner" class="hidden px-4 py-2 bg-indigo-950/80 border-b border-indigo-800/70 flex items-center justify-between gap-2">
+        <span class="text-[11px] text-indigo-200">Need to install this DDM profile directly on a Mac/iPhone?</span>
+        <button onclick="downloadDdmAsMobileconfig()" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-[11px] font-semibold text-white flex items-center gap-1 shrink-0 transition">
+          <i data-lucide="file-down" class="w-3 h-3"></i> Download .mobileconfig
+        </button>
       </div>
 
       <!-- Status / Token Bar -->
       <div class="px-4 py-2 bg-slate-950/60 border-b border-slate-800 flex items-center justify-between text-[11px]">
         <span id="validationBadge" class="flex items-center gap-1.5 text-emerald-400 font-medium">
-          <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Valid Apple Schema Output
+          <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Step 3: Ready to Download
         </span>
-        <span id="serverTokenBadge" class="font-mono text-slate-400 truncate max-w-[200px]" title="SHA-256 ServerToken"></span>
+        <span id="serverTokenBadge" class="font-mono text-slate-400 truncate max-w-[190px]" title="Payload / Token Status"></span>
       </div>
 
       <!-- Code Preview -->
@@ -226,13 +283,13 @@
     </aside>
   </div>
 
-  <!-- MODAL 1: Schema Repository & Custom Policy Definition Loader -->
+  <!-- MODAL 1: Add Custom Schema / Application Policy -->
   <div id="repoModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh]">
       <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <i data-lucide="git-branch" class="w-4 h-4 text-sky-600"></i>
-          <h3 class="text-sm font-bold text-slate-900">Load Apple Schema or Application Policy Definition</h3>
+          <i data-lucide="plus-square" class="w-4 h-4 text-sky-600"></i>
+          <h3 class="text-sm font-bold text-slate-900">Add Custom Apple Schema or Application Policy</h3>
         </div>
         <button onclick="closeModal('repoModal')" class="text-slate-400 hover:text-slate-700">
           <i data-lucide="x" class="w-4 h-4"></i>
@@ -242,19 +299,19 @@
       <div class="p-5 space-y-4 overflow-y-auto flex-1">
         <div class="flex gap-2">
           <select id="repoFolderSelect" onchange="fetchGitHubDirectory()" class="px-3 py-2 text-xs border border-slate-200 rounded-lg bg-slate-50 font-medium">
-            <option value="mdm/profiles">MDM Profiles (mdm/profiles)</option>
-            <option value="declarative/declarations/configurations">DDM Configurations</option>
-            <option value="declarative/declarations/assets">DDM Assets</option>
-            <option value="declarative/declarations/activations">DDM Activations</option>
-            <option value="declarative/declarations/management">DDM Management</option>
+            <option value="mdm/profiles">Standard MDM Payloads</option>
+            <option value="declarative/declarations/configurations">Declarative DDM Configurations</option>
+            <option value="declarative/declarations/assets">Declarative DDM Assets</option>
+            <option value="declarative/declarations/activations">Declarative DDM Activations</option>
+            <option value="declarative/declarations/management">Declarative DDM Management</option>
           </select>
           <button onclick="fetchGitHubDirectory()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Browse Repository
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Browse Online Catalog
           </button>
         </div>
 
         <div id="repoFileList" class="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-48 overflow-y-auto bg-slate-50">
-          <div class="p-4 text-xs text-slate-500 text-center">Click "Browse Repository" to load YAML schemas, or paste any YAML or XML policy definition below.</div>
+          <div class="p-4 text-xs text-slate-500 text-center">Click "Browse Online Catalog" to load additional schemas, or paste a YAML / XML plist definition below.</div>
         </div>
 
         <div>
@@ -277,7 +334,7 @@
   <div id="importModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-xl overflow-hidden">
       <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
-        <h3 class="text-sm font-bold text-slate-900">Import .mobileconfig XML or DDM JSON</h3>
+        <h3 class="text-sm font-bold text-slate-900">Import Existing .mobileconfig or DDM JSON</h3>
         <button onclick="closeModal('importModal')" class="text-slate-400 hover:text-slate-700">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
@@ -290,7 +347,39 @@
       </div>
       <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
         <button onclick="closeModal('importModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600">Cancel</button>
-        <button onclick="importFromText()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Import Content</button>
+        <button onclick="importFromText()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Import Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: First-Time User Quick Guide -->
+  <div id="helpModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-xl overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="book-open" class="w-4 h-4 text-sky-600"></i>
+          <h3 class="text-sm font-bold text-slate-900">RGM Profile Editor — Quick Start Guide</h3>
+        </div>
+        <button onclick="closeModal('helpModal')" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-3 text-xs text-slate-600 leading-relaxed">
+        <div class="p-3 rounded-xl bg-sky-50 border border-sky-100">
+          <div class="font-bold text-sky-900 mb-1">1. Standard Profile (.mobileconfig)</div>
+          <p>Use this mode to configure Wi-Fi, Passcode, Restrictions, VPN, Certificates, or macOS app settings (Chrome, Edge, Firefox, Outlook, Zoom). Click <strong>Download .mobileconfig</strong> when finished.</p>
+        </div>
+        <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-100">
+          <div class="font-bold text-indigo-900 mb-1">2. Declarative DDM (JSON & .mobileconfig)</div>
+          <p>Apple's modern Declarative Device Management lets devices evaluate rules autonomously. You can export raw <strong>declarations.json</strong> for your MDM server, or click <strong>Download .mobileconfig</strong> to wrap your declarations inside Apple's <code class="text-indigo-800">com.apple.declarations</code> profile format for local installation (iOS 17+ / macOS 14+).</p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="font-bold text-slate-800 mb-1">3. Editing Existing Profiles</div>
+          <p>Have an existing <code class="text-slate-800">.mobileconfig</code> file? Click <strong>Import File</strong> in the top-right corner to load it into the visual form editor, tweak any setting, and re-download.</p>
+        </div>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeModal('helpModal')" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800">Got It</button>
       </div>
     </div>
   </div>
@@ -395,13 +484,82 @@
     // 2. BUILT-IN CATALOG (CLASSIC MDM + APPLICATION POLICIES + DDM)
     // =========================================================================
     const BUILTIN_SCHEMAS = [
+      // --- ESSENTIALS (TOP FOR FIRST-TIME USERS) ---
+      {
+        protocol: 'mdm',
+        category: 'Essentials',
+        title: 'Wi-Fi Network',
+        payloadType: 'com.apple.wifi.managed',
+        description: 'Connect devices automatically to your corporate WPA2/WPA3 or 802.1X Wi-Fi network.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+',
+        keys: [
+          { key: 'SSID_STR', title: 'Wi-Fi Network Name (SSID)', type: 'string', required: true, default: 'Corp-WiFi' },
+          { key: 'HIDDEN_NETWORK', title: 'Hidden Network', type: 'boolean', default: false },
+          { key: 'AutoJoin', title: 'Join Automatically', type: 'boolean', default: true },
+          { key: 'EncryptionType', title: 'Security / Encryption Type', type: 'string', rangelist: ['WPA2', 'WPA3', 'WPA', 'WEP', 'Any', 'None'], default: 'WPA2' },
+          { key: 'Password', title: 'Wi-Fi Password', type: 'string' },
+          { key: 'DisableAssociationMACRandomization', title: 'Disable Private MAC Address Randomization', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Essentials',
+        title: 'Passcode & Lock Screen Policy',
+        payloadType: 'com.apple.mobiledevice.passwordpolicy',
+        description: 'Require a device passcode and set minimum length, complexity, and auto-lock timeout.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, visionOS 2.0+, watchOS 10.0+',
+        keys: [
+          { key: 'forcePIN', title: 'Require Passcode on Device', type: 'boolean', default: true },
+          { key: 'allowSimple', title: 'Allow Simple Passcodes (e.g. 1234)', type: 'boolean', default: false },
+          { key: 'requireAlphanumeric', title: 'Require Letters & Numbers', type: 'boolean', default: false },
+          { key: 'minLength', title: 'Minimum Passcode Length', type: 'integer', default: 6 },
+          { key: 'minComplexChars', title: 'Minimum Special Characters (0-4)', type: 'integer', default: 1 },
+          { key: 'maxFailedAttempts', title: 'Max Failed Attempts Before Wipe/Lock', type: 'integer', default: 10 },
+          { key: 'maxInactivity', title: 'Auto-Lock After Inactivity (Minutes)', type: 'integer', default: 5 }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Essentials',
+        title: 'Device Restrictions',
+        payloadType: 'com.apple.applicationaccess',
+        description: 'Control camera, screenshots, AirDrop, iCloud backup, App Store installs, and USB access.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.1+',
+        keys: [
+          { key: 'allowCamera', title: 'Allow Camera', type: 'boolean', default: true },
+          { key: 'allowScreenShot', title: 'Allow Screenshots & Screen Recording', type: 'boolean', default: true },
+          { key: 'allowAirDrop', title: 'Allow AirDrop', type: 'boolean', default: true },
+          { key: 'allowUSBRestrictedMode', title: 'Block USB Accessories When Locked', type: 'boolean', default: true },
+          { key: 'allowEraseContentAndSettings', title: 'Allow Erase All Content and Settings', type: 'boolean', default: true },
+          { key: 'allowCloudBackup', title: 'Allow iCloud Backup', type: 'boolean', default: true },
+          { key: 'allowAppInstallation', title: 'Allow Installing Apps', type: 'boolean', default: true },
+          { key: 'allowSafari', title: 'Allow Safari Browser', type: 'boolean', default: true },
+          { key: 'forceEncryptedBackup', title: 'Require Encrypted Backups', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Essentials',
+        title: 'Web Clip (Home Screen / Dock Shortcut)',
+        payloadType: 'com.apple.webClip.managed',
+        description: 'Add a web app shortcut icon to the iOS Home Screen or macOS Dock.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+',
+        keys: [
+          { key: 'Label', title: 'Shortcut Icon Title', type: 'string', required: true, default: 'Employee Portal' },
+          { key: 'URL', title: 'Website URL', type: 'string', required: true, default: 'https://portal.example.com' },
+          { key: 'FullScreen', title: 'Open as Full-Screen Web App (iOS)', type: 'boolean', default: true },
+          { key: 'IsRemovable', title: 'Allow User to Remove Shortcut', type: 'boolean', default: false },
+          { key: 'Precomposed', title: 'Precomposed Icon (No Gloss Shine)', type: 'boolean', default: true }
+        ]
+      },
+
       // --- ENTERPRISE APPLICATION POLICY SCHEMAS ---
       {
         protocol: 'mdm',
         category: 'Enterprise Apps',
         title: 'Mozilla Firefox',
         payloadType: 'org.mozilla.firefox',
-        description: 'Configures Mozilla Firefox browser policies: General, Add-ons, Bookmarks, Languages, Network (DNSOverHTTPS, Proxy, Ciphers), Privacy, and Security.',
+        description: 'Configures Mozilla Firefox browser policies: General, Add-ons, Bookmarks, Network (DNSOverHTTPS, Proxy, Ciphers), Privacy, and Security.',
         supportedOS: 'macOS Application Policy (org.mozilla.firefox)',
         keys: [
           { key: 'EnterprisePoliciesEnabled', title: 'Enable Firefox Enterprise Policies', type: 'boolean', required: true, default: true },
@@ -646,10 +804,10 @@
         keys: []
       },
 
-      // --- CORE CLASSIC MDM PROFILES ---
+      // --- ADDITIONAL MDM PROFILES ---
       {
         protocol: 'mdm',
-        category: 'MDM Enrollment',
+        category: 'Security & Identity',
         title: 'MDM (Enrollment Payload)',
         payloadType: 'com.apple.mdm',
         description: 'Configures the core Mobile Device Management (MDM) check-in URL, server URL, APNs topic, identity certificate, and access rights.',
@@ -663,60 +821,55 @@
           { key: 'AccessRights', title: 'Access rights bitmask', type: 'integer', default: 8191 }
         ]
       },
-      {
-        protocol: 'mdm',
-        category: 'Restrictions',
-        title: 'Restrictions',
-        payloadType: 'com.apple.applicationaccess',
-        description: 'Configures device, iCloud, Safari, Siri, AirDrop, App Store, and media rating restrictions.',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [
-          { key: 'allowCamera', title: 'Allow camera use', type: 'boolean', default: true },
-          { key: 'allowScreenShot', title: 'Allow screenshots and screen recording', type: 'boolean', default: true },
-          { key: 'allowAirDrop', title: 'Allow AirDrop', type: 'boolean', default: true },
-          { key: 'allowUSBRestrictedMode', title: 'USB Restricted Mode (block USB while locked)', type: 'boolean', default: true },
-          { key: 'allowEraseContentAndSettings', title: 'Allow Erase All Content and Settings', type: 'boolean', default: true },
-          { key: 'allowCloudBackup', title: 'Allow iCloud Backup', type: 'boolean', default: true },
-          { key: 'allowAppInstallation', title: 'Allow app installation (App Store & local)', type: 'boolean', default: true },
-          { key: 'allowSafari', title: 'Allow Safari browser', type: 'boolean', default: true },
-          { key: 'forceEncryptedBackup', title: 'Force encrypted backups', type: 'boolean', default: false }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Identity',
-        title: 'Passcode',
-        payloadType: 'com.apple.mobiledevice.passwordpolicy',
-        description: 'Enforces passcode length, alphanumeric/complex character rules, expiration, and failed attempts.',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, visionOS 2.0+, watchOS 10.0+',
-        keys: [
-          { key: 'forcePIN', title: 'Require passcode on device', type: 'boolean', default: true },
-          { key: 'allowSimple', title: 'Allow simple passcode', type: 'boolean', default: false },
-          { key: 'requireAlphanumeric', title: 'Require alphanumeric characters', type: 'boolean', default: false },
-          { key: 'minLength', title: 'Minimum passcode length (0-16)', type: 'integer', default: 6 },
-          { key: 'minComplexChars', title: 'Minimum complex symbol characters (0-4)', type: 'integer', default: 1 },
-          { key: 'maxFailedAttempts', title: 'Max failed attempts before wipe/lock (2-11)', type: 'integer', default: 10 },
-          { key: 'maxInactivity', title: 'Auto-lock inactivity timeout (minutes)', type: 'integer', default: 5 }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network',
-        title: 'Wi-Fi (Enterprise 802.1X & Hotspot 2.0)',
-        payloadType: 'com.apple.wifi.managed',
-        description: 'Configures WPA2/WPA3 Personal or 802.1X Enterprise Wi-Fi networks.',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.2+',
-        keys: [
-          { key: 'SSID_STR', title: 'Network SSID', type: 'string', default: 'Corp-Enterprise-WiFi' },
-          { key: 'HIDDEN_NETWORK', title: 'Hidden network', type: 'boolean', default: false },
-          { key: 'AutoJoin', title: 'Auto join', type: 'boolean', default: true },
-          { key: 'EncryptionType', title: 'Encryption type', type: 'string', rangelist: ['WPA2', 'WPA3', 'WPA', 'WEP', 'Any', 'None'], default: 'WPA2' },
-          { key: 'Password', title: 'Pre-shared password', type: 'string' },
-          { key: 'DisableAssociationMACRandomization', title: 'Disable MAC address randomization', type: 'boolean', default: false }
-        ]
-      },
 
       // --- DECLARATIVE DEVICE MANAGEMENT (DDM) - CONFIGURATIONS, ASSETS & MGMT ---
+      {
+        protocol: 'ddm',
+        category: 'Security & Passcode',
+        title: 'Passcode: Settings',
+        payloadType: 'com.apple.configuration.passcode.settings',
+        description: 'Configures device passcode complexity, length, lockout, and reuse history.',
+        supportedOS: 'iOS 15.0+, macOS 13.0+, visionOS 2.0+, watchOS 10.0+',
+        keys: [
+          { key: 'RequirePasscode', title: 'Require passcode on device', type: 'boolean', default: true },
+          { key: 'MinimumLength', title: 'Minimum passcode length (0-16)', type: 'integer', default: 6 },
+          { key: 'RequireAlphanumericPasscode', title: 'Require alphanumeric passcode', type: 'boolean', default: false },
+          { key: 'MinimumComplexCharacters', title: 'Minimum complex characters (0-4)', type: 'integer', default: 0 },
+          { key: 'MaximumFailedAttempts', title: 'Max failed attempts before wipe/lock (2-11)', type: 'integer', default: 11 },
+          { key: 'MaximumInactivityInMinutes', title: 'Auto-lock inactivity in minutes (0-15)', type: 'integer', default: 5 }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Network & VPN',
+        title: 'Network: DNS Settings',
+        payloadType: 'com.apple.configuration.network.dns-settings',
+        description: 'Configures encrypted DNS-over-HTTPS (HTTPS) or DNS-over-TLS (TLS).',
+        supportedOS: 'iOS 27.0+, macOS 27.0+, visionOS 27.0+',
+        keys: [
+          { key: 'VisibleName', title: 'Visible name', type: 'string', required: true, default: 'Encrypted Corporate DNS' },
+          {
+            key: 'DNSSettings', title: 'DNS settings', type: 'dictionary', required: true,
+            subkeys: [
+              { key: 'DNSProtocol', title: 'DNS protocol', type: 'string', required: true, rangelist: ['HTTPS', 'TLS'], default: 'HTTPS' },
+              { key: 'ServerURL', title: 'DoH Server URL (https://)', type: 'string', default: 'https://dns.quad9.net/dns-query' }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Software Updates',
+        title: 'Software Update: Enforcement: Specific',
+        payloadType: 'com.apple.configuration.softwareupdate.enforcement.specific',
+        description: 'Enforces a specific target OS version and local installation deadline.',
+        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 18.4+, visionOS 26.0+',
+        keys: [
+          { key: 'TargetOSVersion', title: 'Target OS version (e.g. 26.2)', type: 'string', required: true, default: '26.2' },
+          { key: 'TargetLocalDateTime', title: 'Target local date-time (yyyy-mm-ddThh:mm:ss)', type: 'string', required: true, default: '2026-12-15T22:00:00' },
+          { key: 'DetailsURL', title: 'Details URL', type: 'string', default: 'https://it.example.com/software-updates' }
+        ]
+      },
       {
         protocol: 'ddm',
         category: 'System & Accessibility',
@@ -809,48 +962,6 @@
       },
       {
         protocol: 'ddm',
-        category: 'Network & VPN',
-        title: 'Network: DNS Settings',
-        payloadType: 'com.apple.configuration.network.dns-settings',
-        description: 'Configures encrypted DNS-over-HTTPS (HTTPS) or DNS-over-TLS (TLS).',
-        supportedOS: 'iOS 27.0+, macOS 27.0+, visionOS 27.0+',
-        keys: [
-          { key: 'VisibleName', title: 'Visible name', type: 'string', required: true, default: 'Encrypted Corporate DNS' },
-          {
-            key: 'DNSSettings', title: 'DNS settings', type: 'dictionary', required: true,
-            subkeys: [
-              { key: 'DNSProtocol', title: 'DNS protocol', type: 'string', required: true, rangelist: ['HTTPS', 'TLS'], default: 'HTTPS' },
-              { key: 'ServerURL', title: 'DoH Server URL (https://)', type: 'string', default: 'https://dns.quad9.net/dns-query' }
-            ]
-          }
-        ]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Security & Passcode',
-        title: 'Passcode: Settings',
-        payloadType: 'com.apple.configuration.passcode.settings',
-        description: 'Configures device passcode complexity, length, lockout, and reuse history.',
-        supportedOS: 'iOS 15.0+, macOS 13.0+, visionOS 2.0+, watchOS 10.0+',
-        keys: [
-          { key: 'RequirePasscode', title: 'Require passcode on device', type: 'boolean', default: true },
-          { key: 'MinimumLength', title: 'Minimum passcode length (0-16)', type: 'integer', default: 6 }
-        ]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Software Updates',
-        title: 'Software Update: Enforcement: Specific',
-        payloadType: 'com.apple.configuration.softwareupdate.enforcement.specific',
-        description: 'Enforces a specific target OS version and local installation deadline.',
-        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 18.4+, visionOS 26.0+',
-        keys: [
-          { key: 'TargetOSVersion', title: 'Target OS version (e.g. 26.2)', type: 'string', required: true, default: '26.2' },
-          { key: 'TargetLocalDateTime', title: 'Target local date-time (yyyy-mm-ddThh:mm:ss)', type: 'string', required: true, default: '2026-12-15T22:00:00' }
-        ]
-      },
-      {
-        protocol: 'ddm',
         category: 'Assets',
         title: 'Asset: Credential ACME',
         payloadType: 'com.apple.asset.credential.acme',
@@ -923,7 +1034,7 @@
         description: 'Configures the managing organization contact name, support email, URL, and verification IdentityToken.',
         supportedOS: 'iOS 15.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
         keys: [
-          { key: 'Name', title: 'Organization name', type: 'string', required: true, default: 'Enterprise IT Operations' },
+          { key: 'Name', title: 'Organization name', type: 'string', required: true, default: 'RGM IT Operations' },
           { key: 'Email', title: 'Organization email address', type: 'string', default: 'it-support@example.com' },
           { key: 'URL', title: 'Organization support URL', type: 'string', default: 'https://support.example.com' }
         ]
@@ -953,7 +1064,7 @@
     ];
 
     // =========================================================================
-    // 3. APPLICATION STATE & PRESET LOADER
+    // 3. APPLICATION STATE & PRESET LOADERS
     // =========================================================================
     let state = {
       protocol: 'mdm',
@@ -970,8 +1081,25 @@
       });
     }
 
+    function utf8ToBase64(str) {
+      const bytes = new TextEncoder().encode(str);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) {
+        bin += String.fromCharCode(bytes[i]);
+      }
+      return btoa(bin);
+    }
+
     function toggleAdvancedTopLevel() {
       document.getElementById('advancedTopLevelPanel').classList.toggle('hidden');
+    }
+
+    function loadStarterEssentials() {
+      switchMode('mdm');
+      ['com.apple.wifi.managed', 'com.apple.mobiledevice.passwordpolicy'].forEach(pt => {
+        const idx = state.schemas.findIndex(s => s.protocol === 'mdm' && s.payloadType === pt);
+        if (idx !== -1) addSchemaToBuilder(idx);
+      });
     }
 
     function loadEnterpriseAppsPreset() {
@@ -991,6 +1119,15 @@
       });
     }
 
+    function loadDdmStarterPreset() {
+      switchMode('ddm');
+      ['com.apple.configuration.passcode.settings', 'com.apple.configuration.network.dns-settings'].forEach(dt => {
+        const idx = state.schemas.findIndex(s => s.protocol === 'ddm' && s.payloadType === dt);
+        if (idx !== -1) addSchemaToBuilder(idx);
+      });
+      setOutputFormat('ddm_mobileconfig');
+    }
+
     // =========================================================================
     // 4. MODE SWITCHING & CATALOG RENDERING
     // =========================================================================
@@ -1001,35 +1138,41 @@
 
       const mdmBtn = document.getElementById('modeMdmBtn');
       const ddmBtn = document.getElementById('modeDdmBtn');
-      const bridgedTab = document.getElementById('outTabBridged');
+      const ddmMcTab = document.getElementById('outTabDdmMobileconfig');
       const primaryTab = document.getElementById('outTabPrimary');
       const advBtn = document.getElementById('toggleAdvancedTopLevelBtn');
+      const ddmBanner = document.getElementById('ddmMobileconfigBanner');
 
       if (mode === 'mdm') {
-        mdmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm';
-        ddmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900';
-        document.getElementById('activeProtocolBadge').textContent = 'MDM PROFILE';
+        mdmBtn.className = 'px-3 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm';
+        ddmBtn.className = 'px-3 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900';
+        document.getElementById('activeProtocolBadge').textContent = 'STEP 2: PROFILE DETAILS';
         document.getElementById('activeProtocolBadge').className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800';
-        document.getElementById('metaHeaderLabel').textContent = 'Configuration Profile Top-Level Metadata';
-        document.getElementById('metaNameLabel').textContent = 'PayloadDisplayName';
-        document.getElementById('metaIdentLabel').textContent = 'PayloadIdentifier';
-        document.getElementById('metaExtraLabel').textContent = 'PayloadScope (System / User)';
+        document.getElementById('metaHeaderLabel').textContent = 'General Profile Information';
+        document.getElementById('metaNameLabel').textContent = 'Profile Name (Shown on Device)';
+        document.getElementById('metaIdentLabel').textContent = 'Unique Identifier (Reverse-DNS)';
+        document.getElementById('metaExtraLabel').textContent = 'Install Scope (System / User)';
         document.getElementById('metaScopeOrActivation').value = 'System';
         primaryTab.textContent = '.mobileconfig XML';
-        bridgedTab.classList.add('hidden');
+        primaryTab.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400';
+        ddmMcTab.classList.add('hidden');
+        ddmBanner.classList.add('hidden');
         advBtn.classList.remove('hidden');
       } else {
-        ddmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm';
-        mdmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900';
-        document.getElementById('activeProtocolBadge').textContent = 'DECLARATIVE DDM';
+        ddmBtn.className = 'px-3 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm';
+        mdmBtn.className = 'px-3 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900';
+        document.getElementById('activeProtocolBadge').textContent = 'STEP 2: DECLARATIVE DDM';
         document.getElementById('activeProtocolBadge').className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800';
-        document.getElementById('metaHeaderLabel').textContent = 'Declarative Set & Activation Blueprint Metadata';
-        document.getElementById('metaNameLabel').textContent = 'Blueprint Set Name';
-        document.getElementById('metaIdentLabel').textContent = 'Base Declaration Prefix';
+        document.getElementById('metaHeaderLabel').textContent = 'Declarative Set & Activation Details';
+        document.getElementById('metaNameLabel').textContent = 'Profile / Blueprint Name';
+        document.getElementById('metaIdentLabel').textContent = 'Base Identifier Prefix';
         document.getElementById('metaExtraLabel').textContent = 'Activation Identifier';
-        document.getElementById('metaScopeOrActivation').value = 'com.example.activation.main';
-        primaryTab.textContent = 'DDM Declarations JSON';
-        bridgedTab.classList.remove('hidden');
+        document.getElementById('metaScopeOrActivation').value = 'com.rgm.activation.main';
+        primaryTab.textContent = 'DDM JSON';
+        primaryTab.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400';
+        ddmMcTab.classList.remove('hidden');
+        ddmMcTab.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white';
+        ddmBanner.classList.remove('hidden');
         advBtn.classList.add('hidden');
         document.getElementById('advancedTopLevelPanel').classList.add('hidden');
       }
@@ -1042,12 +1185,12 @@
     function setOutputFormat(fmt) {
       state.outputFormat = fmt;
       const p = document.getElementById('outTabPrimary');
-      const b = document.getElementById('outTabBridged');
+      const m = document.getElementById('outTabDdmMobileconfig');
       if (fmt === 'primary') {
         p.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400';
-        b.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white';
+        m.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white';
       } else {
-        b.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-indigo-400';
+        m.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-indigo-400';
         p.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white';
       }
       refreshOutput();
@@ -1077,21 +1220,21 @@
       const list = document.getElementById('schemaList');
 
       if (!filtered.length) {
-        list.innerHTML = `<div class="p-4 text-center text-xs text-slate-400">No matching schemas found.</div>`;
+        list.innerHTML = `<div class="p-4 text-center text-xs text-slate-400">No matching settings found.</div>`;
         return;
       }
 
       list.innerHTML = filtered.map(schema => {
         const globalIdx = state.schemas.indexOf(schema);
         return `
-          <div class="group p-2.5 rounded-xl border border-slate-100 hover:border-sky-300 hover:bg-sky-50/40 transition cursor-pointer"
+          <div class="group p-2.5 rounded-xl border border-slate-100 hover:border-sky-300 hover:bg-sky-50/50 transition cursor-pointer"
                onclick="addSchemaToBuilder(${globalIdx})">
             <div class="flex items-start justify-between gap-2">
               <div class="min-w-0">
                 <div class="text-xs font-semibold text-slate-800 group-hover:text-sky-700 truncate">${escapeHtml(schema.title)}</div>
                 <div class="text-[10px] font-mono text-slate-400 truncate mt-0.5">${escapeHtml(schema.payloadType)}</div>
               </div>
-              <span class="shrink-0 w-6 h-6 rounded-lg bg-slate-100 group-hover:bg-sky-600 group-hover:text-white text-slate-500 flex items-center justify-center transition">
+              <span class="shrink-0 w-6 h-6 rounded-lg bg-slate-100 group-hover:bg-sky-600 group-hover:text-white text-slate-500 flex items-center justify-center transition" title="Add to Profile">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i>
               </span>
             </div>
@@ -1144,12 +1287,21 @@
         uuid,
         identifier: `${schema.payloadType}.${uuid}`,
         displayName: schema.title,
+        showTechMeta: false,
         schema,
         values: buildDefaultValues(schema.keys)
       });
 
       renderActiveItems();
       refreshOutput();
+    }
+
+    function toggleItemTechMeta(instanceId) {
+      const item = state.activeItems.find(i => i.instanceId === instanceId);
+      if (item) {
+        item.showTechMeta = !item.showTechMeta;
+        renderActiveItems();
+      }
     }
 
     function removeActiveItem(instanceId) {
@@ -1304,14 +1456,15 @@
         <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/70 space-y-2">
           <div class="flex items-center justify-between">
             <div>
-              <span class="text-xs font-bold text-slate-800">Custom Managed Preferences / Properties</span>
-              <span class="text-[10px] font-mono text-slate-400 ml-1.5">ANY</span>
+              <span class="text-xs font-bold text-slate-800">Custom Key / Value Settings</span>
+              <span class="text-[10px] font-mono text-slate-400 ml-1.5">Dictionary</span>
             </div>
             <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '[]', 'kv_map', '[]')"
-              class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-semibold hover:bg-sky-100">
-              + Add Key / Value
+              class="px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-semibold hover:bg-sky-100">
+              + Add Setting Key
             </button>
           </div>
+          ${entries.length === 0 ? `<p class="text-[11px] text-slate-400">Click "+ Add Setting Key" to add custom managed preferences for this app.</p>` : ''}
           <div class="space-y-1.5">
             ${entries.map(([entryKey, entryVal]) => {
               const entryPathStr = escapeHtml(JSON.stringify([entryKey]));
@@ -1361,8 +1514,8 @@
                       <div class="flex items-center justify-between border-b border-slate-100 pb-1">
                         <span class="text-xs font-mono font-bold text-indigo-700">${escapeHtml(teamKey)}</span>
                         <div class="flex items-center gap-2">
-                          <button type="button" onclick="addArrayItem('${item.instanceId}', '${teamPathStr}', 'string', '[]')" class="text-[11px] font-semibold text-sky-600 hover:underline">+ Add Bundle/Type</button>
-                          <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(teamKey)}')" class="text-[11px] text-rose-500 hover:underline">Remove Team</button>
+                          <button type="button" onclick="addArrayItem('${item.instanceId}', '${teamPathStr}', 'string', '[]')" class="text-[11px] font-semibold text-sky-600 hover:underline">+ Add Item</button>
+                          <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(teamKey)}')" class="text-[11px] text-rose-500 hover:underline">Remove</button>
                         </div>
                       </div>
                       <div class="space-y-1.5">
@@ -1398,7 +1551,7 @@
                 </div>
                 <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'dynamic_dict', '${subkeysStr}')"
                   class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-semibold hover:bg-sky-100">
-                  + Add Domain / Entry
+                  + Add Entry
                 </button>
               </div>
               <div class="space-y-2.5">
@@ -1566,7 +1719,7 @@
               </label>
               <select onchange="updateField('${item.instanceId}', '${pathStr}', this.value, '${k.type || 'string'}')"
                 class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none focus:border-sky-500">
-                ${!k.required ? `<option value="">-- Unset --</option>` : ''}
+                ${!k.required ? `<option value="">-- Default / Unset --</option>` : ''}
                 ${k.rangelist.map(opt => `<option value="${escapeHtml(opt)}" ${String(current) === String(opt) ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
               </select>
               ${k.content ? `<p class="text-[11px] text-slate-500">${escapeHtml(k.content)}</p>` : ''}
@@ -1624,26 +1777,33 @@
               </div>
               <div class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(item.schema.supportedOS || '')}</div>
             </div>
-            <button onclick="removeActiveItem('${item.instanceId}')" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Remove">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button onclick="toggleItemTechMeta('${item.instanceId}')" class="px-2 py-1 rounded-lg text-[11px] font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition" title="Show Identifier & UUID">
+                ${item.showTechMeta ? 'Hide IDs' : 'IDs'}
+              </button>
+              <button onclick="removeActiveItem('${item.instanceId}')" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Remove">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
           </div>
 
           <div class="p-4 space-y-3">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3 border-b border-slate-100">
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">${state.protocol === 'mdm' ? 'PayloadIdentifier' : 'Declaration Identifier'}</label>
-                <input type="text" value="${escapeHtml(item.identifier)}"
-                  oninput="itemMetaUpdate('${item.instanceId}', 'identifier', this.value)"
-                  class="w-full px-2.5 py-1 text-xs font-mono border border-slate-200 rounded-lg" />
+            ${item.showTechMeta ? `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3 border-b border-slate-100 bg-slate-50/60 p-2.5 rounded-xl">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">${state.protocol === 'mdm' ? 'PayloadIdentifier' : 'Declaration Identifier'}</label>
+                  <input type="text" value="${escapeHtml(item.identifier)}"
+                    oninput="itemMetaUpdate('${item.instanceId}', 'identifier', this.value)"
+                    class="w-full px-2.5 py-1 text-xs font-mono border border-slate-200 rounded-lg bg-white" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">${state.protocol === 'mdm' ? 'PayloadUUID' : 'ServerToken Seed'}</label>
+                  <input type="text" value="${escapeHtml(item.uuid)}"
+                    oninput="itemMetaUpdate('${item.instanceId}', 'uuid', this.value)"
+                    class="w-full px-2.5 py-1 text-xs font-mono border border-slate-200 rounded-lg bg-white" />
+                </div>
               </div>
-              <div>
-                <label class="block text-[11px] font-semibold text-slate-600 mb-1">${state.protocol === 'mdm' ? 'PayloadUUID' : 'ServerToken Seed'}</label>
-                <input type="text" value="${escapeHtml(item.uuid)}"
-                  oninput="itemMetaUpdate('${item.instanceId}', 'uuid', this.value)"
-                  class="w-full px-2.5 py-1 text-xs font-mono border border-slate-200 rounded-lg" />
-              </div>
-            </div>
+            ` : ''}
 
             <div class="space-y-3">
               ${item.schema.rootKvMap ? renderRootKvMap(item) : renderKeyControls(item, item.schema.keys)}
@@ -1664,7 +1824,7 @@
     }
 
     // =========================================================================
-    // 6. XML PLIST & DECLARATIVE DDM JSON SERIALIZATION + SHA-256 SERVERTOKEN
+    // 6. XML PLIST & DECLARATIVE DDM SERIALIZATION (.mobileconfig + JSON)
     // =========================================================================
     function cleanObject(obj) {
       if (Array.isArray(obj)) {
@@ -1714,10 +1874,10 @@
 
     function buildClassicMobileconfigXml() {
       const displayName = document.getElementById('metaDisplayName').value || 'Corporate Profile';
-      const identifier = document.getElementById('metaIdentifier').value || 'com.example.mdm.profile';
-      const org = document.getElementById('metaOrg').value || 'Enterprise IT';
+      const identifier = document.getElementById('metaIdentifier').value || 'com.rgm.mdm.profile';
+      const org = document.getElementById('metaOrg').value || 'RGM IT';
       const scope = document.getElementById('metaScopeOrActivation').value || 'System';
-      const description = document.getElementById('metaDescription').value || 'Generated by Apple MDM & DDM Studio';
+      const description = document.getElementById('metaDescription').value || 'Created with RGM Profile Editor';
       const targetDeviceType = parseInt(document.getElementById('metaTargetDeviceType').value || '0', 10);
       const removalDisallowed = document.getElementById('metaRemovalDisallowed').checked;
       const removalDateStr = document.getElementById('metaRemovalDate').value.trim();
@@ -1765,7 +1925,7 @@
 
     async function buildDeclarativeBundle() {
       const ddmItems = state.activeItems.filter(i => i.schema.protocol === 'ddm');
-      const activationId = document.getElementById('metaScopeOrActivation').value || 'com.example.activation.main';
+      const activationId = document.getElementById('metaScopeOrActivation').value || 'com.rgm.activation.main';
 
       const declarations = [];
       const configIdentifiers = [];
@@ -1797,9 +1957,41 @@
       }
 
       return {
-        BlueprintName: document.getElementById('metaDisplayName').value || 'DDM Blueprint',
+        BlueprintName: document.getElementById('metaDisplayName').value || 'RGM Declarative Profile',
         Declarations: declarations
       };
+    }
+
+    async function buildDdmMobileconfigXml() {
+      const bundle = await buildDeclarativeBundle();
+      const base64Declarations = bundle.Declarations.map(decl => ({
+        __plistData: utf8ToBase64(JSON.stringify(decl))
+      }));
+
+      const displayName = document.getElementById('metaDisplayName').value || 'RGM Declarative Profile';
+      const identifier = document.getElementById('metaIdentifier').value || 'com.rgm.ddm.profile';
+      const org = document.getElementById('metaOrg').value || 'RGM IT';
+
+      const root = {
+        PayloadContent: [{
+          PayloadType: 'com.apple.declarations',
+          PayloadVersion: 1,
+          PayloadIdentifier: `${identifier}.declarations`,
+          PayloadUUID: uuidv4(),
+          PayloadDisplayName: 'Declarative Management',
+          Declarations: base64Declarations
+        }],
+        PayloadDescription: 'Created with RGM Profile Editor',
+        PayloadDisplayName: displayName,
+        PayloadIdentifier: identifier,
+        PayloadOrganization: org,
+        PayloadRemovalDisallowed: false,
+        PayloadType: 'Configuration',
+        PayloadUUID: uuidv4(),
+        PayloadVersion: 1
+      };
+
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n${jsToPlistXml(root, '')}\n</plist>`;
     }
 
     async function refreshOutput() {
@@ -1811,35 +2003,19 @@
         const xml = buildClassicMobileconfigXml();
         preview.textContent = xml;
         tokenBadge.textContent = `${state.activeItems.filter(i => i.schema.protocol === 'mdm').length} payload(s)`;
-        dlText.textContent = '.mobileconfig';
+        dlText.textContent = 'Download .mobileconfig';
       } else {
         const bundle = await buildDeclarativeBundle();
         const jsonStr = JSON.stringify(bundle, null, 2);
         const bundleHash = await sha256Hex(jsonStr);
-        tokenBadge.textContent = `Token: ${bundleHash.slice(0, 16)}…`;
+        tokenBadge.textContent = `Token: ${bundleHash.slice(0, 14)}…`;
 
         if (state.outputFormat === 'primary') {
           preview.textContent = jsonStr;
-          dlText.textContent = 'declarations.json';
+          dlText.textContent = 'Download JSON';
         } else {
-          const bridgedRoot = {
-            PayloadContent: [{
-              PayloadType: 'com.apple.declarative.management.bridge',
-              PayloadVersion: 1,
-              PayloadIdentifier: (document.getElementById('metaIdentifier').value || 'com.example.ddm') + '.bridge',
-              PayloadUUID: uuidv4(),
-              PayloadDisplayName: 'Declarative Management Declarations',
-              DeclarationsJSON: jsonStr
-            }],
-            PayloadDisplayName: document.getElementById('metaDisplayName').value || 'DDM Bridged Profile',
-            PayloadIdentifier: document.getElementById('metaIdentifier').value || 'com.example.ddm.profile',
-            PayloadOrganization: document.getElementById('metaOrg').value || 'Enterprise IT',
-            PayloadType: 'Configuration',
-            PayloadUUID: uuidv4(),
-            PayloadVersion: 1
-          };
-          preview.textContent = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n${jsToPlistXml(bridgedRoot, '')}\n</plist>`;
-          dlText.textContent = 'ddm-bridged.mobileconfig';
+          preview.textContent = await buildDdmMobileconfigXml();
+          dlText.textContent = 'Download .mobileconfig';
         }
       }
     }
@@ -1868,7 +2044,7 @@
           </div>
         `).join('');
       } catch (err) {
-        listEl.innerHTML = `<div class="p-4 text-xs text-rose-600">Could not reach remote repository (${escapeHtml(err.message)}). You can paste any raw YAML or XML policy definition directly below.</div>`;
+        listEl.innerHTML = `<div class="p-4 text-xs text-rose-600">Could not reach remote catalog (${escapeHtml(err.message)}). You can paste any raw YAML or XML policy definition directly below.</div>`;
       }
     }
 
@@ -2041,6 +2217,7 @@
               uuid: uuidv4(),
               identifier: d.Identifier || d.Type,
               displayName: matched.title,
+              showTechMeta: false,
               schema: matched,
               values: d.Payload || {}
             });
@@ -2076,6 +2253,7 @@
               uuid: PayloadUUID || uuidv4(),
               identifier: PayloadIdentifier || PayloadType,
               displayName: PayloadDisplayName || matched.title,
+              showTechMeta: false,
               schema: matched,
               values: rest
             });
@@ -2121,21 +2299,34 @@
       setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
     }
 
-    function downloadOutput() {
-      const text = document.getElementById('codePreview').textContent;
-      const isJson = state.protocol === 'ddm' && state.outputFormat === 'primary';
-      const filename = isJson ? 'declarations.json' : (state.protocol === 'ddm' ? 'ddm-bridged.mobileconfig' : 'profile.mobileconfig');
-      const mime = isJson ? 'application/json' : 'application/x-apple-aspen-config';
-
-      const blob = new Blob([text], { type: mime });
+    function triggerFileDownload(content, filename, mime) {
+      const blob = new Blob([content], { type: mime });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = filename;
       a.click();
     }
 
+    function downloadOutput() {
+      const text = document.getElementById('codePreview').textContent;
+      const isJson = state.protocol === 'ddm' && state.outputFormat === 'primary';
+      const safeSlug = (document.getElementById('metaDisplayName').value || 'rgm-profile')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'rgm-profile';
+      const filename = isJson ? `${safeSlug}-ddm.json` : `${safeSlug}.mobileconfig`;
+      const mime = isJson ? 'application/json' : 'application/x-apple-aspen-config';
+      triggerFileDownload(text, filename, mime);
+    }
+
+    async function downloadDdmAsMobileconfig() {
+      const xml = await buildDdmMobileconfigXml();
+      const safeSlug = (document.getElementById('metaDisplayName').value || 'rgm-ddm-profile')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'rgm-ddm-profile';
+      triggerFileDownload(xml, `${safeSlug}-ddm.mobileconfig`, 'application/x-apple-aspen-config');
+    }
+
     function openRepoModal() { document.getElementById('repoModal').classList.replace('hidden', 'flex'); }
     function openImportModal() { document.getElementById('importModal').classList.replace('hidden', 'flex'); }
+    function openHelpModal() { document.getElementById('helpModal').classList.replace('hidden', 'flex'); }
     function closeModal(id) { document.getElementById(id).classList.replace('flex', 'hidden'); }
 
     function escapeHtml(str) {
