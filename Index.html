@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apple MDM & DDM Studio — .mobileconfig & Declarative Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    code, pre, textarea.code { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen flex flex-col overflow-hidden">
+
+  <!-- Top Bar -->
+  <header class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shrink-0 z-10">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-sm">
+        <i data-lucide="shield-check" class="w-5 h-5 text-sky-400"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-sm font-bold tracking-tight text-slate-900">Apple MDM & DDM Studio</h1>
+          <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
+            apple/device-management
+          </span>
+        </div>
+        <p class="text-xs text-slate-500">Classic Profiles (.mobileconfig) + Declarative Device Management (JSON & Bridged XML)</p>
+      </div>
+    </div>
+
+    <!-- Protocol Mode Switcher -->
+    <div class="hidden md:flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+      <button onclick="switchMode('mdm')" id="modeMdmBtn"
+        class="px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm">
+        <i data-lucide="file-code-2" class="w-3.5 h-3.5 text-sky-600"></i>
+        MDM Profiles (.mobileconfig)
+      </button>
+      <button onclick="switchMode('ddm')" id="modeDdmBtn"
+        class="px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+        <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-600"></i>
+        Declarative DDM (JSON)
+      </button>
+    </div>
+
+    <!-- Right Actions -->
+    <div class="flex items-center gap-2">
+      <button onclick="loadEnterpriseAppsPreset()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 flex items-center gap-1.5 transition" title="Load Outlook, Chrome, Keystone, Drive, Firefox, Claude & Edge">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-600"></i>
+        <span>Enterprise Apps Preset</span>
+      </button>
+      <button onclick="openRepoModal()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition">
+        <i data-lucide="git-branch" class="w-3.5 h-3.5 text-slate-500"></i>
+        <span>Repo Tree / YAML</span>
+      </button>
+      <button onclick="openImportModal()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition">
+        <i data-lucide="upload" class="w-3.5 h-3.5 text-slate-500"></i>
+        <span>Import</span>
+      </button>
+      <button onclick="openDeployModal()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 shadow-sm transition">
+        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        <span>Push to MDM</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main 3-Column Workspace -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- Left Sidebar: Schema Catalog -->
+    <aside class="w-72 bg-white border-r border-slate-200 flex flex-col shrink-0">
+      <div class="p-3 border-b border-slate-100 space-y-2">
+        <div class="flex items-center justify-between">
+          <span id="catalogHeaderTitle" class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Schema Catalog</span>
+          <span id="schemaCountBadge" class="text-[11px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">0</span>
+        </div>
+        <div class="relative">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+          <input id="schemaSearchInput" type="text" oninput="renderSchemaCatalog()" placeholder="Filter schemas or types..."
+            class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500" />
+        </div>
+        <div class="flex gap-1 overflow-x-auto pb-0.5" id="categoryFilterBar"></div>
+      </div>
+
+      <div id="schemaList" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
+    </aside>
+
+    <!-- Center Column: Profile Metadata + Active Payloads / Declarations Form -->
+    <main class="flex-1 flex flex-col overflow-hidden bg-slate-50/70">
+      <!-- Top Metadata Card -->
+      <div class="bg-white border-b border-slate-200 px-5 py-3.5 shrink-0">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2">
+            <span id="activeProtocolBadge" class="text-[11px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800">MDM PROFILE</span>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500" id="metaHeaderLabel">Configuration Profile Metadata</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="regenerateAllUUIDs()" class="text-[11px] font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1">
+              <i data-lucide="refresh-cw" class="w-3 h-3"></i> Regenerate UUIDs
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaNameLabel">Profile Display Name</label>
+            <input id="metaDisplayName" type="text" value="Corporate Enterprise Configuration" oninput="refreshOutput()"
+              class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaIdentLabel">PayloadIdentifier</label>
+            <input id="metaIdentifier" type="text" value="com.example.mdm.profile" oninput="refreshOutput()"
+              class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Organization</label>
+            <input id="metaOrg" type="text" value="Enterprise IT" oninput="refreshOutput()"
+              class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaExtraLabel">Scope / Activation ID</label>
+            <input id="metaScopeOrActivation" type="text" value="System" oninput="refreshOutput()"
+              class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Items Tabs + Dynamic Form Editor -->
+      <div class="flex-1 overflow-y-auto p-5 space-y-4" id="editorContainer">
+        <div id="emptyEditorState" class="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto py-12">
+          <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
+            <i data-lucide="layers" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-sm font-bold text-slate-800 mb-1">No Payloads or Declarations Added Yet</h3>
+          <p class="text-xs text-slate-500 leading-relaxed mb-4">
+            Select any MDM payload or Declarative DDM schema from the left catalog, click <strong>Enterprise Apps Preset</strong>, or fetch live YAML schemas from <code class="text-slate-700">apple/device-management</code>.
+          </p>
+        </div>
+
+        <div id="activeItemsStack" class="space-y-4 hidden"></div>
+      </div>
+    </main>
+
+    <!-- Right Column: Live XML / JSON Output & Validation -->
+    <aside class="w-[430px] bg-slate-900 text-slate-100 flex flex-col shrink-0 border-l border-slate-800">
+      <div class="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-1.5" id="outputFormatTabs">
+          <button onclick="setOutputFormat('primary')" id="outTabPrimary"
+            class="px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400">
+            .mobileconfig XML
+          </button>
+          <button onclick="setOutputFormat('bridged')" id="outTabBridged"
+            class="px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white hidden">
+            Bridged .mobileconfig
+          </button>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <button onclick="copyOutput()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1 transition">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span id="copyBtnText">Copy</span>
+          </button>
+          <button onclick="downloadOutput()" class="px-2.5 py-1 rounded bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white flex items-center gap-1 transition">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span id="downloadBtnText">Download</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Status / Token Bar -->
+      <div class="px-4 py-2 bg-slate-950/60 border-b border-slate-800 flex items-center justify-between text-[11px]">
+        <span id="validationBadge" class="flex items-center gap-1.5 text-emerald-400 font-medium">
+          <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Valid Apple Schema Output
+        </span>
+        <span id="serverTokenBadge" class="font-mono text-slate-400 truncate max-w-[200px]" title="SHA-256 ServerToken"></span>
+      </div>
+
+      <!-- Code Preview -->
+      <pre id="codePreview" class="flex-1 overflow-auto p-4 text-xs leading-relaxed text-sky-100 font-mono select-all"></pre>
+    </aside>
+  </div>
+
+  <!-- MODAL 1: GitHub Repository Tree & Custom YAML Loader -->
+  <div id="repoModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh]">
+      <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="git-branch" class="w-4 h-4 text-sky-600"></i>
+          <h3 class="text-sm font-bold text-slate-900">Load Schema from apple/device-management</h3>
+        </div>
+        <button onclick="closeModal('repoModal')" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 overflow-y-auto flex-1">
+        <div class="flex gap-2">
+          <select id="repoFolderSelect" onchange="fetchGitHubDirectory()" class="px-3 py-2 text-xs border border-slate-200 rounded-lg bg-slate-50 font-medium">
+            <option value="mdm/profiles">mdm/profiles</option>
+            <option value="declarative/declarations/configurations">declarative/declarations/configurations</option>
+            <option value="declarative/declarations/assets">declarative/declarations/assets</option>
+            <option value="declarative/declarations/activations">declarative/declarations/activations</option>
+            <option value="declarative/declarations/management">declarative/declarations/management</option>
+          </select>
+          <button onclick="fetchGitHubDirectory()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Browse Live Repo
+          </button>
+        </div>
+
+        <div id="repoFileList" class="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-48 overflow-y-auto bg-slate-50">
+          <div class="p-4 text-xs text-slate-500 text-center">Click "Browse Live Repo" to load YAML schemas directly from GitHub, or paste raw YAML below.</div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Or Paste Any Apple Device Management YAML Schema</label>
+          <textarea id="rawYamlInput" rows="7" placeholder="Paste raw YAML from apple/device-management here..."
+            class="w-full p-3 text-xs font-mono border border-slate-200 rounded-xl focus:outline-none focus:border-sky-500"></textarea>
+        </div>
+      </div>
+
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+        <button onclick="closeModal('repoModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900">Cancel</button>
+        <button onclick="parsePastedYaml()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-700 text-white">
+          Parse & Add to Builder
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Import Existing .mobileconfig or DDM JSON -->
+  <div id="importModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-xl overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-slate-900">Import .mobileconfig XML or DDM JSON</h3>
+        <button onclick="closeModal('importModal')" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-3">
+        <input type="file" id="importFileInput" accept=".mobileconfig,.plist,.xml,.json" onchange="handleFileUpload(event)"
+          class="block w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100" />
+        <textarea id="importTextArea" rows="8" placeholder="Paste .mobileconfig XML plist or DDM declaration JSON..."
+          class="w-full p-3 text-xs font-mono border border-slate-200 rounded-xl focus:outline-none focus:border-sky-500"></textarea>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+        <button onclick="closeModal('importModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600">Cancel</button>
+        <button onclick="importFromText()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Import Content</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Upload / Push to Any MDM Solution -->
+  <div id="deployModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="send" class="w-4 h-4 text-sky-600"></i>
+          <h3 class="text-sm font-bold text-slate-900">Upload / Push to MDM Solution</h3>
+        </div>
+        <button onclick="closeModal('deployModal')" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Target MDM Platform</label>
+            <select id="mdmVendorSelect" onchange="updateDeploySnippets()" class="w-full px-2.5 py-2 text-xs border border-slate-200 rounded-lg bg-white">
+              <option value="micromdm">MicroMDM / NanoMDM</option>
+              <option value="fleetdm">FleetDM</option>
+              <option value="simplemdm">SimpleMDM</option>
+              <option value="jamf">Jamf Pro API</option>
+              <option value="intune">Microsoft Intune (Graph API)</option>
+              <option value="custom">Custom REST Endpoint</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">MDM Server Endpoint URL</label>
+            <input id="mdmEndpointUrl" type="url" value="https://mdm.example.com/v1/profiles" oninput="updateDeploySnippets()"
+              class="w-full px-2.5 py-2 text-xs font-mono border border-slate-200 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Bearer Token / API Key</label>
+            <input id="mdmApiToken" type="password" placeholder="••••••••••••" oninput="updateDeploySnippets()"
+              class="w-full px-2.5 py-2 text-xs font-mono border border-slate-200 rounded-lg" />
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-slate-700">Ready-to-Run CLI / cURL Command</span>
+            <button onclick="copyCurlCommand()" class="text-[11px] font-semibold text-sky-600 hover:text-sky-700">Copy cURL</button>
+          </div>
+          <pre id="curlSnippetBox" class="p-3 rounded-xl bg-slate-900 text-sky-200 text-xs font-mono overflow-x-auto"></pre>
+        </div>
+
+        <div id="pushStatusAlert" class="hidden p-3 rounded-xl text-xs"></div>
+      </div>
+
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <span class="text-[11px] text-slate-500">Client-side direct push (requires CORS enabled on your MDM API)</span>
+        <div class="flex gap-2">
+          <button onclick="closeModal('deployModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600">Close</button>
+          <button onclick="executeDirectMdmPush()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5">
+            <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i> Push Now via REST
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. SHARED REUSABLE SUB-SCHEMAS
+    // =========================================================================
+    const BINARY_ID_SUBKEYS = [
+      { key: 'CDHash', title: 'Code directory hash (40-char SHA)', type: 'string' },
+      { key: 'SigningID', title: 'Signing ID', type: 'string' },
+      { key: 'TeamID', title: 'Team ID (or *APPLE*)', type: 'string' },
+      { key: 'PathPrefix', title: 'Path prefix', type: 'string' },
+      { key: 'SigningState', title: 'Signing state', type: 'string', rangelist: ['All', 'TestFlight', 'DeveloperID', 'Enterprise', 'AppStore', 'Apple'], default: 'All' }
+    ];
+
+    function buildAssetReferenceDict(defaultUrl, defaultContentType, contentTypeOptions) {
+      const ctField = contentTypeOptions
+        ? { key: 'ContentType', title: 'Content type', type: 'string', rangelist: contentTypeOptions, default: defaultContentType }
+        : { key: 'ContentType', title: 'Content type', type: 'string', default: defaultContentType };
+      return {
+        key: 'Reference', title: 'External reference', type: 'dictionary', required: true,
+        subkeys: [
+          { key: 'DataURL', title: 'Data URL (https://)', type: 'string', required: true, default: defaultUrl },
+          ctField,
+          { key: 'Size', title: 'Byte size (optional)', type: 'integer' },
+          { key: 'Hash-SHA-256', title: 'SHA-256 hash (hex)', type: 'string' }
+        ]
+      };
+    }
+
+    const ASSET_AUTH_DICT = {
+      key: 'Authentication', title: 'Server authentication', type: 'dictionary',
+      subkeys: [
+        { key: 'Type', title: 'Authentication type', type: 'string', required: true, rangelist: ['MDM', 'None'], default: 'MDM' }
+      ]
+    };
+
+    const ASSET_ACCESSIBLE_FIELD = {
+      key: 'Accessible', title: 'Keychain accessibility', type: 'string', rangelist: ['Default', 'AfterFirstUnlock'], default: 'Default'
+    };
+
+    const SYSTEM_PREF_PANES_LIST = [
+      'com.apple.ClassroomSettings', 'com.apple.Localization', 'com.apple.preference.datetime',
+      'com.apple.preference.desktopscreeneffect', 'com.apple.preference.digihub.discs', 'com.apple.preference.displays',
+      'com.apple.preference.dock', 'com.apple.preference.energysaver', 'com.apple.preference.expose',
+      'com.apple.preference.general', 'com.apple.preference.ink', 'com.apple.preference.keyboard',
+      'com.apple.preference.mouse', 'com.apple.preference.network', 'com.apple.preference.notifications',
+      'com.apple.preference.printfax', 'com.apple.preference.screentime', 'com.apple.preference.security',
+      'com.apple.preference.sidecar', 'com.apple.preference.sound', 'com.apple.preference.speech',
+      'com.apple.preference.spotlight', 'com.apple.preference.startupdisk', 'com.apple.preference.trackpad',
+      'com.apple.preference.universalaccess', 'com.apple.preferences.AppleIDPrefPane', 'com.apple.preferences.appstore',
+      'com.apple.preferences.Bluetooth', 'com.apple.preferences.configurationprofiles', 'com.apple.preferences.extensions',
+      'com.apple.preferences.FamilySharingPrefPane', 'com.apple.preferences.icloud', 'com.apple.preferences.internetaccounts',
+      'com.apple.preferences.parentalcontrols', 'com.apple.preferences.password', 'com.apple.preferences.sharing',
+      'com.apple.preferences.softwareupdate', 'com.apple.preferences.users', 'com.apple.preferences.wallet',
+      'com.apple.prefpanel.fibrechannel', 'com.apple.prefs.backup', 'com.apple.Xsan'
+    ];
+
+    const SYSTEM_SETTINGS_EXTENSIONS_LIST = [
+      'com.apple.Accessibility-Settings.extension', 'com.apple.AirDrop-Handoff-Settings.extension',
+      'com.apple.Battery-Settings.extension', 'com.apple.BluetoothSettings', 'com.apple.CD-DVD-Settings.extension',
+      'com.apple.ClassKit-Settings.extension', 'com.apple.Classroom-Settings.extension',
+      'com.apple.ControlCenter-Settings.extension', 'com.apple.Date-Time-Settings.extension',
+      'com.apple.Desktop-Settings.extension', 'com.apple.Displays-Settings.extension',
+      'com.apple.ExtensionsPreferences', 'com.apple.Family-Settings.extension', 'com.apple.Focus-Settings.extension',
+      'com.apple.Game-Center-Settings.extension', 'com.apple.Game-Controller-Settings.extension',
+      'com.apple.HeadphoneSettings', 'com.apple.Internet-Accounts-Settings.extension',
+      'com.apple.Keyboard-Settings.extension', 'com.apple.Localization-Settings.extension',
+      'com.apple.Lock-Screen-Settings.extension', 'com.apple.LoginItems-Settings.extension',
+      'com.apple.Mouse-Settings.extension', 'com.apple.Network-Settings.extension',
+      'com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension', 'com.apple.Notifications-Settings.extension',
+      'com.apple.Passwords-Settings.extension', 'com.apple.Print-Scan-Settings.extension',
+      'com.apple.Screen-Time-Settings.extension', 'com.apple.ScreenSaver-Settings.extension',
+      'com.apple.Sharing-Settings.extension', 'com.apple.Siri-Settings.extension',
+      'com.apple.Software-Update-Settings.extension', 'com.apple.Sound-Settings.extension',
+      'com.apple.Startup-Disk-Settings.extension', 'com.apple.Time-Machine-Settings.extension',
+      'com.apple.Touch-ID-Settings.extension', 'com.apple.Trackpad-Settings.extension',
+      'com.apple.Transfer-Reset-Settings.extension', 'com.apple.Users-Groups-Settings.extension',
+      'com.apple.WalletSettingsExtension', 'com.apple.Wallpaper-Settings.extension',
+      'com.apple.settings.Storage', 'com.apple.systempreferences.AppleIDSettings', 'com.apple.wifi-settings-extension'
+    ];
+
+    const MEDIA_ACTIONS = ['authenticate', 'read-only', 'deny', 'eject'];
+    const MEDIA_ITEMS_SUBKEYS = [
+      { key: 'cd', title: 'CD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'dvd', title: 'DVD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'bd', title: 'Blu-ray (BD)', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'blankcd', title: 'Blank CD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'blankdvd', title: 'Blank DVD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'blankbd', title: 'Blank Blu-ray', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'dvdram', title: 'DVD-RAM', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'disk-image', title: 'Disk Image (.dmg)', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'harddisk-internal', title: 'Internal Hard Disk', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'harddisk-external', title: 'External Hard Disk / USB / SD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
+      { key: 'networkdisk', title: 'Network Disk', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS }
+    ];
+
+    const TCC_IDENTITY_SUBKEYS = [
+      { key: 'Identifier', title: 'App Bundle ID or binary path (case-sensitive)', type: 'string', required: true, default: 'com.example.corpagent' },
+      { key: 'IdentifierType', title: 'Identifier type', type: 'string', required: true, rangelist: ['bundleID', 'path'], default: 'bundleID' },
+      { key: 'CodeRequirement', title: 'Code Requirement (from codesign -display -r -)', type: 'string', required: true, default: 'anchor apple generic' },
+      { key: 'StaticCode', title: 'Static code validation', type: 'boolean', default: false },
+      { key: 'Authorization', title: 'Authorization (macOS 11+, replaces Allowed)', type: 'string', rangelist: ['Allow', 'Deny', 'AllowStandardUserToSetSystemService'], default: 'Allow' },
+      { key: 'Allowed', title: 'Allowed (boolean, omit if Authorization is set)', type: 'boolean' },
+      { key: 'AEReceiverIdentifier', title: 'AppleEvents Receiver Identifier (AppleEvents only)', type: 'string' },
+      { key: 'AEReceiverIdentifierType', title: 'AppleEvents Receiver Type', type: 'string', rangelist: ['bundleID', 'path'] },
+      { key: 'AEReceiverCodeRequirement', title: 'AppleEvents Receiver Code Requirement', type: 'string' }
+    ];
+
+    const TCC_SERVICES_SUBKEYS = [
+      'SystemPolicyAllFiles', 'ScreenCapture', 'Accessibility', 'PostEvent', 'ListenEvent',
+      'SystemPolicySysAdminFiles', 'SystemPolicyDesktopFolder', 'SystemPolicyDocumentsFolder',
+      'SystemPolicyDownloadsFolder', 'SystemPolicyNetworkVolumes', 'SystemPolicyRemovableVolumes',
+      'SystemPolicyAppBundles', 'SystemPolicyAppData', 'AddressBook', 'Calendar', 'Reminders',
+      'Photos', 'Camera', 'Microphone', 'BluetoothAlways', 'SpeechRecognition', 'AppleEvents',
+      'MediaLibrary', 'FileProviderPresence'
+    ].map(svc => ({
+      key: svc, title: svc, type: 'array', itemType: 'dictionary', subkeys: TCC_IDENTITY_SUBKEYS
+    }));
+
+    const VPN_SA_SUBKEYS = [
+      { key: 'EncryptionAlgorithm', title: 'Encryption algorithm', type: 'string', rangelist: ['DES', '3DES', 'AES-128', 'AES-256', 'AES-128-GCM', 'AES-256-GCM', 'ChaCha20Poly1305'], default: 'AES-256' },
+      { key: 'IntegrityAlgorithm', title: 'Integrity algorithm', type: 'string', rangelist: ['SHA1-96', 'SHA1-160', 'SHA2-256', 'SHA2-384', 'SHA2-512'], default: 'SHA2-256' },
+      { key: 'DiffieHellmanGroup', title: 'Diffie-Hellman group', type: 'integer', rangelist: [1, 2, 5, 14, 15, 16, 17, 18, 19, 20, 21, 31, 32], default: 14 },
+      { key: 'PostQuantumKeyExchangeMethods', title: 'Post-quantum key exchange methods (RFC 9370)', type: 'array', itemType: 'integer', rangelist: [0, 36, 37] },
+      { key: 'LifeTimeInMinutes', title: 'SA lifetime in minutes (10-1440)', type: 'integer', default: 1440 }
+    ];
+
+    const ON_DEMAND_RULES_SUBKEYS = [
+      { key: 'Action', title: 'On demand action', type: 'string', required: true, rangelist: ['Allow', 'Connect', 'Disconnect', 'EvaluateConnection', 'Ignore'], default: 'Connect' },
+      {
+        key: 'ActionParameters', title: 'Action parameters (for EvaluateConnection)', type: 'array', itemType: 'dictionary',
+        subkeys: [
+          { key: 'Domains', title: 'Domains', type: 'array', itemType: 'string', required: true },
+          { key: 'DomainAction', title: 'Domain action', type: 'string', required: true, rangelist: ['ConnectIfNeeded', 'NeverConnect'], default: 'ConnectIfNeeded' },
+          { key: 'RequiredDNSServers', title: 'Required DNS servers', type: 'array', itemType: 'string' },
+          { key: 'RequiredURLStringProbe', title: 'Required URL string probe', type: 'string' }
+        ]
+      },
+      { key: 'DNSDomainMatch', title: 'DNS domain match', type: 'array', itemType: 'string' },
+      { key: 'DNSServerAddressMatch', title: 'DNS server address match', type: 'array', itemType: 'string' },
+      { key: 'InterfaceTypeMatch', title: 'Interface type match', type: 'string', rangelist: ['Ethernet', 'WiFi', 'Cellular'] },
+      { key: 'SSIDMatch', title: 'SSID match', type: 'array', itemType: 'string' },
+      { key: 'URLStringProbe', title: 'URL string probe', type: 'string' }
+    ];
+
+    const VPN_COMMON_SUBKEYS = [
+      { key: 'UserDefinedName', title: 'VPN connection display name', type: 'string', required: true, default: 'Corporate VPN' },
+      { key: 'VPNType', title: 'VPN type', type: 'string', required: true, rangelist: ['IKEv2', 'IPSec', 'L2TP', 'VPN', 'AlwaysOn', 'TransparentProxy'], default: 'IKEv2' },
+      { key: 'VPNSubType', title: 'VPN SubType (Plugin Bundle ID when VPNType = VPN/TransparentProxy)', type: 'string' },
+      {
+        key: 'VendorConfig', title: 'Vendor configuration', type: 'dictionary',
+        subkeys: [
+          { key: 'Realm', title: 'Realm (Juniper/Pulse)', type: 'string' },
+          { key: 'Role', title: 'Role (Juniper/Pulse)', type: 'string' },
+          { key: 'Group', title: 'Group (Cisco AnyConnect)', type: 'string' },
+          { key: 'LoginGroupOrDomain', title: 'Login group/domain (SonicWALL)', type: 'string' }
+        ]
+      },
+      {
+        key: 'IKEv2', title: 'IKEv2 settings (when VPNType = IKEv2)', type: 'dictionary',
+        subkeys: [
+          { key: 'RemoteAddress', title: 'VPN server address', type: 'string', required: true, default: 'vpn.example.com' },
+          { key: 'LocalIdentifier', title: 'Local identifier', type: 'string', required: true, default: 'client.example.com' },
+          { key: 'RemoteIdentifier', title: 'Remote identifier', type: 'string', required: true, default: 'vpn.example.com' },
+          { key: 'AuthenticationMethod', title: 'Authentication method', type: 'string', required: true, rangelist: ['None', 'SharedSecret', 'Certificate'], default: 'Certificate' },
+          { key: 'PayloadCertificateUUID', title: 'Client identity certificate PayloadUUID', type: 'string' },
+          { key: 'SharedSecret', title: 'Shared secret (when SharedSecret)', type: 'string' },
+          { key: 'ExtendedAuthEnabled', title: 'Enable EAP authentication (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'AuthName', title: 'EAP Username', type: 'string' },
+          { key: 'AuthPassword', title: 'EAP Password', type: 'string' },
+          { key: 'IncludeAllNetworks', title: 'Include all networks / Full tunnel (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'ExcludeLocalNetworks', title: 'Exclude local networks (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
+          { key: 'OnDemandEnabled', title: 'Enable VPN On Demand (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'OnDemandRules', title: 'On Demand rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS },
+          { key: 'EnablePFS', title: 'Enable Perfect Forward Secrecy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
+          { key: 'MTU', title: 'MTU (1280-1400)', type: 'integer', default: 1280 },
+          { key: 'PPK', title: 'Post-quantum pre-shared key (Base64 <data>)', type: 'data' },
+          { key: 'PPKIdentifier', title: 'Post-quantum PPK identifier', type: 'string' },
+          { key: 'IKESecurityAssociationParameters', title: 'IKE SA parameters', type: 'dictionary', subkeys: VPN_SA_SUBKEYS },
+          { key: 'ChildSecurityAssociationParameters', title: 'Child SA parameters', type: 'dictionary', subkeys: VPN_SA_SUBKEYS }
+        ]
+      },
+      {
+        key: 'VPN', title: 'SSL / Plugin VPN settings (when VPNType = VPN)', type: 'dictionary',
+        subkeys: [
+          { key: 'RemoteAddress', title: 'VPN server address', type: 'string', required: true, default: 'sslvpn.example.com' },
+          { key: 'AuthenticationMethod', title: 'Authentication method', type: 'string', rangelist: ['Password', 'Certificate', 'Password+Certificate'], default: 'Password' },
+          { key: 'AuthName', title: 'Username', type: 'string' },
+          { key: 'AuthPassword', title: 'Password', type: 'string' },
+          { key: 'PayloadCertificateUUID', title: 'Certificate PayloadUUID', type: 'string' },
+          { key: 'ProviderBundleIdentifier', title: 'Network Extension provider Bundle ID', type: 'string' },
+          { key: 'ProviderDesignatedRequirement', title: 'Provider designated requirement (macOS)', type: 'string' },
+          { key: 'ProviderType', title: 'Provider type', type: 'string', rangelist: ['packet-tunnel', 'app-proxy'], default: 'packet-tunnel' },
+          { key: 'OnDemandEnabled', title: 'Enable VPN On Demand (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'OnDemandRules', title: 'On Demand rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS }
+        ]
+      },
+      {
+        key: 'IPSec', title: 'Cisco IPSec / L2TP IPSec settings', type: 'dictionary',
+        subkeys: [
+          { key: 'RemoteAddress', title: 'VPN server address', type: 'string', default: 'ipsec.example.com' },
+          { key: 'AuthenticationMethod', title: 'Authentication method', type: 'string', rangelist: ['SharedSecret', 'Certificate'], default: 'SharedSecret' },
+          { key: 'LocalIdentifier', title: 'Group name (LocalIdentifier)', type: 'string' },
+          { key: 'SharedSecret', title: 'Shared secret (Base64 <data>)', type: 'data' },
+          { key: 'XAuthEnabled', title: 'XAuth enabled (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
+          { key: 'XAuthName', title: 'XAuth username', type: 'string' },
+          { key: 'XAuthPassword', title: 'XAuth password', type: 'string' },
+          { key: 'PayloadCertificateUUID', title: 'Certificate PayloadUUID', type: 'string' }
+        ]
+      },
+      {
+        key: 'DNS', title: 'VPN DNS settings', type: 'dictionary',
+        subkeys: [
+          { key: 'DNSProtocol', title: 'DNS protocol (iOS 14+ / macOS 11+)', type: 'string', required: true, rangelist: ['Cleartext', 'HTTPS', 'TLS'], default: 'Cleartext' },
+          { key: 'ServerAddresses', title: 'DNS server IP addresses', type: 'array', itemType: 'string', required: true },
+          { key: 'SearchDomains', title: 'Search domains', type: 'array', itemType: 'string' },
+          { key: 'DomainName', title: 'Primary domain name', type: 'string' },
+          { key: 'SupplementalMatchDomains', title: 'Supplemental match domains', type: 'array', itemType: 'string' },
+          { key: 'ServerURL', title: 'DoH Server URL (when HTTPS)', type: 'string' },
+          { key: 'ServerName', title: 'DoT Server hostname (when TLS)', type: 'string' }
+        ]
+      },
+      {
+        key: 'Proxies', title: 'VPN Proxy settings', type: 'dictionary',
+        subkeys: [
+          { key: 'HTTPEnable', title: 'Enable HTTP proxy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'HTTPProxy', title: 'HTTP proxy host', type: 'string' },
+          { key: 'HTTPPort', title: 'HTTP proxy port', type: 'integer' },
+          { key: 'HTTPSEnable', title: 'Enable HTTPS proxy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'HTTPSProxy', title: 'HTTPS proxy host', type: 'string' },
+          { key: 'HTTPSPort', title: 'HTTPS proxy port', type: 'integer' },
+          { key: 'ProxyAutoConfigEnable', title: 'Enable PAC auto-config (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'ProxyAutoConfigURLString', title: 'PAC URL', type: 'string' }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 2. BUILT-IN CATALOG (CLASSIC MDM PROFILES + ENTERPRISE APPS + DDM)
+    // =========================================================================
+    const BUILTIN_SCHEMAS = [
+      // --- CLASSIC MDM PROFILES (.mobileconfig) - UPLOADED BATCH 11 (201-210) ---
+      {
+        protocol: 'mdm',
+        category: 'System & Desktop',
+        title: 'System Preferences / System Settings',
+        payloadType: 'com.apple.systempreferences',
+        description: 'Hides or enables System Preferences panes and macOS 13+ System Settings extensions (DisabledSystemSettings).',
+        supportedOS: 'macOS 10.7+ (Deprecated in 13.0)',
+        keys: [
+          { key: 'DisabledSystemSettings', title: 'Disabled System Settings extensions (macOS 13+)', type: 'array', itemType: 'string', rangelist: SYSTEM_SETTINGS_EXTENSIONS_LIST },
+          { key: 'DisabledPreferencePanes', title: 'Disabled legacy Preference Panes (macOS < 13)', type: 'array', itemType: 'string', rangelist: SYSTEM_PREF_PANES_LIST },
+          { key: 'EnabledPreferencePanes', title: 'Enabled legacy Preference Panes (macOS < 13)', type: 'array', itemType: 'string', rangelist: SYSTEM_PREF_PANES_LIST }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Media & Peripherals',
+        title: 'Media Management: Allowed Media',
+        payloadType: 'com.apple.systemuiserver',
+        description: 'Controls mount, unmount, and logout-eject policies for external drives, USB, SD cards, disk images, and optical media on macOS.',
+        supportedOS: 'macOS 10.7–10.15 (Deprecated in 11.0)',
+        keys: [
+          { key: 'mount-controls', title: 'Volume mount controls', type: 'dictionary', subkeys: MEDIA_ITEMS_SUBKEYS },
+          { key: 'unmount-controls', title: 'Volume unmount controls', type: 'dictionary', subkeys: MEDIA_ITEMS_SUBKEYS },
+          { key: 'logout-eject', title: 'Eject on logout controls', type: 'dictionary', subkeys: MEDIA_ITEMS_SUBKEYS }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Identity',
+        title: 'Privacy Preferences Policy Control (TCC)',
+        payloadType: 'com.apple.TCC.configuration-profile-policy',
+        description: 'Pre-approves or denies macOS TCC privacy permissions (Full Disk Access, Screen Recording, Accessibility, AppleEvents, Camera, Mic, Folders).',
+        supportedOS: 'macOS 10.14+ (User-Approved MDM)',
+        keys: [
+          { key: 'Services', title: 'TCC Privacy Services', type: 'dictionary', required: true, subkeys: TCC_SERVICES_SUBKEYS }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network',
+        title: '802.1X: Third Active Ethernet',
+        payloadType: 'com.apple.thirdactiveethernet.managed',
+        description: 'Configures 802.1X wired authentication for the third active Ethernet interface on macOS.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          { key: 'Interface', title: 'Interface type', type: 'string', rangelist: ['ThirdActiveEthernet'], default: 'ThirdActiveEthernet' },
+          { key: 'SetupModes', title: 'Setup mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
+          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (802.1X keys)', type: 'kv_map' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network',
+        title: '802.1X: Third Ethernet',
+        payloadType: 'com.apple.thirdethernet.managed',
+        description: 'Configures 802.1X wired authentication for the third Ethernet interface by service order on macOS.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          { key: 'Interface', title: 'Interface type', type: 'string', rangelist: ['ThirdEthernet'], default: 'ThirdEthernet' },
+          { key: 'SetupModes', title: 'Setup mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
+          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (802.1X keys)', type: 'kv_map' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Media & Peripherals',
+        title: 'TV Remote',
+        payloadType: 'com.apple.tvremote',
+        description: 'Restricts which iOS devices can control an Apple TV and which Apple TVs an iOS device can control via the Remote app.',
+        supportedOS: 'iOS 11.3+, tvOS 11.3+ (Supervised)',
+        keys: [
+          {
+            key: 'AllowedTVs', title: 'Allowed Apple TVs (for iOS devices)', type: 'array', itemType: 'dictionary',
+            subkeys: [
+              { key: 'TVDeviceID', title: 'Apple TV MAC address (xx:xx:xx:xx:xx:xx)', type: 'string', required: true, default: 'AA:BB:CC:DD:EE:FF' },
+              { key: 'TVDeviceName', title: 'Apple TV device name (iOS 15+)', type: 'string', default: 'Boardroom Apple TV' }
+            ]
+          },
+          {
+            key: 'AllowedRemotes', title: 'Allowed iOS Remotes (for Apple TV)', type: 'array', itemType: 'dictionary',
+            subkeys: [
+              { key: 'RemoteDeviceID', title: 'iOS device MAC address (xx:xx:xx:xx:xx:xx)', type: 'string', required: true, default: '11:22:33:44:55:66' }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'System & Desktop',
+        title: 'Accessibility',
+        payloadType: 'com.apple.universalaccess',
+        description: 'Configures macOS accessibility features including VoiceOver, Zoom, Sticky Keys, Slow Keys, Mouse Keys, Contrast, and Invert Colors.',
+        supportedOS: 'macOS 10.9+',
+        keys: [
+          { key: 'voiceOverOnOffKey', title: 'Enable VoiceOver', type: 'boolean', default: false },
+          { key: 'whiteOnBlack', title: 'Enable Invert Colors', type: 'boolean', default: false },
+          { key: 'contrast', title: 'Display contrast (0.0 to 1.0)', type: 'real', default: 0.0 },
+          { key: 'flashScreen', title: 'Flash screen on alert sound', type: 'boolean', default: false },
+          { key: 'stereoAsMono', title: 'Play stereo audio as mono', type: 'boolean', default: false },
+          { key: 'closeViewHotkeysEnabled', title: 'Enable Zoom keyboard shortcuts', type: 'boolean', default: false },
+          { key: 'closeViewScrollWheelToggle', title: 'Enable Zoom scroll gesture', type: 'boolean', default: false },
+          { key: 'closeViewSmoothImages', title: 'Smooth images when zoomed', type: 'boolean', default: false },
+          { key: 'closeViewFarPoint', title: 'Minimum zoom level', type: 'integer' },
+          { key: 'closeViewNearPoint', title: 'Maximum zoom level', type: 'integer' },
+          { key: 'stickyKey', title: 'Enable Sticky Keys', type: 'boolean', default: false },
+          { key: 'stickyKeyBeepOnModifier', title: 'Beep when modifier key set (Sticky Keys)', type: 'boolean', default: false },
+          { key: 'stickyKeyShowWindow', title: 'Display pressed keys on screen', type: 'boolean', default: false },
+          { key: 'slowKey', title: 'Enable Slow Keys', type: 'boolean', default: false },
+          { key: 'slowKeyBeepOn', title: 'Click key sounds (Slow Keys)', type: 'boolean', default: false },
+          { key: 'slowKeyDelay', title: 'Slow Keys acceptance delay (ms)', type: 'integer' },
+          { key: 'mouseDriver', title: 'Enable Mouse Keys', type: 'boolean', default: false },
+          { key: 'mouseDriverIgnoreTrackpad', title: 'Ignore built-in trackpad when Mouse Keys on', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network',
+        title: 'App-Layer VPN (Per-App VPN)',
+        payloadType: 'com.apple.vpn.managed.applayer',
+        description: 'Configures a Per-App VPN tunnel triggered by managed apps, Safari domains, Associated Domains, SMB domains, or Cellular Slices.',
+        supportedOS: 'iOS 7.0+, macOS 10.9+, visionOS 1.1+, watchOS 10.0+',
+        keys: [
+          { key: 'VPNUUID', title: 'Per-App VPN UUID (referenced by managed apps)', type: 'string', required: true, default: '11111111-2222-4333-8444-555555555555' },
+          { key: 'OnDemandMatchAppEnabled', title: 'Auto-connect VPN when associated apps use network', type: 'boolean', default: true },
+          { key: 'SafariDomains', title: 'Safari domains triggering VPN', type: 'array', itemType: 'string' },
+          { key: 'AssociatedDomains', title: 'Associated domains triggering VPN (iOS 14+ / macOS 11+)', type: 'array', itemType: 'string' },
+          { key: 'ExcludedDomains', title: 'Excluded domains', type: 'array', itemType: 'string' },
+          { key: 'SMBDomains', title: 'SMB domains accessible via VPN (iOS 13+)', type: 'array', itemType: 'string' },
+          { key: 'CellularSliceUUID', title: 'Cellular Slice DNN / AppCategory (iOS 18+)', type: 'string' },
+          ...VPN_COMMON_SUBKEYS
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network',
+        title: 'App-to-App-Layer VPN Mapping (macOS)',
+        payloadType: 'com.apple.vpn.managed.appmapping',
+        description: 'Maps macOS applications and spawned command-line helper tools to a Per-App VPNUUID using code-signing requirements.',
+        supportedOS: 'macOS 10.9+',
+        keys: [
+          {
+            key: 'AppLayerVPNMapping', title: 'App-to-VPN mappings', type: 'array', itemType: 'dictionary', required: true,
+            subkeys: [
+              { key: 'Identifier', title: 'App bundle identifier', type: 'string', required: true, default: 'com.example.corpapp' },
+              { key: 'VPNUUID', title: 'Target Per-App VPNUUID', type: 'string', required: true, default: '11111111-2222-4333-8444-555555555555' },
+              { key: 'SigningIdentifier', title: 'Code signature signing identifier', type: 'string', required: true, default: 'com.example.corpapp' },
+              { key: 'DesignatedRequirement', title: 'Designated Requirement (codesign -d -r -)', type: 'string', required: true, default: 'anchor apple generic' },
+              { key: 'Path', title: 'Executable file-system path (optional)', type: 'string' },
+              {
+                key: 'MatchTools', title: 'Spawned helper/CLI tool rules (macOS 10.15.4+)', type: 'array', itemType: 'dictionary',
+                subkeys: [
+                  { key: 'SigningIdentifier', title: 'Tool signing identifier', type: 'string', required: true },
+                  { key: 'DesignatedRequirement', title: 'Tool designated requirement', type: 'string', required: true },
+                  { key: 'Path', title: 'Tool file-system path', type: 'string' }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network',
+        title: 'VPN (IKEv2 / IPSec / SSL / AlwaysOn / TransparentProxy)',
+        payloadType: 'com.apple.vpn.managed',
+        description: 'Configures device-wide IKEv2, Cisco IPSec, L2TP, SSL VPN plugins, iOS AlwaysOn VPN, and macOS TransparentProxy.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 17.0+, visionOS 1.0+',
+        keys: VPN_COMMON_SUBKEYS
+      },
+
+      // --- THIRD-PARTY ENTERPRISE APPS (FROM UPLOADED Test.mobileconfig) ---
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Microsoft Outlook',
+        payloadType: 'com.microsoft.Outlook',
+        description: 'Configures managed preferences for Microsoft Outlook for Mac.',
+        supportedOS: 'macOS Managed App Preferences',
+        rootKvMap: true,
+        keys: []
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Google Chrome',
+        payloadType: 'com.google.Chrome',
+        description: 'Configures managed enterprise browser policies for Google Chrome.',
+        supportedOS: 'macOS Managed App Preferences',
+        keys: [
+          { key: 'HomepageLocation', title: 'Homepage URL', type: 'string', default: 'www.apple.com' },
+          { key: 'NewTabPageLocation', title: 'New Tab Page URL', type: 'string', default: 'www.apple.com' },
+          { key: 'ShowHomeButton', title: 'Show Home button on toolbar', type: 'boolean', default: true },
+          { key: 'DefaultBrowserSettingEnabled', title: 'Set Chrome as default browser', type: 'boolean', default: true },
+          { key: 'BlockThirdPartyCookies', title: 'Block third-party cookies', type: 'boolean', default: true },
+          { key: 'DefaultCookiesSetting', title: 'Default cookies setting (1=Allow, 2=Block, 4=Session)', type: 'integer', rangelist: [1, 2, 4], default: 2 },
+          { key: 'RestoreOnStartup', title: 'Action on startup (1=Restore, 4=URLs, 5=New Tab)', type: 'integer', rangelist: [1, 4, 5], default: 5 },
+          { key: 'PasswordLeakDetectionEnabled', title: 'Enable password leak detection', type: 'boolean', default: true },
+          { key: 'ReportSafeBrowsingData', title: 'Report Safe Browsing telemetry', type: 'boolean', default: true },
+          { key: 'CloudReportingEnabled', title: 'Enable Chrome Browser Cloud Management reporting', type: 'boolean', default: true },
+          { key: 'CloudExtensionRequestEnabled', title: 'Allow users to request extensions in cloud', type: 'boolean', default: true },
+          { key: 'AllowWebAuthnWithBrokenTlsCerts', title: 'Allow WebAuthn with broken TLS certs', type: 'boolean', default: true },
+          { key: 'DomainReliabilityAllowed', title: 'Allow domain reliability monitoring', type: 'boolean', default: true },
+          { key: 'EnterpriseProfileCreationKeepBrowsingData', title: 'Keep browsing data on enterprise profile creation', type: 'boolean', default: true },
+          { key: 'NativeMessagingUserLevelHosts', title: 'Allow user-level native messaging hosts', type: 'boolean', default: true },
+          { key: 'ShowCastIconInToolbar', title: 'Show Cast icon in toolbar', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Google Software Update Preferences',
+        payloadType: 'com.google.Keystone',
+        description: 'Configures Google Software Update (Keystone) update check intervals and policies.',
+        supportedOS: 'macOS Managed App Preferences',
+        rootKvMap: true,
+        keys: []
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Google Drive for desktop',
+        payloadType: 'com.google.drivefs.settings',
+        description: 'Configures managed settings for Google Drive for desktop on macOS.',
+        supportedOS: 'macOS Managed App Preferences',
+        rootKvMap: true,
+        keys: []
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Firefox',
+        payloadType: 'org.mozilla.firefox',
+        description: 'Enables and configures Mozilla Firefox enterprise policies on macOS.',
+        supportedOS: 'macOS Managed App Preferences',
+        keys: [
+          { key: 'EnterprisePoliciesEnabled', title: 'Enable Firefox Enterprise Policies', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Claude (Claude for Desktop)',
+        payloadType: 'com.anthropic.claudefordesktop',
+        description: 'Configures managed enterprise preferences for Claude for Desktop on macOS.',
+        supportedOS: 'macOS Managed App Preferences',
+        rootKvMap: true,
+        keys: []
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Microsoft Edge',
+        payloadType: 'com.microsoft.Edge',
+        description: 'Configures managed enterprise browser policies for Microsoft Edge.',
+        supportedOS: 'macOS Managed App Preferences',
+        keys: [
+          { key: 'BlockThirdPartyCookies', title: 'Block third-party cookies', type: 'boolean', default: true },
+          { key: 'DefaultImagesSetting', title: 'Default images setting (1=Allow, 2=Block)', type: 'integer', rangelist: [1, 2], default: 2 },
+          { key: 'DefaultInsecureContentSetting', title: 'Default insecure content setting (1=Allow, 2=Block)', type: 'integer', rangelist: [1, 2], default: 2 },
+          { key: 'MediaRouterCastAllowAllIPs', title: 'Allow Media Router Cast on all IPs', type: 'boolean', default: true },
+          { key: 'NativeMessagingUserLevelHosts', title: 'Allow user-level native messaging hosts', type: 'boolean', default: true },
+          { key: 'NewTabPageHideDefaultTopSites', title: 'Hide default top sites on New Tab Page', type: 'boolean', default: true },
+          { key: 'ShowCastIconInToolbar', title: 'Show Cast icon in toolbar', type: 'boolean', default: true }
+        ]
+      },
+
+      // --- CORE CLASSIC MDM PROFILES ---
+      {
+        protocol: 'mdm',
+        category: 'MDM Enrollment',
+        title: 'MDM (Enrollment Payload)',
+        payloadType: 'com.apple.mdm',
+        description: 'Configures the core Mobile Device Management (MDM) check-in URL, server URL, APNs topic, identity certificate, and access rights.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [
+          { key: 'IdentityCertificateUUID', title: 'Identity certificate / SCEP PayloadUUID', type: 'string', required: true, default: '00000000-0000-0000-0000-000000000000' },
+          { key: 'Topic', title: 'APNs Push Topic (com.apple.mgmt.*)', type: 'string', required: true, default: 'com.apple.mgmt.External.00000000-0000-0000-0000-000000000000' },
+          { key: 'ServerURL', title: 'MDM Server URL (https://)', type: 'string', required: true, default: 'https://mdm.example.com/mdm/connect' },
+          { key: 'CheckInURL', title: 'MDM Check-In URL (https://)', type: 'string', default: 'https://mdm.example.com/mdm/checkin' },
+          { key: 'SignMessage', title: 'Sign device messages', type: 'boolean', default: true },
+          { key: 'AccessRights', title: 'Access rights bitmask', type: 'integer', default: 8191 }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Restrictions',
+        title: 'Restrictions',
+        payloadType: 'com.apple.applicationaccess',
+        description: 'Configures device, iCloud, Safari, Siri, AirDrop, App Store, and media rating restrictions.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [
+          { key: 'allowCamera', title: 'Allow camera use', type: 'boolean', default: true },
+          { key: 'allowScreenShot', title: 'Allow screenshots and screen recording', type: 'boolean', default: true },
+          { key: 'allowAirDrop', title: 'Allow AirDrop', type: 'boolean', default: true },
+          { key: 'allowUSBRestrictedMode', title: 'USB Restricted Mode (block USB while locked)', type: 'boolean', default: true },
+          { key: 'allowEraseContentAndSettings', title: 'Allow Erase All Content and Settings', type: 'boolean', default: true },
+          { key: 'allowCloudBackup', title: 'Allow iCloud Backup', type: 'boolean', default: true },
+          { key: 'allowAppInstallation', title: 'Allow app installation (App Store & local)', type: 'boolean', default: true },
+          { key: 'allowSafari', title: 'Allow Safari browser', type: 'boolean', default: true },
+          { key: 'forceEncryptedBackup', title: 'Force encrypted backups', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network',
+        title: 'Wi-Fi Configuration',
+        payloadType: 'com.apple.wifi.managed',
+        description: 'Configures enterprise or WPA2/WPA3 Wi-Fi networks.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+',
+        keys: [
+          { key: 'SSID_STR', title: 'Network SSID', type: 'string', required: true, default: 'Corp-WiFi' },
+          { key: 'HIDDEN_NETWORK', title: 'Hidden Network', type: 'boolean', default: false },
+          { key: 'AutoJoin', title: 'Auto Join', type: 'boolean', default: true },
+          { key: 'EncryptionType', title: 'Encryption Type', type: 'string', rangelist: ['WPA', 'WPA2', 'WPA3', 'WEP', 'Any', 'None'], default: 'WPA2' },
+          { key: 'Password', title: 'Pre-Shared Password', type: 'string', default: '' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Identity',
+        title: 'Passcode',
+        payloadType: 'com.apple.mobiledevice.passwordpolicy',
+        description: 'Enforces passcode length, alphanumeric/complex character rules, expiration, and failed attempts.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, visionOS 2.0+, watchOS 10.0+',
+        keys: [
+          { key: 'forcePIN', title: 'Require passcode on device', type: 'boolean', default: true },
+          { key: 'allowSimple', title: 'Allow simple passcode', type: 'boolean', default: false },
+          { key: 'requireAlphanumeric', title: 'Require alphanumeric characters', type: 'boolean', default: false },
+          { key: 'minLength', title: 'Minimum passcode length (0-16)', type: 'integer', default: 6 },
+          { key: 'minComplexChars', title: 'Minimum complex symbol characters (0-4)', type: 'integer', default: 1 },
+          { key: 'maxFailedAttempts', title: 'Max failed attempts before wipe/lock (2-11)', type: 'integer', default: 10 },
+          { key: 'maxInactivity', title: 'Auto-lock inactivity timeout (minutes)', type: 'integer', default: 5 }
+        ]
+      },
+
+      // --- DECLARATIVE DEVICE MANAGEMENT (DDM) - CONFIGURATIONS, ASSETS & MGMT ---
+      {
+        protocol: 'ddm',
+        category: 'System & Accessibility',
+        title: 'Accessibility Settings',
+        payloadType: 'com.apple.configuration.accessibility.settings',
+        description: 'The declaration to configure accessibility settings.',
+        supportedOS: 'iOS 27.0+, macOS 27.0+, visionOS 27.0+',
+        keys: [
+          {
+            key: 'Vision', title: 'Vision', type: 'dictionary',
+            subkeys: [{ key: 'AllowLiveRecognition', title: 'Allow live recognition', type: 'boolean', default: true }]
+          }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Accounts',
+        title: 'Account: CalDAV',
+        payloadType: 'com.apple.configuration.account.caldav',
+        description: 'The declaration to configure a Calendar account.',
+        supportedOS: 'iOS 15.0+, macOS 13.0+, visionOS 1.1+',
+        keys: [
+          { key: 'VisibleName', title: 'Account name', type: 'string', default: 'Corporate Calendar' },
+          { key: 'HostName', title: 'Server host name', type: 'string', required: true, default: 'caldav.example.com' },
+          { key: 'Port', title: 'Server port', type: 'integer', default: 443 },
+          { key: 'Path', title: 'Server path', type: 'string', default: '/principals/' },
+          { key: 'AuthenticationCredentialsAssetReference', title: 'Auth credentials asset reference', type: 'string', default: 'com.example.asset.cred.caldav' }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Accounts',
+        title: 'Account: CardDAV',
+        payloadType: 'com.apple.configuration.account.carddav',
+        description: 'The declaration to configure a Contacts account.',
+        supportedOS: 'iOS 15.0+, macOS 13.0+, visionOS 1.1+',
+        keys: [
+          { key: 'VisibleName', title: 'Account name', type: 'string', default: 'Corporate Contacts' },
+          { key: 'HostName', title: 'Server host name', type: 'string', required: true, default: 'carddav.example.com' },
+          { key: 'Port', title: 'Server port', type: 'integer', default: 443 },
+          { key: 'Path', title: 'Server path', type: 'string', default: '/addressbooks/' },
+          { key: 'AuthenticationCredentialsAssetReference', title: 'Auth credentials asset reference', type: 'string', default: 'com.example.asset.cred.carddav' }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Apps & Web',
+        title: 'App: Managed',
+        payloadType: 'com.apple.configuration.app.managed',
+        description: 'The declaration to configure and install a managed App Store, Enterprise, or packaged app.',
+        supportedOS: 'iOS 17.2+, macOS 26.0+, visionOS 2.4+',
+        keys: [
+          { key: 'AppStoreID', title: 'App Store ID', type: 'string', default: '' },
+          { key: 'BundleID', title: 'Bundle ID', type: 'string', default: 'com.example.enterpriseapp' }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Apps & Web',
+        title: 'App: Settings',
+        payloadType: 'com.apple.configuration.app.settings',
+        description: 'Configures allowed/denied apps, macOS binary allowlists/denylists, and app privacy permission defaults.',
+        supportedOS: 'iOS 27.0+, macOS 27.0+, tvOS 27.0+, visionOS 27.0+',
+        keys: [
+          {
+            key: 'Allowed', title: 'Allowed apps & binaries', type: 'dictionary',
+            subkeys: [
+              { key: 'AllowedApps', title: 'Allowed apps (Bundle IDs)', type: 'array', itemType: 'string' },
+              { key: 'DeniedApps', title: 'Denied apps (Bundle IDs)', type: 'array', itemType: 'string' },
+              { key: 'AllowedBinaries', title: 'Allowed binaries (macOS)', type: 'array', itemType: 'dictionary', subkeys: BINARY_ID_SUBKEYS },
+              { key: 'DeniedBinaries', title: 'Denied binaries (macOS)', type: 'array', itemType: 'dictionary', subkeys: BINARY_ID_SUBKEYS }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Apple Intelligence',
+        title: 'Intelligence Settings',
+        payloadType: 'com.apple.configuration.intelligence.settings',
+        description: 'Configures Apple Intelligence features including Writing Tools, Genmoji, Image Playground, and Visual Intelligence.',
+        supportedOS: 'iOS 26.4+, macOS 26.4+, visionOS 26.4+',
+        keys: [
+          { key: 'AllowAppleIntelligenceReport', title: 'Allow Apple Intelligence Report', type: 'boolean', default: true },
+          { key: 'AllowGenmoji', title: 'Allow Genmoji', type: 'boolean', default: true },
+          { key: 'AllowImagePlayground', title: 'Allow Image Playground', type: 'boolean', default: true },
+          { key: 'AllowVisualIntelligence', title: 'Allow Visual Intelligence (27.0+)', type: 'boolean', default: true },
+          { key: 'AllowWritingTools', title: 'Allow Writing Tools', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Network & VPN',
+        title: 'Network: DNS Settings',
+        payloadType: 'com.apple.configuration.network.dns-settings',
+        description: 'Configures encrypted DNS-over-HTTPS (HTTPS) or DNS-over-TLS (TLS).',
+        supportedOS: 'iOS 27.0+, macOS 27.0+, visionOS 27.0+',
+        keys: [
+          { key: 'VisibleName', title: 'Visible name', type: 'string', required: true, default: 'Encrypted Corporate DNS' },
+          {
+            key: 'DNSSettings', title: 'DNS settings', type: 'dictionary', required: true,
+            subkeys: [
+              { key: 'DNSProtocol', title: 'DNS protocol', type: 'string', required: true, rangelist: ['HTTPS', 'TLS'], default: 'HTTPS' },
+              { key: 'ServerURL', title: 'DoH Server URL (https://)', type: 'string', default: 'https://dns.quad9.net/dns-query' }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Security & Passcode',
+        title: 'Passcode: Settings',
+        payloadType: 'com.apple.configuration.passcode.settings',
+        description: 'Configures device passcode complexity, length, lockout, and reuse history.',
+        supportedOS: 'iOS 15.0+, macOS 13.0+, visionOS 2.0+, watchOS 10.0+',
+        keys: [
+          { key: 'RequirePasscode', title: 'Require passcode on device', type: 'boolean', default: true },
+          { key: 'MinimumLength', title: 'Minimum passcode length (0-16)', type: 'integer', default: 6 }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Software Updates',
+        title: 'Software Update: Enforcement: Specific',
+        payloadType: 'com.apple.configuration.softwareupdate.enforcement.specific',
+        description: 'Enforces a specific target OS version and local installation deadline.',
+        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 18.4+, visionOS 26.0+',
+        keys: [
+          { key: 'TargetOSVersion', title: 'Target OS version (e.g. 26.2)', type: 'string', required: true, default: '26.2' },
+          { key: 'TargetLocalDateTime', title: 'Target local date-time (yyyy-mm-ddThh:mm:ss)', type: 'string', required: true, default: '2026-12-15T22:00:00' }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Assets',
+        title: 'Asset: Credential ACME',
+        payloadType: 'com.apple.asset.credential.acme',
+        description: 'A reference to an ACME identity JSON document.',
+        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/acme-identity.json', 'application/json'), ASSET_AUTH_DICT, ASSET_ACCESSIBLE_FIELD]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Assets',
+        title: 'Asset: Credential Certificate',
+        payloadType: 'com.apple.asset.credential.certificate',
+        description: 'A reference to one PKCS #1 or PEM encoded certificate.',
+        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/root-ca.pem', 'application/pem', ['application/pem', 'application/pkcs1']), ASSET_AUTH_DICT]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Assets',
+        title: 'Asset: Credential Identity',
+        payloadType: 'com.apple.asset.credential.identity',
+        description: 'A reference to a PKCS #12 password-protected identity JSON document.',
+        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/client-identity.json', 'application/json'), ASSET_AUTH_DICT, ASSET_ACCESSIBLE_FIELD]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Assets',
+        title: 'Asset: Credential SCEP',
+        payloadType: 'com.apple.asset.credential.scep',
+        description: 'A reference to a SCEP identity JSON document.',
+        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/scep-identity.json', 'application/json'), ASSET_AUTH_DICT, ASSET_ACCESSIBLE_FIELD]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Assets',
+        title: 'Asset: Credential User Name and Password',
+        payloadType: 'com.apple.asset.credential.userpassword',
+        description: 'A reference to JSON data describing a username and password credential.',
+        supportedOS: 'iOS 15.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/userpass.json', 'application/json'), ASSET_AUTH_DICT]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Assets',
+        title: 'Asset: Data',
+        payloadType: 'com.apple.asset.data',
+        description: 'A reference to arbitrary data (zip archives, property lists, DER keys).',
+        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/service-config.zip', 'application/zip', ['application/zip', 'application/plist', 'application/x-plist', 'application/xml', 'application/octet-stream']), ASSET_AUTH_DICT]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Assets',
+        title: 'Asset: User Identity',
+        payloadType: 'com.apple.asset.useridentity',
+        description: 'The user-identity data (FullName, EmailAddress) referenced by Account declarations.',
+        supportedOS: 'iOS 15.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [
+          { key: 'FullName', title: 'Full name', type: 'string', default: 'Jane Doe' },
+          { key: 'EmailAddress', title: 'Email address', type: 'string', default: 'jane.doe@example.com' }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Management',
+        title: 'Management: Organization Information',
+        payloadType: 'com.apple.management.organization-info',
+        description: 'Configures the managing organization contact name, support email, URL, and verification IdentityToken.',
+        supportedOS: 'iOS 15.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [
+          { key: 'Name', title: 'Organization name', type: 'string', required: true, default: 'Enterprise IT Operations' },
+          { key: 'Email', title: 'Organization email address', type: 'string', default: 'it-support@example.com' },
+          { key: 'URL', title: 'Organization support URL', type: 'string', default: 'https://support.example.com' }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Management',
+        title: 'Management: Properties',
+        payloadType: 'com.apple.management.properties',
+        description: 'Configures arbitrary server-managed properties (key/value pairs) on the device.',
+        supportedOS: 'iOS 16.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
+        rootKvMap: true,
+        keys: []
+      },
+      {
+        protocol: 'ddm',
+        category: 'Management',
+        title: 'Management: Server Capabilities',
+        payloadType: 'com.apple.management.server-capabilities',
+        description: 'Advertises the MDM server protocol version and supported optional DDM protocol features.',
+        supportedOS: 'iOS 15.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
+        keys: [
+          { key: 'Version', title: 'Protocol version', type: 'string', required: true, default: '1.0.0' },
+          { key: 'SupportedFeatures', title: 'Supported features (e.g. com.apple.* feature keys)', type: 'kv_map', required: true }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 3. APPLICATION STATE & PRESET LOADER
+    // =========================================================================
+    let state = {
+      protocol: 'mdm',
+      selectedCategory: 'All',
+      outputFormat: 'primary',
+      schemas: [...BUILTIN_SCHEMAS],
+      activeItems: []
+    };
+
+    function uuidv4() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16).toUpperCase();
+      });
+    }
+
+    function loadEnterpriseAppsPreset() {
+      switchMode('mdm');
+      const presetDomains = [
+        'com.microsoft.Outlook',
+        'com.google.Chrome',
+        'com.google.Keystone',
+        'com.google.drivefs.settings',
+        'org.mozilla.firefox',
+        'com.anthropic.claudefordesktop',
+        'com.microsoft.Edge'
+      ];
+      presetDomains.forEach(domain => {
+        const idx = state.schemas.findIndex(s => s.protocol === 'mdm' && s.payloadType === domain);
+        if (idx !== -1) addSchemaToBuilder(idx);
+      });
+    }
+
+    // =========================================================================
+    // 4. MODE SWITCHING & CATALOG RENDERING
+    // =========================================================================
+    function switchMode(mode) {
+      state.protocol = mode;
+      state.selectedCategory = 'All';
+      state.outputFormat = 'primary';
+
+      const mdmBtn = document.getElementById('modeMdmBtn');
+      const ddmBtn = document.getElementById('modeDdmBtn');
+      const bridgedTab = document.getElementById('outTabBridged');
+      const primaryTab = document.getElementById('outTabPrimary');
+
+      if (mode === 'mdm') {
+        mdmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm';
+        ddmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900';
+        document.getElementById('activeProtocolBadge').textContent = 'MDM PROFILE';
+        document.getElementById('activeProtocolBadge').className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800';
+        document.getElementById('metaHeaderLabel').textContent = 'Configuration Profile Top-Level Metadata';
+        document.getElementById('metaNameLabel').textContent = 'PayloadDisplayName';
+        document.getElementById('metaIdentLabel').textContent = 'PayloadIdentifier';
+        document.getElementById('metaExtraLabel').textContent = 'PayloadScope (System / User)';
+        document.getElementById('metaScopeOrActivation').value = 'System';
+        primaryTab.textContent = '.mobileconfig XML';
+        bridgedTab.classList.add('hidden');
+      } else {
+        ddmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm';
+        mdmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900';
+        document.getElementById('activeProtocolBadge').textContent = 'DECLARATIVE DDM';
+        document.getElementById('activeProtocolBadge').className = 'text-[11px] font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800';
+        document.getElementById('metaHeaderLabel').textContent = 'Declarative Set & Activation Blueprint Metadata';
+        document.getElementById('metaNameLabel').textContent = 'Blueprint Set Name';
+        document.getElementById('metaIdentLabel').textContent = 'Base Declaration Prefix';
+        document.getElementById('metaExtraLabel').textContent = 'Activation Identifier';
+        document.getElementById('metaScopeOrActivation').value = 'com.example.activation.main';
+        primaryTab.textContent = 'DDM Declarations JSON';
+        bridgedTab.classList.remove('hidden');
+      }
+
+      renderSchemaCatalog();
+      renderActiveItems();
+      refreshOutput();
+    }
+
+    function setOutputFormat(fmt) {
+      state.outputFormat = fmt;
+      const p = document.getElementById('outTabPrimary');
+      const b = document.getElementById('outTabBridged');
+      if (fmt === 'primary') {
+        p.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400';
+        b.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white';
+      } else {
+        b.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-indigo-400';
+        p.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white';
+      }
+      refreshOutput();
+    }
+
+    function renderSchemaCatalog() {
+      const query = document.getElementById('schemaSearchInput').value.toLowerCase();
+      const protocolSchemas = state.schemas.filter(s => s.protocol === state.protocol);
+
+      const categories = ['All', ...new Set(protocolSchemas.map(s => s.category || 'General'))];
+      const catBar = document.getElementById('categoryFilterBar');
+      catBar.innerHTML = categories.map(cat => {
+        const active = state.selectedCategory === cat;
+        return `<button onclick="state.selectedCategory='${cat}';renderSchemaCatalog()"
+          class="px-2 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap transition ${active ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+          ${cat}
+        </button>`;
+      }).join('');
+
+      const filtered = protocolSchemas.filter(s => {
+        const matchCat = state.selectedCategory === 'All' || (s.category || 'General') === state.selectedCategory;
+        const matchQ = !query || s.title.toLowerCase().includes(query) || s.payloadType.toLowerCase().includes(query) || (s.description || '').toLowerCase().includes(query);
+        return matchCat && matchQ;
+      });
+
+      document.getElementById('schemaCountBadge').textContent = filtered.length;
+      const list = document.getElementById('schemaList');
+
+      if (!filtered.length) {
+        list.innerHTML = `<div class="p-4 text-center text-xs text-slate-400">No matching schemas found.</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(schema => {
+        const globalIdx = state.schemas.indexOf(schema);
+        return `
+          <div class="group p-2.5 rounded-xl border border-slate-100 hover:border-sky-300 hover:bg-sky-50/40 transition cursor-pointer"
+               onclick="addSchemaToBuilder(${globalIdx})">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-xs font-semibold text-slate-800 group-hover:text-sky-700 truncate">${escapeHtml(schema.title)}</div>
+                <div class="text-[10px] font-mono text-slate-400 truncate mt-0.5">${escapeHtml(schema.payloadType)}</div>
+              </div>
+              <span class="shrink-0 w-6 h-6 rounded-lg bg-slate-100 group-hover:bg-sky-600 group-hover:text-white text-slate-500 flex items-center justify-center transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 leading-snug">${escapeHtml(schema.description || '')}</p>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // =========================================================================
+    // 5. ADDING & RENDERING DYNAMIC FORMS (WITH <date> AND ANY->ARRAY SUPPORT)
+    // =========================================================================
+    function buildDefaultValues(keys) {
+      const obj = {};
+      (keys || []).forEach(k => {
+        if (k.type === 'dictionary' && k.subkeys) {
+          if (k.required) obj[k.key] = buildDefaultValues(k.subkeys);
+        } else if (k.type === 'array') {
+          if (k.default !== undefined) obj[k.key] = JSON.parse(JSON.stringify(k.default));
+          else if (k.required) {
+            if (k.itemType === 'dictionary') obj[k.key] = [buildDefaultValues(k.subkeys)];
+            else if (k.itemType === 'array') obj[k.key] = [[buildDefaultValues(k.subkeys)]];
+            else if (k.itemType === 'data') obj[k.key] = [{ __plistData: '' }];
+            else obj[k.key] = [''];
+          }
+        } else if (k.default !== undefined && k.default !== '') {
+          obj[k.key] = k.default;
+        } else if (k.required) {
+          if (k.type === 'boolean') obj[k.key] = false;
+          else if (k.type === 'integer' || k.type === 'real') obj[k.key] = 0;
+          else if (k.type === 'data') obj[k.key] = { __plistData: '' };
+          else if (k.type === 'date') obj[k.key] = { __plistDate: '' };
+          else obj[k.key] = k.rangelist ? k.rangelist[0] : '';
+        }
+      });
+      return obj;
+    }
+
+    function addSchemaToBuilder(schemaIdx) {
+      const schema = state.schemas[schemaIdx];
+      if (!schema) return;
+
+      const instanceId = 'inst_' + Math.random().toString(36).slice(2, 9);
+      const uuid = uuidv4();
+
+      state.activeItems.push({
+        instanceId,
+        uuid,
+        identifier: `${schema.payloadType}.${uuid}`,
+        displayName: schema.title,
+        schema,
+        values: buildDefaultValues(schema.keys)
+      });
+
+      renderActiveItems();
+      refreshOutput();
+    }
+
+    function removeActiveItem(instanceId) {
+      state.activeItems = state.activeItems.filter(i => i.instanceId !== instanceId);
+      renderActiveItems();
+      refreshOutput();
+    }
+
+    function regenerateAllUUIDs() {
+      state.activeItems.forEach(item => { item.uuid = uuidv4(); });
+      renderActiveItems();
+      refreshOutput();
+    }
+
+    function getNestedValue(obj, path) {
+      if (!path.length) return obj;
+      return path.reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
+    }
+
+    function setNestedValue(obj, path, value) {
+      let curr = obj;
+      for (let i = 0; i < path.length - 1; i++) {
+        if (curr[path[i]] === undefined || typeof curr[path[i]] !== 'object') {
+          curr[path[i]] = typeof path[i + 1] === 'number' ? [] : {};
+        }
+        curr = curr[path[i]];
+      }
+      const last = path[path.length - 1];
+      if (value === undefined) {
+        delete curr[last];
+      } else {
+        curr[last] = value;
+      }
+    }
+
+    function updateField(instanceId, pathJson, rawVal, fieldType) {
+      const item = state.activeItems.find(i => i.instanceId === instanceId);
+      if (!item) return;
+      const path = JSON.parse(pathJson);
+
+      let parsed = rawVal;
+      if (fieldType === 'boolean') {
+        parsed = rawVal === true || rawVal === 'true';
+      } else if (fieldType === 'integer') {
+        parsed = rawVal === '' ? undefined : parseInt(rawVal, 10);
+      } else if (fieldType === 'real' || fieldType === 'number') {
+        parsed = rawVal === '' ? undefined : parseFloat(rawVal);
+      } else if (fieldType === 'data') {
+        parsed = rawVal === '' ? undefined : { __plistData: String(rawVal) };
+      } else if (fieldType === 'date') {
+        parsed = rawVal === '' ? undefined : { __plistDate: String(rawVal) };
+      } else if (fieldType === 'string') {
+        parsed = rawVal === '' ? undefined : String(rawVal);
+      }
+
+      setNestedValue(item.values, path, parsed);
+      refreshOutput();
+    }
+
+    function toggleOptionalDict(instanceId, pathJson, subkeysJson) {
+      const item = state.activeItems.find(i => i.instanceId === instanceId);
+      if (!item) return;
+      const path = JSON.parse(pathJson);
+      const existing = getNestedValue(item.values, path);
+      if (existing !== undefined) {
+        setNestedValue(item.values, path, undefined);
+      } else {
+        const subkeys = JSON.parse(subkeysJson);
+        setNestedValue(item.values, path, buildDefaultValues(subkeys));
+      }
+      renderActiveItems();
+      refreshOutput();
+    }
+
+    function addArrayItem(instanceId, pathJson, itemType, subkeysJson) {
+      const item = state.activeItems.find(i => i.instanceId === instanceId);
+      if (!item) return;
+      const path = JSON.parse(pathJson);
+      let arr = getNestedValue(item.values, path);
+      if (!Array.isArray(arr)) {
+        arr = [];
+        setNestedValue(item.values, path, arr);
+      }
+      if (itemType === 'dictionary') {
+        arr.push(buildDefaultValues(JSON.parse(subkeysJson || '[]')));
+      } else if (itemType === 'array') {
+        arr.push([buildDefaultValues(JSON.parse(subkeysJson || '[]'))]);
+      } else if (itemType === 'integer') {
+        arr.push(0);
+      } else if (itemType === 'data') {
+        arr.push({ __plistData: '' });
+      } else {
+        arr.push('');
+      }
+      renderActiveItems();
+      refreshOutput();
+    }
+
+    function removeArrayItem(instanceId, pathJson, index) {
+      const item = state.activeItems.find(i => i.instanceId === instanceId);
+      if (!item) return;
+      const path = JSON.parse(pathJson);
+      const arr = getNestedValue(item.values, path);
+      if (Array.isArray(arr)) {
+        arr.splice(index, 1);
+        if (arr.length === 0) setNestedValue(item.values, path, undefined);
+      }
+      renderActiveItems();
+      refreshOutput();
+    }
+
+    function addDynamicDictEntry(instanceId, pathJson, mode, subkeysJson) {
+      const item = state.activeItems.find(i => i.instanceId === instanceId);
+      if (!item) return;
+      const keyName = prompt(
+        mode === 'kv_map' ? 'Enter key name (e.g. AutoUpdate, Department):' :
+        mode === 'kv_array_map' ? 'Enter Team Identifier (e.g. ABCD123456):' :
+        'Enter domain or identifier key:'
+      );
+      if (!keyName || !keyName.trim()) return;
+
+      const path = [...JSON.parse(pathJson), keyName.trim()];
+      if (mode === 'kv_map') {
+        setNestedValue(item.values, path, '');
+      } else if (mode === 'kv_array_map') {
+        setNestedValue(item.values, path, ['']);
+      } else {
+        setNestedValue(item.values, path, buildDefaultValues(JSON.parse(subkeysJson || '[]')));
+      }
+      renderActiveItems();
+      refreshOutput();
+    }
+
+    function removeDynamicDictEntry(instanceId, pathJson, entryKey) {
+      const item = state.activeItems.find(i => i.instanceId === instanceId);
+      if (!item) return;
+      const parentPath = JSON.parse(pathJson);
+      setNestedValue(item.values, [...parentPath, entryKey], undefined);
+      if (parentPath.length > 0) {
+        const parentObj = getNestedValue(item.values, parentPath);
+        if (parentObj && Object.keys(parentObj).length === 0) {
+          setNestedValue(item.values, parentPath, undefined);
+        }
+      }
+      renderActiveItems();
+      refreshOutput();
+    }
+
+    function renderRootKvMap(item) {
+      const entries = Object.entries(item.values || {});
+      return `
+        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/70 space-y-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-slate-800">Custom Managed Preferences / Properties</span>
+              <span class="text-[10px] font-mono text-slate-400 ml-1.5">ANY</span>
+            </div>
+            <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '[]', 'kv_map', '[]')"
+              class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-semibold hover:bg-sky-100">
+              + Add Key / Value
+            </button>
+          </div>
+          <div class="space-y-1.5">
+            ${entries.map(([entryKey, entryVal]) => {
+              const entryPathStr = escapeHtml(JSON.stringify([entryKey]));
+              return `
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono font-semibold text-slate-700 bg-white px-2 py-1 rounded border border-slate-200 shrink-0">${escapeHtml(entryKey)}</span>
+                  <input type="text" value="${escapeHtml(entryVal ?? '')}" oninput="updateField('${item.instanceId}', '${entryPathStr}', this.value, 'string')"
+                    class="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white" placeholder="Value..." />
+                  <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '[]', '${escapeHtml(entryKey)}')"
+                    class="text-slate-400 hover:text-rose-600 px-1">✕</button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderKeyControls(item, keys, parentPath = []) {
+      return (keys || []).map(k => {
+        const currentPath = [...parentPath, k.key];
+        const pathStr = escapeHtml(JSON.stringify(currentPath));
+        const val = getNestedValue(item.values, currentPath);
+
+        if (k.type === 'kv_array_map') {
+          const dictVal = (val && typeof val === 'object') ? val : {};
+          const entries = Object.entries(dictVal);
+          return `
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/70 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
+                  <span class="text-[10px] font-mono text-slate-400 ml-1.5">${escapeHtml(k.key)}</span>
+                </div>
+                <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'kv_array_map', '[]')"
+                  class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-semibold hover:bg-sky-100">
+                  + Add Team ID
+                </button>
+              </div>
+              <div class="space-y-2">
+                ${entries.map(([teamKey, itemsArr]) => {
+                  const teamPath = [...currentPath, teamKey];
+                  const teamPathStr = escapeHtml(JSON.stringify(teamPath));
+                  const arr = Array.isArray(itemsArr) ? itemsArr : [];
+                  return `
+                    <div class="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2">
+                      <div class="flex items-center justify-between border-b border-slate-100 pb-1">
+                        <span class="text-xs font-mono font-bold text-indigo-700">${escapeHtml(teamKey)}</span>
+                        <div class="flex items-center gap-2">
+                          <button type="button" onclick="addArrayItem('${item.instanceId}', '${teamPathStr}', 'string', '[]')" class="text-[11px] font-semibold text-sky-600 hover:underline">+ Add Bundle/Type</button>
+                          <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(teamKey)}')" class="text-[11px] text-rose-500 hover:underline">Remove Team</button>
+                        </div>
+                      </div>
+                      <div class="space-y-1.5">
+                        ${arr.map((strVal, sIdx) => {
+                          const sPathStr = escapeHtml(JSON.stringify([...teamPath, sIdx]));
+                          return `
+                            <div class="flex items-center gap-2">
+                              <input type="text" value="${escapeHtml(strVal ?? '')}" oninput="updateField('${item.instanceId}', '${sPathStr}', this.value, 'string')"
+                                class="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-slate-50" placeholder="e.g. com.example.extension or NetworkExtension" />
+                              <button type="button" onclick="removeArrayItem('${item.instanceId}', '${teamPathStr}', ${sIdx})" class="text-slate-400 hover:text-rose-600 px-1">✕</button>
+                            </div>
+                          `;
+                        }).join('')}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (k.type === 'dynamic_dict') {
+          const dictVal = (val && typeof val === 'object') ? val : {};
+          const entries = Object.entries(dictVal);
+          const subkeysStr = escapeHtml(JSON.stringify(k.subkeys || []));
+          return `
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/70 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
+                  <span class="text-[10px] font-mono text-slate-400 ml-1.5">${escapeHtml(k.key)}</span>
+                </div>
+                <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'dynamic_dict', '${subkeysStr}')"
+                  class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-semibold hover:bg-sky-100">
+                  + Add Domain / Entry
+                </button>
+              </div>
+              <div class="space-y-2.5">
+                ${entries.map(([entryKey]) => {
+                  const entryPath = [...currentPath, entryKey];
+                  return `
+                    <div class="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2">
+                      <div class="flex items-center justify-between border-b border-slate-100 pb-1">
+                        <span class="text-xs font-mono font-bold text-indigo-700">${escapeHtml(entryKey)}</span>
+                        <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(entryKey)}')"
+                          class="text-[11px] text-rose-500 hover:underline">Remove</button>
+                      </div>
+                      ${renderKeyControls(item, k.subkeys, entryPath)}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (k.type === 'kv_map') {
+          const dictVal = (val && typeof val === 'object') ? val : {};
+          const entries = Object.entries(dictVal);
+          return `
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/70 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
+                  <span class="text-[10px] font-mono text-slate-400 ml-1.5">${escapeHtml(k.key)}</span>
+                </div>
+                <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'kv_map', '[]')"
+                  class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-semibold hover:bg-sky-100">
+                  + Add Key/Value
+                </button>
+              </div>
+              <div class="space-y-1.5">
+                ${entries.map(([entryKey, entryVal]) => {
+                  const entryPathStr = escapeHtml(JSON.stringify([...currentPath, entryKey]));
+                  return `
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-mono font-semibold text-slate-700 bg-white px-2 py-1 rounded border border-slate-200 shrink-0">${escapeHtml(entryKey)}</span>
+                      <input type="text" value="${escapeHtml(entryVal ?? '')}" oninput="updateField('${item.instanceId}', '${entryPathStr}', this.value, 'string')"
+                        class="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-white" placeholder="Value..." />
+                      <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(entryKey)}')"
+                        class="text-slate-400 hover:text-rose-600 px-1">✕</button>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (k.type === 'dictionary' && k.subkeys) {
+          const isEnabled = val !== undefined;
+          const subkeysStr = escapeHtml(JSON.stringify(k.subkeys));
+          return `
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/70 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
+                  <span class="text-[10px] font-mono text-slate-400 ml-1.5">${escapeHtml(k.key)}</span>
+                  ${k.required ? '<span class="ml-1.5 text-[10px] font-semibold text-rose-600">Required</span>' : ''}
+                </div>
+                ${!k.required ? `
+                  <button type="button" onclick="toggleOptionalDict('${item.instanceId}', '${pathStr}', '${subkeysStr}')"
+                    class="px-2 py-0.5 rounded text-[11px] font-semibold ${isEnabled ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-sky-50 text-sky-700 border border-sky-200'}">
+                    ${isEnabled ? 'Remove Section' : '+ Configure'}
+                  </button>
+                ` : ''}
+              </div>
+              ${k.content ? `<p class="text-[11px] text-slate-500">${escapeHtml(k.content)}</p>` : ''}
+              ${isEnabled ? `<div class="pl-3 border-l-2 border-sky-200 space-y-2.5 pt-1">${renderKeyControls(item, k.subkeys, currentPath)}</div>` : ''}
+            </div>
+          `;
+        }
+
+        if (k.type === 'array') {
+          const arr = Array.isArray(val) ? val : [];
+          const subkeysStr = escapeHtml(JSON.stringify(k.subkeys || []));
+          return `
+            <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
+                  <span class="text-[10px] font-mono text-slate-400 ml-1.5">${escapeHtml(k.key)}[]</span>
+                  ${k.required ? '<span class="ml-1.5 text-[10px] font-semibold text-rose-600">Required</span>' : ''}
+                </div>
+                <button type="button" onclick="addArrayItem('${item.instanceId}', '${pathStr}', '${k.itemType || 'string'}', '${subkeysStr}')"
+                  class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-semibold hover:bg-sky-100">
+                  + Add ${k.itemType === 'array' ? 'RDN / Group' : 'Item'}
+                </button>
+              </div>
+              ${k.content ? `<p class="text-[11px] text-slate-500">${escapeHtml(k.content)}</p>` : ''}
+              <div class="space-y-2">
+                ${arr.map((entry, idx) => {
+                  const elemPath = [...currentPath, idx];
+                  const elemPathStr = escapeHtml(JSON.stringify(elemPath));
+                  if (k.itemType === 'array' && k.subkeys) {
+                    const innerArr = Array.isArray(entry) ? entry : [];
+                    return `
+                      <div class="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-1">
+                          <span class="text-[11px] font-bold text-slate-700">Group #${idx + 1}</span>
+                          <div class="flex items-center gap-2">
+                            <button type="button" onclick="addArrayItem('${item.instanceId}', '${elemPathStr}', 'dictionary', '${subkeysStr}')"
+                              class="text-[11px] font-semibold text-sky-600 hover:underline">+ Add Pair</button>
+                            <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-[11px] text-rose-500 hover:underline">Remove</button>
+                          </div>
+                        </div>
+                        <div class="space-y-2 pl-2 border-l-2 border-slate-200">
+                          ${innerArr.map((_, innerIdx) => {
+                            const iconPath = [...elemPath, innerIdx];
+                            return `
+                              <div class="p-2 bg-slate-50 rounded border border-slate-200 space-y-1.5">
+                                <div class="flex justify-between items-center">
+                                  <span class="text-[10px] font-semibold text-slate-500">Pair #${innerIdx + 1}</span>
+                                  <button type="button" onclick="removeArrayItem('${item.instanceId}', '${elemPathStr}', ${innerIdx})" class="text-[10px] text-rose-500">Remove</button>
+                                </div>
+                                ${renderKeyControls(item, k.subkeys, iconPath)}
+                              </div>
+                            `;
+                          }).join('')}
+                        </div>
+                      </div>
+                    `;
+                  } else if (k.itemType === 'dictionary' && k.subkeys) {
+                    return `
+                      <div class="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-1">
+                          <span class="text-[11px] font-semibold text-slate-500">Item #${idx + 1}</span>
+                          <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-[11px] text-rose-500 hover:underline">Remove</button>
+                        </div>
+                        ${renderKeyControls(item, k.subkeys, elemPath)}
+                      </div>
+                    `;
+                  } else if (k.rangelist) {
+                    return `
+                      <div class="flex items-center gap-2">
+                        <select onchange="updateField('${item.instanceId}', '${elemPathStr}', this.value, '${k.itemType || 'string'}')"
+                          class="flex-1 px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white">
+                          ${k.rangelist.map(opt => `<option value="${escapeHtml(opt)}" ${String(entry) === String(opt) ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
+                        </select>
+                        <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-slate-400 hover:text-rose-600 px-1.5">✕</button>
+                      </div>
+                    `;
+                  } else {
+                    const elemInputType = k.itemType === 'integer' ? 'number' : 'text';
+                    const elemVal = (entry && typeof entry === 'object' && entry.__plistData !== undefined) ? entry.__plistData : (entry ?? '');
+                    return `
+                      <div class="flex items-center gap-2">
+                        <input type="${elemInputType}" value="${escapeHtml(elemVal)}" oninput="updateField('${item.instanceId}', '${elemPathStr}', this.value, '${k.itemType || 'string'}')"
+                          class="flex-1 px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white" placeholder="${k.itemType === 'data' ? 'Base64 encoded data...' : 'Enter value...'}" />
+                        <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-slate-400 hover:text-rose-600 px-1.5">✕</button>
+                      </div>
+                    `;
+                  }
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (k.type === 'boolean') {
+          const checked = val !== undefined ? Boolean(val) : (k.default !== undefined ? Boolean(k.default) : false);
+          return `
+            <div class="flex items-start justify-between gap-4 py-1.5 border-b border-slate-100 last:border-0">
+              <div>
+                <div class="text-xs font-semibold text-slate-800">
+                  ${escapeHtml(k.title || k.key)}
+                  <span class="text-[10px] font-mono text-slate-400 font-normal ml-1">${escapeHtml(k.key)}</span>
+                </div>
+                ${k.content ? `<p class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(k.content)}</p>` : ''}
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                <input type="checkbox" ${checked ? 'checked' : ''}
+                  onchange="updateField('${item.instanceId}', '${pathStr}', this.checked, 'boolean')" class="sr-only peer">
+                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-600"></div>
+              </label>
+            </div>
+          `;
+        }
+
+        if (k.rangelist && k.rangelist.length) {
+          const current = val !== undefined ? val : (k.default !== undefined ? k.default : '');
+          return `
+            <div class="space-y-1">
+              <label class="block text-xs font-semibold text-slate-800">
+                ${escapeHtml(k.title || k.key)}
+                <span class="text-[10px] font-mono text-slate-400 font-normal ml-1">${escapeHtml(k.key)}</span>
+                ${k.required ? '<span class="text-rose-500 ml-0.5">*</span>' : ''}
+              </label>
+              <select onchange="updateField('${item.instanceId}', '${pathStr}', this.value, '${k.type || 'string'}')"
+                class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none focus:border-sky-500">
+                ${!k.required ? `<option value="">-- Unset --</option>` : ''}
+                ${k.rangelist.map(opt => `<option value="${escapeHtml(opt)}" ${String(current) === String(opt) ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
+              </select>
+              ${k.content ? `<p class="text-[11px] text-slate-500">${escapeHtml(k.content)}</p>` : ''}
+            </div>
+          `;
+        }
+
+        const inputType = (k.type === 'integer' || k.type === 'real') ? 'number' : 'text';
+        const displayVal = (val && typeof val === 'object' && val.__plistData !== undefined) ? val.__plistData :
+                           (val && typeof val === 'object' && val.__plistDate !== undefined) ? val.__plistDate :
+                           (val !== undefined ? val : '');
+        const tagHint = k.type === 'data' ? ' (<data> Base64)' : (k.type === 'date' ? ' (<date> ISO 8601)' : '');
+        const placeholderText = k.type === 'data' ? 'Base64 encoded data...' :
+                                k.type === 'date' ? '2027-12-31T23:59:59Z' :
+                                (k.default !== undefined && k.default !== '' ? 'Default: ' + escapeHtml(k.default) : 'Enter ' + escapeHtml(k.key));
+        return `
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-slate-800">
+              ${escapeHtml(k.title || k.key)}
+              <span class="text-[10px] font-mono text-slate-400 font-normal ml-1">${escapeHtml(k.key)}${tagHint}</span>
+              ${k.required ? '<span class="text-rose-500 ml-0.5">*</span>' : ''}
+            </label>
+            <input type="${inputType}" step="${k.type === 'real' ? 'any' : '1'}" value="${escapeHtml(displayVal)}"
+              placeholder="${placeholderText}"
+              oninput="updateField('${item.instanceId}', '${pathStr}', this.value, '${k.type || 'string'}')"
+              class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none focus:border-sky-500" />
+            ${k.content ? `<p class="text-[11px] text-slate-500">${escapeHtml(k.content)}</p>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderActiveItems() {
+      const items = state.activeItems.filter(i => i.schema.protocol === state.protocol);
+      const emptyEl = document.getElementById('emptyEditorState');
+      const stackEl = document.getElementById('activeItemsStack');
+
+      if (!items.length) {
+        emptyEl.classList.remove('hidden');
+        stackEl.classList.add('hidden');
+        stackEl.innerHTML = '';
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      stackEl.classList.remove('hidden');
+
+      stackEl.innerHTML = items.map(item => `
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="px-4 py-3 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <h3 class="text-xs font-bold text-slate-900">${escapeHtml(item.schema.title)}</h3>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200/70 text-slate-700">${escapeHtml(item.schema.payloadType)}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(item.schema.supportedOS || '')}</div>
+            </div>
+            <button onclick="removeActiveItem('${item.instanceId}')" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Remove">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="p-4 space-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">${state.protocol === 'mdm' ? 'PayloadIdentifier' : 'Declaration Identifier'}</label>
+                <input type="text" value="${escapeHtml(item.identifier)}"
+                  oninput="itemMetaUpdate('${item.instanceId}', 'identifier', this.value)"
+                  class="w-full px-2.5 py-1 text-xs font-mono border border-slate-200 rounded-lg" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">${state.protocol === 'mdm' ? 'PayloadUUID' : 'ServerToken Seed'}</label>
+                <input type="text" value="${escapeHtml(item.uuid)}"
+                  oninput="itemMetaUpdate('${item.instanceId}', 'uuid', this.value)"
+                  class="w-full px-2.5 py-1 text-xs font-mono border border-slate-200 rounded-lg" />
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              ${item.schema.rootKvMap ? renderRootKvMap(item) : renderKeyControls(item, item.schema.keys)}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function itemMetaUpdate(instanceId, field, value) {
+      const item = state.activeItems.find(i => i.instanceId === instanceId);
+      if (item) {
+        item[field] = value;
+        refreshOutput();
+      }
+    }
+
+    // =========================================================================
+    // 6. XML PLIST & DECLARATIVE DDM JSON SERIALIZATION + SHA-256 SERVERTOKEN
+    // =========================================================================
+    function cleanObject(obj) {
+      if (Array.isArray(obj)) {
+        return obj.map(cleanObject).filter(v => v !== undefined && v !== '');
+      }
+      if (obj && typeof obj === 'object') {
+        if (obj.__plistData !== undefined || obj.__plistDate !== undefined) return obj;
+        const res = {};
+        Object.entries(obj).forEach(([k, v]) => {
+          const cleaned = cleanObject(v);
+          if (cleaned !== undefined && !(Array.isArray(cleaned) && cleaned.length === 0)) {
+            res[k] = cleaned;
+          }
+        });
+        return res;
+      }
+      return obj;
+    }
+
+    function jsToPlistXml(val, indent = '  ') {
+      if (val === null || val === undefined) return '';
+      if (typeof val === 'boolean') return `${indent}<${val ? 'true' : 'false'}/>`;
+      if (typeof val === 'number') {
+        return Number.isInteger(val) ? `${indent}<integer>${val}</integer>` : `${indent}<real>${val}</real>`;
+      }
+      if (typeof val === 'string') {
+        return `${indent}<string>${escapeXml(val)}</string>`;
+      }
+      if (Array.isArray(val)) {
+        if (!val.length) return `${indent}<array/>`;
+        return `${indent}<array>\n${val.map(v => jsToPlistXml(v, indent + '  ')).join('\n')}\n${indent}</array>`;
+      }
+      if (typeof val === 'object') {
+        if (val.__plistData !== undefined) {
+          return `${indent}<data>${escapeXml(val.__plistData)}</data>`;
+        }
+        if (val.__plistDate !== undefined) {
+          return `${indent}<date>${escapeXml(val.__plistDate)}</date>`;
+        }
+        const entries = Object.entries(val);
+        if (!entries.length) return `${indent}<dict/>`;
+        const inner = entries.map(([k, v]) => `${indent}  <key>${escapeXml(k)}</key>\n${jsToPlistXml(v, indent + '  ')}`).join('\n');
+        return `${indent}<dict>\n${inner}\n${indent}</dict>`;
+      }
+      return '';
+    }
+
+    function buildClassicMobileconfigXml() {
+      const displayName = document.getElementById('metaDisplayName').value || 'Corporate Profile';
+      const identifier = document.getElementById('metaIdentifier').value || 'com.example.mdm.profile';
+      const org = document.getElementById('metaOrg').value || 'Enterprise IT';
+      const scope = document.getElementById('metaScopeOrActivation').value || 'System';
+
+      const mdmItems = state.activeItems.filter(i => i.schema.protocol === 'mdm');
+      const payloadContent = mdmItems.map(item => {
+        const cleaned = cleanObject(item.values);
+        return {
+          PayloadType: item.schema.payloadType,
+          PayloadVersion: 1,
+          PayloadIdentifier: item.identifier,
+          PayloadUUID: item.uuid,
+          PayloadEnabled: true,
+          PayloadDisplayName: item.schema.title,
+          ...cleaned
+        };
+      });
+
+      const root = {
+        PayloadContent: payloadContent,
+        PayloadDescription: 'Generated by Apple MDM & DDM Studio',
+        PayloadDisplayName: displayName,
+        PayloadIdentifier: identifier,
+        PayloadOrganization: org,
+        PayloadRemovalDisallowed: false,
+        PayloadScope: scope,
+        PayloadType: 'Configuration',
+        PayloadUUID: uuidv4(),
+        PayloadVersion: 1
+      };
+
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n${jsToPlistXml(root, '')}\n</plist>`;
+    }
+
+    async function sha256Hex(message) {
+      const msgUint8 = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function buildDeclarativeBundle() {
+      const ddmItems = state.activeItems.filter(i => i.schema.protocol === 'ddm');
+      const activationId = document.getElementById('metaScopeOrActivation').value || 'com.example.activation.main';
+
+      const declarations = [];
+      const configIdentifiers = [];
+
+      for (const item of ddmItems) {
+        const payloadObj = cleanObject(item.values);
+        const tokenHash = await sha256Hex(JSON.stringify({ id: item.identifier, seed: item.uuid, payload: payloadObj }));
+        const decl = {
+          Type: item.schema.payloadType,
+          Identifier: item.identifier,
+          ServerToken: tokenHash.slice(0, 32),
+          Payload: payloadObj
+        };
+        declarations.push(decl);
+        if (item.schema.payloadType.startsWith('com.apple.configuration.')) {
+          configIdentifiers.push(item.identifier);
+        }
+      }
+
+      if (configIdentifiers.length > 0) {
+        const actPayload = { StandardConfigurations: configIdentifiers };
+        const actHash = await sha256Hex(JSON.stringify({ activationId, actPayload }));
+        declarations.unshift({
+          Type: 'com.apple.activation.simple',
+          Identifier: activationId,
+          ServerToken: actHash.slice(0, 32),
+          Payload: actPayload
+        });
+      }
+
+      return {
+        BlueprintName: document.getElementById('metaDisplayName').value || 'DDM Blueprint',
+        Declarations: declarations
+      };
+    }
+
+    async function refreshOutput() {
+      const preview = document.getElementById('codePreview');
+      const tokenBadge = document.getElementById('serverTokenBadge');
+      const dlText = document.getElementById('downloadBtnText');
+
+      if (state.protocol === 'mdm') {
+        const xml = buildClassicMobileconfigXml();
+        preview.textContent = xml;
+        tokenBadge.textContent = `${state.activeItems.filter(i => i.schema.protocol === 'mdm').length} payload(s)`;
+        dlText.textContent = '.mobileconfig';
+      } else {
+        const bundle = await buildDeclarativeBundle();
+        const jsonStr = JSON.stringify(bundle, null, 2);
+        const bundleHash = await sha256Hex(jsonStr);
+        tokenBadge.textContent = `Token: ${bundleHash.slice(0, 16)}…`;
+
+        if (state.outputFormat === 'primary') {
+          preview.textContent = jsonStr;
+          dlText.textContent = 'declarations.json';
+        } else {
+          const bridgedRoot = {
+            PayloadContent: [{
+              PayloadType: 'com.apple.declarative.management.bridge',
+              PayloadVersion: 1,
+              PayloadIdentifier: (document.getElementById('metaIdentifier').value || 'com.example.ddm') + '.bridge',
+              PayloadUUID: uuidv4(),
+              PayloadDisplayName: 'Declarative Management Declarations',
+              DeclarationsJSON: jsonStr
+            }],
+            PayloadDisplayName: document.getElementById('metaDisplayName').value || 'DDM Bridged Profile',
+            PayloadIdentifier: document.getElementById('metaIdentifier').value || 'com.example.ddm.profile',
+            PayloadOrganization: document.getElementById('metaOrg').value || 'Enterprise IT',
+            PayloadType: 'Configuration',
+            PayloadUUID: uuidv4(),
+            PayloadVersion: 1
+          };
+          preview.textContent = `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n${jsToPlistXml(bridgedRoot, '')}\n</plist>`;
+          dlText.textContent = 'ddm-bridged.mobileconfig';
+        }
+      }
+      updateDeploySnippets();
+    }
+
+    // =========================================================================
+    // 7. GITHUB REPOSITORY BROWSER & YAML PARSER (apple/device-management)
+    // =========================================================================
+    async function fetchGitHubDirectory() {
+      const folder = document.getElementById('repoFolderSelect').value;
+      const listEl = document.getElementById('repoFileList');
+      listEl.innerHTML = `<div class="p-4 text-xs text-slate-500 text-center">Fetching directory from GitHub API...</div>`;
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/apple/device-management/contents/${folder}`);
+        if (!res.ok) throw new Error(`GitHub API HTTP ${res.status}`);
+        const files = await res.json();
+        const yamlFiles = files.filter(f => f.name.endsWith('.yaml'));
+
+        listEl.innerHTML = yamlFiles.map(f => `
+          <div class="px-3.5 py-2 flex items-center justify-between hover:bg-white transition">
+            <span class="text-xs font-mono text-slate-700">${escapeHtml(f.name)}</span>
+            <button onclick="fetchAndLoadRawYaml('${escapeHtml(f.download_url)}')"
+              class="px-2.5 py-1 rounded bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white text-[11px] font-semibold transition">
+              Load YAML
+            </button>
+          </div>
+        `).join('');
+      } catch (err) {
+        listEl.innerHTML = `<div class="p-4 text-xs text-rose-600">Could not reach GitHub API (${escapeHtml(err.message)}). You can paste any raw YAML schema directly below.</div>`;
+      }
+    }
+
+    async function fetchAndLoadRawYaml(url) {
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        document.getElementById('rawYamlInput').value = text;
+        parsePastedYaml();
+      } catch (err) {
+        alert('Failed to download YAML file: ' + err.message);
+      }
+    }
+
+    function normalizeYamlKeys(payloadkeys) {
+      return (payloadkeys || []).map(k => {
+        const rawType = (k.type || '<string>').replace(/[<>]/g, '').toLowerCase();
+        let itemType = 'string';
+        let subkeys = undefined;
+        let finalType = rawType;
+
+        if (rawType === 'dictionary' && k.subkeys) {
+          if (k.subkeys.length === 1 && k.subkeys[0].key === 'ANY') {
+            const anySub = k.subkeys[0];
+            const anyType = (anySub.type || '<string>').replace(/[<>]/g, '').toLowerCase();
+            if (anyType === 'dictionary' && anySub.subkeys) {
+              finalType = 'dynamic_dict';
+              subkeys = normalizeYamlKeys(anySub.subkeys);
+            } else if (anyType === 'array') {
+              finalType = 'kv_array_map';
+            } else {
+              finalType = 'kv_map';
+            }
+          } else {
+            subkeys = normalizeYamlKeys(k.subkeys);
+          }
+        } else if (rawType === 'array' && k.subkeys && k.subkeys.length) {
+          const firstSub = k.subkeys[0];
+          const subRawType = (firstSub.type || '<string>').replace(/[<>]/g, '').toLowerCase();
+          if (subRawType === 'dictionary' && firstSub.subkeys) {
+            itemType = 'dictionary';
+            subkeys = normalizeYamlKeys(firstSub.subkeys);
+          } else {
+            itemType = subRawType;
+          }
+        }
+
+        return {
+          key: k.key,
+          title: k.title || k.key,
+          type: finalType,
+          itemType,
+          required: k.presence === 'required',
+          default: k.default,
+          rangelist: k.rangelist || (k.subkeys && k.subkeys[0] && k.subkeys[0].rangelist ? k.subkeys[0].rangelist : undefined),
+          content: k.content || '',
+          subkeys
+        };
+      });
+    }
+
+    function parsePastedYaml() {
+      const yamlStr = document.getElementById('rawYamlInput').value.trim();
+      if (!yamlStr) return;
+
+      try {
+        const doc = jsyaml.load(yamlStr);
+        const isDdm = Boolean(doc?.payload?.declarationtype);
+        const payloadType = doc?.payload?.declarationtype || doc?.payload?.payloadtype || 'com.apple.custom.payload';
+        const isRootKv = Array.isArray(doc.payloadkeys) && doc.payloadkeys.length === 1 && doc.payloadkeys[0].key === 'ANY';
+
+        const schema = {
+          protocol: isDdm ? 'ddm' : 'mdm',
+          category: 'Imported YAML',
+          title: doc.title || payloadType,
+          payloadType,
+          description: doc.description || '',
+          supportedOS: 'Parsed from apple/device-management YAML',
+          rootKvMap: isRootKv,
+          keys: isRootKv ? [] : normalizeYamlKeys(doc.payloadkeys)
+        };
+
+        state.schemas.unshift(schema);
+        switchMode(schema.protocol);
+        addSchemaToBuilder(0);
+        closeModal('repoModal');
+      } catch (err) {
+        alert('YAML Parse Error: ' + err.message);
+      }
+    }
+
+    // =========================================================================
+    // 8. IMPORT, EXPORT & MDM REST API DEPLOYMENT
+    // =========================================================================
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => { document.getElementById('importTextArea').value = ev.target.result; };
+      reader.readAsText(file);
+    }
+
+    function importFromText() {
+      const raw = document.getElementById('importTextArea').value.trim();
+      if (!raw) return;
+
+      try {
+        if (raw.startsWith('{')) {
+          const json = JSON.parse(raw);
+          const decls = json.Declarations || [json];
+          switchMode('ddm');
+          decls.forEach(d => {
+            if (d.Type === 'com.apple.activation.simple') return;
+            const matched = state.schemas.find(s => s.payloadType === d.Type) || {
+              protocol: 'ddm',
+              category: 'Imported',
+              title: d.Type,
+              payloadType: d.Type,
+              keys: Object.keys(d.Payload || {}).map(k => ({ key: k, title: k, type: typeof d.Payload[k] }))
+            };
+            state.activeItems.push({
+              instanceId: 'inst_' + Math.random().toString(36).slice(2, 9),
+              uuid: uuidv4(),
+              identifier: d.Identifier || d.Type,
+              displayName: matched.title,
+              schema: matched,
+              values: d.Payload || {}
+            });
+          });
+          renderActiveItems();
+          refreshOutput();
+          closeModal('importModal');
+        } else {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(raw, 'text/xml');
+          const rootDict = xmlDoc.querySelector('plist > dict');
+          const parsed = parsePlistNode(rootDict);
+          switchMode('mdm');
+          if (parsed.PayloadDisplayName) document.getElementById('metaDisplayName').value = parsed.PayloadDisplayName;
+          if (parsed.PayloadIdentifier) document.getElementById('metaIdentifier').value = parsed.PayloadIdentifier;
+          if (parsed.PayloadOrganization) document.getElementById('metaOrg').value = parsed.PayloadOrganization;
+
+          (parsed.PayloadContent || []).forEach(p => {
+            const { PayloadType, PayloadVersion, PayloadIdentifier, PayloadUUID, PayloadEnabled, PayloadDisplayName, ...rest } = p;
+            const matched = state.schemas.find(s => s.payloadType === PayloadType) || {
+              protocol: 'mdm',
+              category: 'Imported',
+              title: PayloadDisplayName || PayloadType,
+              payloadType: PayloadType,
+              rootKvMap: true,
+              keys: []
+            };
+            state.activeItems.push({
+              instanceId: 'inst_' + Math.random().toString(36).slice(2, 9),
+              uuid: PayloadUUID || uuidv4(),
+              identifier: PayloadIdentifier || PayloadType,
+              displayName: PayloadDisplayName || matched.title,
+              schema: matched,
+              values: rest
+            });
+          });
+          renderActiveItems();
+          refreshOutput();
+          closeModal('importModal');
+        }
+      } catch (err) {
+        alert('Import failed: ' + err.message);
+      }
+    }
+
+    function parsePlistNode(node) {
+      if (!node) return null;
+      const tag = node.tagName;
+      if (tag === 'string') return node.textContent;
+      if (tag === 'integer') return parseInt(node.textContent, 10);
+      if (tag === 'real') return parseFloat(node.textContent);
+      if (tag === 'true') return true;
+      if (tag === 'false') return false;
+      if (tag === 'data') return { __plistData: node.textContent.trim() };
+      if (tag === 'date') return { __plistDate: node.textContent.trim() };
+      if (tag === 'array') return Array.from(node.children).map(parsePlistNode);
+      if (tag === 'dict') {
+        const obj = {};
+        const children = Array.from(node.children);
+        for (let i = 0; i < children.length; i += 2) {
+          if (children[i].tagName === 'key') {
+            obj[children[i].textContent] = parsePlistNode(children[i + 1]);
+          }
+        }
+        return obj;
+      }
+      return node.textContent;
+    }
+
+    function copyOutput() {
+      const text = document.getElementById('codePreview').textContent;
+      navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copyBtnText');
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+    }
+
+    function downloadOutput() {
+      const text = document.getElementById('codePreview').textContent;
+      const isJson = state.protocol === 'ddm' && state.outputFormat === 'primary';
+      const filename = isJson ? 'declarations.json' : (state.protocol === 'ddm' ? 'ddm-bridged.mobileconfig' : 'profile.mobileconfig');
+      const mime = isJson ? 'application/json' : 'application/x-apple-aspen-config';
+
+      const blob = new Blob([text], { type: mime });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    }
+
+    function updateDeploySnippets() {
+      const vendor = document.getElementById('mdmVendorSelect').value;
+      const urlInput = document.getElementById('mdmEndpointUrl');
+      const token = document.getElementById('mdmApiToken').value || '$MDM_API_TOKEN';
+
+      const defaults = {
+        micromdm: 'https://micromdm.example.com/v1/profiles',
+        fleetdm: 'https://fleet.example.com/api/v1/fleet/configuration_profiles',
+        simplemdm: 'https://a.simplemdm.com/api/v1/custom_configuration_profiles',
+        jamf: 'https://jamf.example.com/JSSResource/osxconfigurationprofiles/id/0',
+        intune: 'https://graph.microsoft.com/v1.0/deviceManagement/deviceConfigurations',
+        custom: urlInput.value
+      };
+      if (document.activeElement !== urlInput && defaults[vendor]) {
+        urlInput.value = defaults[vendor];
+      }
+
+      const isJson = state.protocol === 'ddm' && state.outputFormat === 'primary';
+      const file = isJson ? 'declarations.json' : 'profile.mobileconfig';
+      const contentType = isJson ? 'application/json' : 'application/x-apple-aspen-config';
+
+      document.getElementById('curlSnippetBox').textContent =
+        `curl -X POST "${urlInput.value}" \\\n  -H "Authorization: Bearer ${token}" \\\n  -H "Content-Type: ${contentType}" \\\n  --data-binary @${file}`;
+    }
+
+    async function executeDirectMdmPush() {
+      const url = document.getElementById('mdmEndpointUrl').value;
+      const token = document.getElementById('mdmApiToken').value;
+      const body = document.getElementById('codePreview').textContent;
+      const alertBox = document.getElementById('pushStatusAlert');
+      const isJson = state.protocol === 'ddm' && state.outputFormat === 'primary';
+
+      alertBox.className = 'p-3 rounded-xl text-xs bg-sky-50 text-sky-800 border border-sky-200';
+      alertBox.textContent = 'Sending payload to MDM endpoint...';
+      alertBox.classList.remove('hidden');
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': isJson ? 'application/json' : 'application/x-apple-aspen-config'
+          },
+          body
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        alertBox.className = 'p-3 rounded-xl text-xs bg-emerald-50 text-emerald-800 border border-emerald-200';
+        alertBox.textContent = 'Successfully pushed profile/declaration to MDM server!';
+      } catch (err) {
+        alertBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-800 border border-rose-200';
+        alertBox.textContent = `Push failed: ${err.message}. Check CORS settings on your MDM API or use the cURL command above.`;
+      }
+    }
+
+    function copyCurlCommand() {
+      navigator.clipboard.writeText(document.getElementById('curlSnippetBox').textContent);
+    }
+
+    function openRepoModal() { document.getElementById('repoModal').classList.replace('hidden', 'flex'); }
+    function openImportModal() { document.getElementById('importModal').classList.replace('hidden', 'flex'); }
+    function openDeployModal() { updateDeploySnippets(); document.getElementById('deployModal').classList.replace('hidden', 'flex'); }
+    function closeModal(id) { document.getElementById(id).classList.replace('flex', 'hidden'); }
+
+    function escapeHtml(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function escapeXml(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+    }
+
+    switchMode('mdm');
+    lucide.createIcons();
+  </script>
+</body>
+</html>
