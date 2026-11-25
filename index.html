@@ -29,10 +29,10 @@
         <div class="flex items-center gap-2">
           <h1 class="text-sm font-bold tracking-tight text-slate-900">Apple MDM & DDM Studio</h1>
           <span class="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
-            apple/device-management
+            MDM & DDM Engine
           </span>
         </div>
-        <p class="text-xs text-slate-500">Classic Profiles (.mobileconfig) + Declarative Device Management (JSON & Bridged XML)</p>
+        <p class="text-xs text-slate-500">Configuration Profiles (.mobileconfig) + Enterprise App Policies + Declarative DDM (JSON)</p>
       </div>
     </div>
 
@@ -52,21 +52,17 @@
 
     <!-- Right Actions -->
     <div class="flex items-center gap-2">
-      <button onclick="loadEnterpriseAppsPreset()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 flex items-center gap-1.5 transition" title="Load Outlook, Chrome, Keystone, Drive, Firefox, Claude & Edge">
+      <button onclick="loadEnterpriseAppsPreset()" class="px-2.5 py-1.5 text-xs font-semibold rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 flex items-center gap-1.5 transition" title="Load Enterprise App Policies">
         <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-600"></i>
         <span>Enterprise Apps Preset</span>
       </button>
       <button onclick="openRepoModal()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition">
         <i data-lucide="git-branch" class="w-3.5 h-3.5 text-slate-500"></i>
-        <span>Repo Tree / YAML</span>
+        <span>Load Schema / Policy</span>
       </button>
-      <button onclick="openImportModal()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition">
-        <i data-lucide="upload" class="w-3.5 h-3.5 text-slate-500"></i>
+      <button onclick="openImportModal()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 shadow-sm transition">
+        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
         <span>Import</span>
-      </button>
-      <button onclick="openDeployModal()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 shadow-sm transition">
-        <i data-lucide="send" class="w-3.5 h-3.5"></i>
-        <span>Push to MDM</span>
       </button>
     </div>
   </header>
@@ -83,7 +79,7 @@
         </div>
         <div class="relative">
           <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
-          <input id="schemaSearchInput" type="text" oninput="renderSchemaCatalog()" placeholder="Filter schemas or types..."
+          <input id="schemaSearchInput" type="text" oninput="renderSchemaCatalog()" placeholder="Filter schemas or bundle IDs..."
             class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500" />
         </div>
         <div class="flex gap-1 overflow-x-auto pb-0.5" id="categoryFilterBar"></div>
@@ -99,9 +95,12 @@
         <div class="flex items-center justify-between mb-2.5">
           <div class="flex items-center gap-2">
             <span id="activeProtocolBadge" class="text-[11px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800">MDM PROFILE</span>
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500" id="metaHeaderLabel">Configuration Profile Metadata</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500" id="metaHeaderLabel">Configuration Profile Top-Level Metadata</h2>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-3">
+            <button id="toggleAdvancedTopLevelBtn" onclick="toggleAdvancedTopLevel()" class="text-[11px] font-semibold text-sky-600 hover:text-sky-800 flex items-center gap-1">
+              <i data-lucide="sliders-horizontal" class="w-3 h-3"></i> Advanced Top-Level Options
+            </button>
             <button onclick="regenerateAllUUIDs()" class="text-[11px] font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1">
               <i data-lucide="refresh-cw" class="w-3 h-3"></i> Regenerate UUIDs
             </button>
@@ -110,7 +109,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaNameLabel">Profile Display Name</label>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaNameLabel">PayloadDisplayName</label>
             <input id="metaDisplayName" type="text" value="Corporate Enterprise Configuration" oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
           </div>
@@ -120,14 +119,54 @@
               class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Organization</label>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">PayloadOrganization</label>
             <input id="metaOrg" type="text" value="Enterprise IT" oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaExtraLabel">Scope / Activation ID</label>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1" id="metaExtraLabel">PayloadScope (System / User)</label>
             <input id="metaScopeOrActivation" type="text" value="System" oninput="refreshOutput()"
               class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
+          </div>
+        </div>
+
+        <!-- Collapsible Top-Level Options -->
+        <div id="advancedTopLevelPanel" class="hidden mt-3 pt-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">TargetDeviceType</label>
+            <select id="metaTargetDeviceType" onchange="refreshOutput()" class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg bg-white">
+              <option value="0">0 — Any / Unspecified</option>
+              <option value="1">1 — iPhone / iPad</option>
+              <option value="2">2 — Apple Watch</option>
+              <option value="3">3 — HomePod</option>
+              <option value="4">4 — Apple TV</option>
+              <option value="5">5 — Mac</option>
+              <option value="6">6 — Vision Pro</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">PayloadDescription</label>
+            <input id="metaDescription" type="text" value="Generated by Apple MDM & DDM Studio" oninput="refreshOutput()"
+              class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">RemovalDate / Expiration (ISO-8601)</label>
+            <input id="metaRemovalDate" type="text" placeholder="e.g. 2027-12-31T23:59:59Z" oninput="refreshOutput()"
+              class="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded-lg" />
+          </div>
+          <div class="flex flex-col justify-between">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Profile Lock & Consent</label>
+            <div class="flex items-center gap-3">
+              <label class="inline-flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
+                <input id="metaRemovalDisallowed" type="checkbox" onchange="refreshOutput()" class="rounded border-slate-300 text-sky-600" />
+                <span>Disallow Removal</span>
+              </label>
+            </div>
+          </div>
+          <div class="md:col-span-4">
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">ConsentText (default / en agreement prompt shown before install)</label>
+            <input id="metaConsentText" type="text" placeholder="Optional end-user consent agreement text..." oninput="refreshOutput()"
+              class="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-lg" />
           </div>
         </div>
       </div>
@@ -140,7 +179,7 @@
           </div>
           <h3 class="text-sm font-bold text-slate-800 mb-1">No Payloads or Declarations Added Yet</h3>
           <p class="text-xs text-slate-500 leading-relaxed mb-4">
-            Select any MDM payload or Declarative DDM schema from the left catalog, click <strong>Enterprise Apps Preset</strong>, or fetch live YAML schemas from <code class="text-slate-700">apple/device-management</code>.
+            Select any MDM payload, enterprise application schema (Firefox, Chrome, Edge, AutoUpdate, Zoom, Okta), or Declarative DDM configuration from the left catalog.
           </p>
         </div>
 
@@ -187,13 +226,13 @@
     </aside>
   </div>
 
-  <!-- MODAL 1: GitHub Repository Tree & Custom YAML Loader -->
+  <!-- MODAL 1: Schema Repository & Custom Policy Definition Loader -->
   <div id="repoModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh]">
       <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="git-branch" class="w-4 h-4 text-sky-600"></i>
-          <h3 class="text-sm font-bold text-slate-900">Load Schema from apple/device-management</h3>
+          <h3 class="text-sm font-bold text-slate-900">Load Apple Schema or Application Policy Definition</h3>
         </div>
         <button onclick="closeModal('repoModal')" class="text-slate-400 hover:text-slate-700">
           <i data-lucide="x" class="w-4 h-4"></i>
@@ -203,24 +242,24 @@
       <div class="p-5 space-y-4 overflow-y-auto flex-1">
         <div class="flex gap-2">
           <select id="repoFolderSelect" onchange="fetchGitHubDirectory()" class="px-3 py-2 text-xs border border-slate-200 rounded-lg bg-slate-50 font-medium">
-            <option value="mdm/profiles">mdm/profiles</option>
-            <option value="declarative/declarations/configurations">declarative/declarations/configurations</option>
-            <option value="declarative/declarations/assets">declarative/declarations/assets</option>
-            <option value="declarative/declarations/activations">declarative/declarations/activations</option>
-            <option value="declarative/declarations/management">declarative/declarations/management</option>
+            <option value="mdm/profiles">MDM Profiles (mdm/profiles)</option>
+            <option value="declarative/declarations/configurations">DDM Configurations</option>
+            <option value="declarative/declarations/assets">DDM Assets</option>
+            <option value="declarative/declarations/activations">DDM Activations</option>
+            <option value="declarative/declarations/management">DDM Management</option>
           </select>
           <button onclick="fetchGitHubDirectory()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Browse Live Repo
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Browse Repository
           </button>
         </div>
 
         <div id="repoFileList" class="border border-slate-200 rounded-xl divide-y divide-slate-100 max-h-48 overflow-y-auto bg-slate-50">
-          <div class="p-4 text-xs text-slate-500 text-center">Click "Browse Live Repo" to load YAML schemas directly from GitHub, or paste raw YAML below.</div>
+          <div class="p-4 text-xs text-slate-500 text-center">Click "Browse Repository" to load YAML schemas, or paste any YAML or XML policy definition below.</div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Or Paste Any Apple Device Management YAML Schema</label>
-          <textarea id="rawYamlInput" rows="7" placeholder="Paste raw YAML from apple/device-management here..."
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Paste YAML Schema or Application Policy Definition (.plist XML)</label>
+          <textarea id="rawYamlInput" rows="7" placeholder="Paste raw YAML schema or XML plist definition here..."
             class="w-full p-3 text-xs font-mono border border-slate-200 rounded-xl focus:outline-none focus:border-sky-500"></textarea>
         </div>
       </div>
@@ -252,67 +291,6 @@
       <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
         <button onclick="closeModal('importModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600">Cancel</button>
         <button onclick="importFromText()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Import Content</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL 3: Upload / Push to Any MDM Solution -->
-  <div id="deployModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl overflow-hidden">
-      <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <i data-lucide="send" class="w-4 h-4 text-sky-600"></i>
-          <h3 class="text-sm font-bold text-slate-900">Upload / Push to MDM Solution</h3>
-        </div>
-        <button onclick="closeModal('deployModal')" class="text-slate-400 hover:text-slate-700">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div class="p-5 space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Target MDM Platform</label>
-            <select id="mdmVendorSelect" onchange="updateDeploySnippets()" class="w-full px-2.5 py-2 text-xs border border-slate-200 rounded-lg bg-white">
-              <option value="micromdm">MicroMDM / NanoMDM</option>
-              <option value="fleetdm">FleetDM</option>
-              <option value="simplemdm">SimpleMDM</option>
-              <option value="jamf">Jamf Pro API</option>
-              <option value="intune">Microsoft Intune (Graph API)</option>
-              <option value="custom">Custom REST Endpoint</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">MDM Server Endpoint URL</label>
-            <input id="mdmEndpointUrl" type="url" value="https://mdm.example.com/v1/profiles" oninput="updateDeploySnippets()"
-              class="w-full px-2.5 py-2 text-xs font-mono border border-slate-200 rounded-lg" />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Bearer Token / API Key</label>
-            <input id="mdmApiToken" type="password" placeholder="••••••••••••" oninput="updateDeploySnippets()"
-              class="w-full px-2.5 py-2 text-xs font-mono border border-slate-200 rounded-lg" />
-          </div>
-        </div>
-
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-xs font-semibold text-slate-700">Ready-to-Run CLI / cURL Command</span>
-            <button onclick="copyCurlCommand()" class="text-[11px] font-semibold text-sky-600 hover:text-sky-700">Copy cURL</button>
-          </div>
-          <pre id="curlSnippetBox" class="p-3 rounded-xl bg-slate-900 text-sky-200 text-xs font-mono overflow-x-auto"></pre>
-        </div>
-
-        <div id="pushStatusAlert" class="hidden p-3 rounded-xl text-xs"></div>
-      </div>
-
-      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-        <span class="text-[11px] text-slate-500">Client-side direct push (requires CORS enabled on your MDM API)</span>
-        <div class="flex gap-2">
-          <button onclick="closeModal('deployModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600">Close</button>
-          <button onclick="executeDirectMdmPush()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5">
-            <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i> Push Now via REST
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -355,414 +333,287 @@
       key: 'Accessible', title: 'Keychain accessibility', type: 'string', rangelist: ['Default', 'AfterFirstUnlock'], default: 'Default'
     };
 
-    const SYSTEM_PREF_PANES_LIST = [
-      'com.apple.ClassroomSettings', 'com.apple.Localization', 'com.apple.preference.datetime',
-      'com.apple.preference.desktopscreeneffect', 'com.apple.preference.digihub.discs', 'com.apple.preference.displays',
-      'com.apple.preference.dock', 'com.apple.preference.energysaver', 'com.apple.preference.expose',
-      'com.apple.preference.general', 'com.apple.preference.ink', 'com.apple.preference.keyboard',
-      'com.apple.preference.mouse', 'com.apple.preference.network', 'com.apple.preference.notifications',
-      'com.apple.preference.printfax', 'com.apple.preference.screentime', 'com.apple.preference.security',
-      'com.apple.preference.sidecar', 'com.apple.preference.sound', 'com.apple.preference.speech',
-      'com.apple.preference.spotlight', 'com.apple.preference.startupdisk', 'com.apple.preference.trackpad',
-      'com.apple.preference.universalaccess', 'com.apple.preferences.AppleIDPrefPane', 'com.apple.preferences.appstore',
-      'com.apple.preferences.Bluetooth', 'com.apple.preferences.configurationprofiles', 'com.apple.preferences.extensions',
-      'com.apple.preferences.FamilySharingPrefPane', 'com.apple.preferences.icloud', 'com.apple.preferences.internetaccounts',
-      'com.apple.preferences.parentalcontrols', 'com.apple.preferences.password', 'com.apple.preferences.sharing',
-      'com.apple.preferences.softwareupdate', 'com.apple.preferences.users', 'com.apple.preferences.wallet',
-      'com.apple.prefpanel.fibrechannel', 'com.apple.prefs.backup', 'com.apple.Xsan'
+    const MAU_APP_PATHS = [
+      '/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app',
+      '/Applications/Microsoft Defender.app',
+      '/Applications/Microsoft Edge.app',
+      '/Applications/Microsoft Excel.app',
+      '/Applications/Microsoft OneNote.app',
+      '/Applications/Microsoft Outlook.app',
+      '/Applications/Microsoft PowerPoint.app',
+      '/Applications/Windows App.app',
+      '/Applications/Microsoft Remote Desktop.app',
+      '/Applications/Microsoft Teams.app',
+      '/Applications/Microsoft Word.app',
+      '/Applications/Company Portal.app',
+      '/Applications/OneDrive.app',
+      '/Applications/Skype for Business.app'
     ];
 
-    const SYSTEM_SETTINGS_EXTENSIONS_LIST = [
-      'com.apple.Accessibility-Settings.extension', 'com.apple.AirDrop-Handoff-Settings.extension',
-      'com.apple.Battery-Settings.extension', 'com.apple.BluetoothSettings', 'com.apple.CD-DVD-Settings.extension',
-      'com.apple.ClassKit-Settings.extension', 'com.apple.Classroom-Settings.extension',
-      'com.apple.ControlCenter-Settings.extension', 'com.apple.Date-Time-Settings.extension',
-      'com.apple.Desktop-Settings.extension', 'com.apple.Displays-Settings.extension',
-      'com.apple.ExtensionsPreferences', 'com.apple.Family-Settings.extension', 'com.apple.Focus-Settings.extension',
-      'com.apple.Game-Center-Settings.extension', 'com.apple.Game-Controller-Settings.extension',
-      'com.apple.HeadphoneSettings', 'com.apple.Internet-Accounts-Settings.extension',
-      'com.apple.Keyboard-Settings.extension', 'com.apple.Localization-Settings.extension',
-      'com.apple.Lock-Screen-Settings.extension', 'com.apple.LoginItems-Settings.extension',
-      'com.apple.Mouse-Settings.extension', 'com.apple.Network-Settings.extension',
-      'com.apple.NetworkExtensionSettingsUI.NESettingsUIExtension', 'com.apple.Notifications-Settings.extension',
-      'com.apple.Passwords-Settings.extension', 'com.apple.Print-Scan-Settings.extension',
-      'com.apple.Screen-Time-Settings.extension', 'com.apple.ScreenSaver-Settings.extension',
-      'com.apple.Sharing-Settings.extension', 'com.apple.Siri-Settings.extension',
-      'com.apple.Software-Update-Settings.extension', 'com.apple.Sound-Settings.extension',
-      'com.apple.Startup-Disk-Settings.extension', 'com.apple.Time-Machine-Settings.extension',
-      'com.apple.Touch-ID-Settings.extension', 'com.apple.Trackpad-Settings.extension',
-      'com.apple.Transfer-Reset-Settings.extension', 'com.apple.Users-Groups-Settings.extension',
-      'com.apple.WalletSettingsExtension', 'com.apple.Wallpaper-Settings.extension',
-      'com.apple.settings.Storage', 'com.apple.systempreferences.AppleIDSettings', 'com.apple.wifi-settings-extension'
-    ];
-
-    const MEDIA_ACTIONS = ['authenticate', 'read-only', 'deny', 'eject'];
-    const MEDIA_ITEMS_SUBKEYS = [
-      { key: 'cd', title: 'CD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'dvd', title: 'DVD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'bd', title: 'Blu-ray (BD)', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'blankcd', title: 'Blank CD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'blankdvd', title: 'Blank DVD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'blankbd', title: 'Blank Blu-ray', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'dvdram', title: 'DVD-RAM', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'disk-image', title: 'Disk Image (.dmg)', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'harddisk-internal', title: 'Internal Hard Disk', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'harddisk-external', title: 'External Hard Disk / USB / SD', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS },
-      { key: 'networkdisk', title: 'Network Disk', type: 'array', itemType: 'string', rangelist: MEDIA_ACTIONS }
-    ];
-
-    const TCC_IDENTITY_SUBKEYS = [
-      { key: 'Identifier', title: 'App Bundle ID or binary path (case-sensitive)', type: 'string', required: true, default: 'com.example.corpagent' },
-      { key: 'IdentifierType', title: 'Identifier type', type: 'string', required: true, rangelist: ['bundleID', 'path'], default: 'bundleID' },
-      { key: 'CodeRequirement', title: 'Code Requirement (from codesign -display -r -)', type: 'string', required: true, default: 'anchor apple generic' },
-      { key: 'StaticCode', title: 'Static code validation', type: 'boolean', default: false },
-      { key: 'Authorization', title: 'Authorization (macOS 11+, replaces Allowed)', type: 'string', rangelist: ['Allow', 'Deny', 'AllowStandardUserToSetSystemService'], default: 'Allow' },
-      { key: 'Allowed', title: 'Allowed (boolean, omit if Authorization is set)', type: 'boolean' },
-      { key: 'AEReceiverIdentifier', title: 'AppleEvents Receiver Identifier (AppleEvents only)', type: 'string' },
-      { key: 'AEReceiverIdentifierType', title: 'AppleEvents Receiver Type', type: 'string', rangelist: ['bundleID', 'path'] },
-      { key: 'AEReceiverCodeRequirement', title: 'AppleEvents Receiver Code Requirement', type: 'string' }
-    ];
-
-    const TCC_SERVICES_SUBKEYS = [
-      'SystemPolicyAllFiles', 'ScreenCapture', 'Accessibility', 'PostEvent', 'ListenEvent',
-      'SystemPolicySysAdminFiles', 'SystemPolicyDesktopFolder', 'SystemPolicyDocumentsFolder',
-      'SystemPolicyDownloadsFolder', 'SystemPolicyNetworkVolumes', 'SystemPolicyRemovableVolumes',
-      'SystemPolicyAppBundles', 'SystemPolicyAppData', 'AddressBook', 'Calendar', 'Reminders',
-      'Photos', 'Camera', 'Microphone', 'BluetoothAlways', 'SpeechRecognition', 'AppleEvents',
-      'MediaLibrary', 'FileProviderPresence'
-    ].map(svc => ({
-      key: svc, title: svc, type: 'array', itemType: 'dictionary', subkeys: TCC_IDENTITY_SUBKEYS
+    const MAU_APPS_SUBKEYS = MAU_APP_PATHS.map(appPath => ({
+      key: appPath,
+      title: appPath.split('/').pop(),
+      type: 'dictionary',
+      subkeys: [
+        { key: 'Application ID', title: 'Application ID (e.g. MSau04, EDGE01, XCEL2019, OPIM2019, TEAMS21)', type: 'string' },
+        { key: 'LCID', title: 'Locale ID (e.g. 1033)', type: 'integer' }
+      ]
     }));
 
-    const VPN_SA_SUBKEYS = [
-      { key: 'EncryptionAlgorithm', title: 'Encryption algorithm', type: 'string', rangelist: ['DES', '3DES', 'AES-128', 'AES-256', 'AES-128-GCM', 'AES-256-GCM', 'ChaCha20Poly1305'], default: 'AES-256' },
-      { key: 'IntegrityAlgorithm', title: 'Integrity algorithm', type: 'string', rangelist: ['SHA1-96', 'SHA1-160', 'SHA2-256', 'SHA2-384', 'SHA2-512'], default: 'SHA2-256' },
-      { key: 'DiffieHellmanGroup', title: 'Diffie-Hellman group', type: 'integer', rangelist: [1, 2, 5, 14, 15, 16, 17, 18, 19, 20, 21, 31, 32], default: 14 },
-      { key: 'PostQuantumKeyExchangeMethods', title: 'Post-quantum key exchange methods (RFC 9370)', type: 'array', itemType: 'integer', rangelist: [0, 36, 37] },
-      { key: 'LifeTimeInMinutes', title: 'SA lifetime in minutes (10-1440)', type: 'integer', default: 1440 }
+    const MAU_DEADLINE_SUBKEYS = MAU_APP_PATHS.map(appPath => ({
+      key: appPath,
+      title: appPath.split('/').pop(),
+      type: 'dictionary',
+      subkeys: [
+        { key: 'Application ID', title: 'Application ID', type: 'string' },
+        { key: 'ForcedUpdateDate', title: 'Forced Update Date (ISO-8601 UTC)', type: 'date' },
+        { key: 'ForcedUpdateDaysAfterRelease', title: 'Forced Update Days After Release', type: 'integer' }
+      ]
+    }));
+
+    const CHROMIUM_PROXY_SUBKEYS = [
+      { key: 'ProxyMode', title: 'Proxy Mode', type: 'string', rangelist: ['auto_detect', 'direct', 'fixed_servers', 'pac_script', 'system'], default: 'system' },
+      { key: 'ProxyServer', title: 'Proxy Server (when fixed_servers)', type: 'string' },
+      { key: 'ProxyBypassList', title: 'Proxy Bypass List (when fixed_servers)', type: 'string' },
+      { key: 'ProxyPacUrl', title: 'Proxy PAC URL (when pac_script)', type: 'string' },
+      { key: 'ProxyPacMandatory', title: 'Proxy PAC Mandatory', type: 'boolean', default: false }
     ];
 
-    const ON_DEMAND_RULES_SUBKEYS = [
-      { key: 'Action', title: 'On demand action', type: 'string', required: true, rangelist: ['Allow', 'Connect', 'Disconnect', 'EvaluateConnection', 'Ignore'], default: 'Connect' },
-      {
-        key: 'ActionParameters', title: 'Action parameters (for EvaluateConnection)', type: 'array', itemType: 'dictionary',
-        subkeys: [
-          { key: 'Domains', title: 'Domains', type: 'array', itemType: 'string', required: true },
-          { key: 'DomainAction', title: 'Domain action', type: 'string', required: true, rangelist: ['ConnectIfNeeded', 'NeverConnect'], default: 'ConnectIfNeeded' },
-          { key: 'RequiredDNSServers', title: 'Required DNS servers', type: 'array', itemType: 'string' },
-          { key: 'RequiredURLStringProbe', title: 'Required URL string probe', type: 'string' }
-        ]
-      },
-      { key: 'DNSDomainMatch', title: 'DNS domain match', type: 'array', itemType: 'string' },
-      { key: 'DNSServerAddressMatch', title: 'DNS server address match', type: 'array', itemType: 'string' },
-      { key: 'InterfaceTypeMatch', title: 'Interface type match', type: 'string', rangelist: ['Ethernet', 'WiFi', 'Cellular'] },
-      { key: 'SSIDMatch', title: 'SSID match', type: 'array', itemType: 'string' },
-      { key: 'URLStringProbe', title: 'URL string probe', type: 'string' }
+    const MANAGED_BOOKMARK_LEAF = [
+      { key: 'name', title: 'Bookmark name', type: 'string', default: 'Enterprise Portal' },
+      { key: 'url', title: 'Bookmark URL', type: 'string', default: 'https://portal.example.com' }
     ];
 
-    const VPN_COMMON_SUBKEYS = [
-      { key: 'UserDefinedName', title: 'VPN connection display name', type: 'string', required: true, default: 'Corporate VPN' },
-      { key: 'VPNType', title: 'VPN type', type: 'string', required: true, rangelist: ['IKEv2', 'IPSec', 'L2TP', 'VPN', 'AlwaysOn', 'TransparentProxy'], default: 'IKEv2' },
-      { key: 'VPNSubType', title: 'VPN SubType (Plugin Bundle ID when VPNType = VPN/TransparentProxy)', type: 'string' },
-      {
-        key: 'VendorConfig', title: 'Vendor configuration', type: 'dictionary',
-        subkeys: [
-          { key: 'Realm', title: 'Realm (Juniper/Pulse)', type: 'string' },
-          { key: 'Role', title: 'Role (Juniper/Pulse)', type: 'string' },
-          { key: 'Group', title: 'Group (Cisco AnyConnect)', type: 'string' },
-          { key: 'LoginGroupOrDomain', title: 'Login group/domain (SonicWALL)', type: 'string' }
-        ]
-      },
-      {
-        key: 'IKEv2', title: 'IKEv2 settings (when VPNType = IKEv2)', type: 'dictionary',
-        subkeys: [
-          { key: 'RemoteAddress', title: 'VPN server address', type: 'string', required: true, default: 'vpn.example.com' },
-          { key: 'LocalIdentifier', title: 'Local identifier', type: 'string', required: true, default: 'client.example.com' },
-          { key: 'RemoteIdentifier', title: 'Remote identifier', type: 'string', required: true, default: 'vpn.example.com' },
-          { key: 'AuthenticationMethod', title: 'Authentication method', type: 'string', required: true, rangelist: ['None', 'SharedSecret', 'Certificate'], default: 'Certificate' },
-          { key: 'PayloadCertificateUUID', title: 'Client identity certificate PayloadUUID', type: 'string' },
-          { key: 'SharedSecret', title: 'Shared secret (when SharedSecret)', type: 'string' },
-          { key: 'ExtendedAuthEnabled', title: 'Enable EAP authentication (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
-          { key: 'AuthName', title: 'EAP Username', type: 'string' },
-          { key: 'AuthPassword', title: 'EAP Password', type: 'string' },
-          { key: 'IncludeAllNetworks', title: 'Include all networks / Full tunnel (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
-          { key: 'ExcludeLocalNetworks', title: 'Exclude local networks (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
-          { key: 'OnDemandEnabled', title: 'Enable VPN On Demand (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
-          { key: 'OnDemandRules', title: 'On Demand rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS },
-          { key: 'EnablePFS', title: 'Enable Perfect Forward Secrecy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
-          { key: 'MTU', title: 'MTU (1280-1400)', type: 'integer', default: 1280 },
-          { key: 'PPK', title: 'Post-quantum pre-shared key (Base64 <data>)', type: 'data' },
-          { key: 'PPKIdentifier', title: 'Post-quantum PPK identifier', type: 'string' },
-          { key: 'IKESecurityAssociationParameters', title: 'IKE SA parameters', type: 'dictionary', subkeys: VPN_SA_SUBKEYS },
-          { key: 'ChildSecurityAssociationParameters', title: 'Child SA parameters', type: 'dictionary', subkeys: VPN_SA_SUBKEYS }
-        ]
-      },
-      {
-        key: 'VPN', title: 'SSL / Plugin VPN settings (when VPNType = VPN)', type: 'dictionary',
-        subkeys: [
-          { key: 'RemoteAddress', title: 'VPN server address', type: 'string', required: true, default: 'sslvpn.example.com' },
-          { key: 'AuthenticationMethod', title: 'Authentication method', type: 'string', rangelist: ['Password', 'Certificate', 'Password+Certificate'], default: 'Password' },
-          { key: 'AuthName', title: 'Username', type: 'string' },
-          { key: 'AuthPassword', title: 'Password', type: 'string' },
-          { key: 'PayloadCertificateUUID', title: 'Certificate PayloadUUID', type: 'string' },
-          { key: 'ProviderBundleIdentifier', title: 'Network Extension provider Bundle ID', type: 'string' },
-          { key: 'ProviderDesignatedRequirement', title: 'Provider designated requirement (macOS)', type: 'string' },
-          { key: 'ProviderType', title: 'Provider type', type: 'string', rangelist: ['packet-tunnel', 'app-proxy'], default: 'packet-tunnel' },
-          { key: 'OnDemandEnabled', title: 'Enable VPN On Demand (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
-          { key: 'OnDemandRules', title: 'On Demand rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS }
-        ]
-      },
-      {
-        key: 'IPSec', title: 'Cisco IPSec / L2TP IPSec settings', type: 'dictionary',
-        subkeys: [
-          { key: 'RemoteAddress', title: 'VPN server address', type: 'string', default: 'ipsec.example.com' },
-          { key: 'AuthenticationMethod', title: 'Authentication method', type: 'string', rangelist: ['SharedSecret', 'Certificate'], default: 'SharedSecret' },
-          { key: 'LocalIdentifier', title: 'Group name (LocalIdentifier)', type: 'string' },
-          { key: 'SharedSecret', title: 'Shared secret (Base64 <data>)', type: 'data' },
-          { key: 'XAuthEnabled', title: 'XAuth enabled (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
-          { key: 'XAuthName', title: 'XAuth username', type: 'string' },
-          { key: 'XAuthPassword', title: 'XAuth password', type: 'string' },
-          { key: 'PayloadCertificateUUID', title: 'Certificate PayloadUUID', type: 'string' }
-        ]
-      },
-      {
-        key: 'DNS', title: 'VPN DNS settings', type: 'dictionary',
-        subkeys: [
-          { key: 'DNSProtocol', title: 'DNS protocol (iOS 14+ / macOS 11+)', type: 'string', required: true, rangelist: ['Cleartext', 'HTTPS', 'TLS'], default: 'Cleartext' },
-          { key: 'ServerAddresses', title: 'DNS server IP addresses', type: 'array', itemType: 'string', required: true },
-          { key: 'SearchDomains', title: 'Search domains', type: 'array', itemType: 'string' },
-          { key: 'DomainName', title: 'Primary domain name', type: 'string' },
-          { key: 'SupplementalMatchDomains', title: 'Supplemental match domains', type: 'array', itemType: 'string' },
-          { key: 'ServerURL', title: 'DoH Server URL (when HTTPS)', type: 'string' },
-          { key: 'ServerName', title: 'DoT Server hostname (when TLS)', type: 'string' }
-        ]
-      },
-      {
-        key: 'Proxies', title: 'VPN Proxy settings', type: 'dictionary',
-        subkeys: [
-          { key: 'HTTPEnable', title: 'Enable HTTP proxy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
-          { key: 'HTTPProxy', title: 'HTTP proxy host', type: 'string' },
-          { key: 'HTTPPort', title: 'HTTP proxy port', type: 'integer' },
-          { key: 'HTTPSEnable', title: 'Enable HTTPS proxy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
-          { key: 'HTTPSProxy', title: 'HTTPS proxy host', type: 'string' },
-          { key: 'HTTPSPort', title: 'HTTPS proxy port', type: 'integer' },
-          { key: 'ProxyAutoConfigEnable', title: 'Enable PAC auto-config (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
-          { key: 'ProxyAutoConfigURLString', title: 'PAC URL', type: 'string' }
-        ]
-      }
+    const MANAGED_BOOKMARK_ITEM_SUBKEYS = [
+      { key: 'toplevel_name', title: 'Top-level folder name (first item only)', type: 'string' },
+      { key: 'name', title: 'Item or folder name', type: 'string', default: 'IT Helpdesk' },
+      { key: 'url', title: 'URL (omit if folder with children)', type: 'string', default: 'https://helpdesk.example.com' },
+      { key: 'children', title: 'Nested folder bookmarks', type: 'array', itemType: 'dictionary', subkeys: MANAGED_BOOKMARK_LEAF }
     ];
 
     // =========================================================================
-    // 2. BUILT-IN CATALOG (CLASSIC MDM PROFILES + ENTERPRISE APPS + DDM)
+    // 2. BUILT-IN CATALOG (CLASSIC MDM + APPLICATION POLICIES + DDM)
     // =========================================================================
     const BUILTIN_SCHEMAS = [
-      // --- CLASSIC MDM PROFILES (.mobileconfig) - UPLOADED BATCH 11 (201-210) ---
-      {
-        protocol: 'mdm',
-        category: 'System & Desktop',
-        title: 'System Preferences / System Settings',
-        payloadType: 'com.apple.systempreferences',
-        description: 'Hides or enables System Preferences panes and macOS 13+ System Settings extensions (DisabledSystemSettings).',
-        supportedOS: 'macOS 10.7+ (Deprecated in 13.0)',
-        keys: [
-          { key: 'DisabledSystemSettings', title: 'Disabled System Settings extensions (macOS 13+)', type: 'array', itemType: 'string', rangelist: SYSTEM_SETTINGS_EXTENSIONS_LIST },
-          { key: 'DisabledPreferencePanes', title: 'Disabled legacy Preference Panes (macOS < 13)', type: 'array', itemType: 'string', rangelist: SYSTEM_PREF_PANES_LIST },
-          { key: 'EnabledPreferencePanes', title: 'Enabled legacy Preference Panes (macOS < 13)', type: 'array', itemType: 'string', rangelist: SYSTEM_PREF_PANES_LIST }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Media & Peripherals',
-        title: 'Media Management: Allowed Media',
-        payloadType: 'com.apple.systemuiserver',
-        description: 'Controls mount, unmount, and logout-eject policies for external drives, USB, SD cards, disk images, and optical media on macOS.',
-        supportedOS: 'macOS 10.7–10.15 (Deprecated in 11.0)',
-        keys: [
-          { key: 'mount-controls', title: 'Volume mount controls', type: 'dictionary', subkeys: MEDIA_ITEMS_SUBKEYS },
-          { key: 'unmount-controls', title: 'Volume unmount controls', type: 'dictionary', subkeys: MEDIA_ITEMS_SUBKEYS },
-          { key: 'logout-eject', title: 'Eject on logout controls', type: 'dictionary', subkeys: MEDIA_ITEMS_SUBKEYS }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Identity',
-        title: 'Privacy Preferences Policy Control (TCC)',
-        payloadType: 'com.apple.TCC.configuration-profile-policy',
-        description: 'Pre-approves or denies macOS TCC privacy permissions (Full Disk Access, Screen Recording, Accessibility, AppleEvents, Camera, Mic, Folders).',
-        supportedOS: 'macOS 10.14+ (User-Approved MDM)',
-        keys: [
-          { key: 'Services', title: 'TCC Privacy Services', type: 'dictionary', required: true, subkeys: TCC_SERVICES_SUBKEYS }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network',
-        title: '802.1X: Third Active Ethernet',
-        payloadType: 'com.apple.thirdactiveethernet.managed',
-        description: 'Configures 802.1X wired authentication for the third active Ethernet interface on macOS.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'Interface', title: 'Interface type', type: 'string', rangelist: ['ThirdActiveEthernet'], default: 'ThirdActiveEthernet' },
-          { key: 'SetupModes', title: 'Setup mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
-          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (802.1X keys)', type: 'kv_map' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network',
-        title: '802.1X: Third Ethernet',
-        payloadType: 'com.apple.thirdethernet.managed',
-        description: 'Configures 802.1X wired authentication for the third Ethernet interface by service order on macOS.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'Interface', title: 'Interface type', type: 'string', rangelist: ['ThirdEthernet'], default: 'ThirdEthernet' },
-          { key: 'SetupModes', title: 'Setup mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
-          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (802.1X keys)', type: 'kv_map' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Media & Peripherals',
-        title: 'TV Remote',
-        payloadType: 'com.apple.tvremote',
-        description: 'Restricts which iOS devices can control an Apple TV and which Apple TVs an iOS device can control via the Remote app.',
-        supportedOS: 'iOS 11.3+, tvOS 11.3+ (Supervised)',
-        keys: [
-          {
-            key: 'AllowedTVs', title: 'Allowed Apple TVs (for iOS devices)', type: 'array', itemType: 'dictionary',
-            subkeys: [
-              { key: 'TVDeviceID', title: 'Apple TV MAC address (xx:xx:xx:xx:xx:xx)', type: 'string', required: true, default: 'AA:BB:CC:DD:EE:FF' },
-              { key: 'TVDeviceName', title: 'Apple TV device name (iOS 15+)', type: 'string', default: 'Boardroom Apple TV' }
-            ]
-          },
-          {
-            key: 'AllowedRemotes', title: 'Allowed iOS Remotes (for Apple TV)', type: 'array', itemType: 'dictionary',
-            subkeys: [
-              { key: 'RemoteDeviceID', title: 'iOS device MAC address (xx:xx:xx:xx:xx:xx)', type: 'string', required: true, default: '11:22:33:44:55:66' }
-            ]
-          }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'System & Desktop',
-        title: 'Accessibility',
-        payloadType: 'com.apple.universalaccess',
-        description: 'Configures macOS accessibility features including VoiceOver, Zoom, Sticky Keys, Slow Keys, Mouse Keys, Contrast, and Invert Colors.',
-        supportedOS: 'macOS 10.9+',
-        keys: [
-          { key: 'voiceOverOnOffKey', title: 'Enable VoiceOver', type: 'boolean', default: false },
-          { key: 'whiteOnBlack', title: 'Enable Invert Colors', type: 'boolean', default: false },
-          { key: 'contrast', title: 'Display contrast (0.0 to 1.0)', type: 'real', default: 0.0 },
-          { key: 'flashScreen', title: 'Flash screen on alert sound', type: 'boolean', default: false },
-          { key: 'stereoAsMono', title: 'Play stereo audio as mono', type: 'boolean', default: false },
-          { key: 'closeViewHotkeysEnabled', title: 'Enable Zoom keyboard shortcuts', type: 'boolean', default: false },
-          { key: 'closeViewScrollWheelToggle', title: 'Enable Zoom scroll gesture', type: 'boolean', default: false },
-          { key: 'closeViewSmoothImages', title: 'Smooth images when zoomed', type: 'boolean', default: false },
-          { key: 'closeViewFarPoint', title: 'Minimum zoom level', type: 'integer' },
-          { key: 'closeViewNearPoint', title: 'Maximum zoom level', type: 'integer' },
-          { key: 'stickyKey', title: 'Enable Sticky Keys', type: 'boolean', default: false },
-          { key: 'stickyKeyBeepOnModifier', title: 'Beep when modifier key set (Sticky Keys)', type: 'boolean', default: false },
-          { key: 'stickyKeyShowWindow', title: 'Display pressed keys on screen', type: 'boolean', default: false },
-          { key: 'slowKey', title: 'Enable Slow Keys', type: 'boolean', default: false },
-          { key: 'slowKeyBeepOn', title: 'Click key sounds (Slow Keys)', type: 'boolean', default: false },
-          { key: 'slowKeyDelay', title: 'Slow Keys acceptance delay (ms)', type: 'integer' },
-          { key: 'mouseDriver', title: 'Enable Mouse Keys', type: 'boolean', default: false },
-          { key: 'mouseDriverIgnoreTrackpad', title: 'Ignore built-in trackpad when Mouse Keys on', type: 'boolean', default: false }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network',
-        title: 'App-Layer VPN (Per-App VPN)',
-        payloadType: 'com.apple.vpn.managed.applayer',
-        description: 'Configures a Per-App VPN tunnel triggered by managed apps, Safari domains, Associated Domains, SMB domains, or Cellular Slices.',
-        supportedOS: 'iOS 7.0+, macOS 10.9+, visionOS 1.1+, watchOS 10.0+',
-        keys: [
-          { key: 'VPNUUID', title: 'Per-App VPN UUID (referenced by managed apps)', type: 'string', required: true, default: '11111111-2222-4333-8444-555555555555' },
-          { key: 'OnDemandMatchAppEnabled', title: 'Auto-connect VPN when associated apps use network', type: 'boolean', default: true },
-          { key: 'SafariDomains', title: 'Safari domains triggering VPN', type: 'array', itemType: 'string' },
-          { key: 'AssociatedDomains', title: 'Associated domains triggering VPN (iOS 14+ / macOS 11+)', type: 'array', itemType: 'string' },
-          { key: 'ExcludedDomains', title: 'Excluded domains', type: 'array', itemType: 'string' },
-          { key: 'SMBDomains', title: 'SMB domains accessible via VPN (iOS 13+)', type: 'array', itemType: 'string' },
-          { key: 'CellularSliceUUID', title: 'Cellular Slice DNN / AppCategory (iOS 18+)', type: 'string' },
-          ...VPN_COMMON_SUBKEYS
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network',
-        title: 'App-to-App-Layer VPN Mapping (macOS)',
-        payloadType: 'com.apple.vpn.managed.appmapping',
-        description: 'Maps macOS applications and spawned command-line helper tools to a Per-App VPNUUID using code-signing requirements.',
-        supportedOS: 'macOS 10.9+',
-        keys: [
-          {
-            key: 'AppLayerVPNMapping', title: 'App-to-VPN mappings', type: 'array', itemType: 'dictionary', required: true,
-            subkeys: [
-              { key: 'Identifier', title: 'App bundle identifier', type: 'string', required: true, default: 'com.example.corpapp' },
-              { key: 'VPNUUID', title: 'Target Per-App VPNUUID', type: 'string', required: true, default: '11111111-2222-4333-8444-555555555555' },
-              { key: 'SigningIdentifier', title: 'Code signature signing identifier', type: 'string', required: true, default: 'com.example.corpapp' },
-              { key: 'DesignatedRequirement', title: 'Designated Requirement (codesign -d -r -)', type: 'string', required: true, default: 'anchor apple generic' },
-              { key: 'Path', title: 'Executable file-system path (optional)', type: 'string' },
-              {
-                key: 'MatchTools', title: 'Spawned helper/CLI tool rules (macOS 10.15.4+)', type: 'array', itemType: 'dictionary',
-                subkeys: [
-                  { key: 'SigningIdentifier', title: 'Tool signing identifier', type: 'string', required: true },
-                  { key: 'DesignatedRequirement', title: 'Tool designated requirement', type: 'string', required: true },
-                  { key: 'Path', title: 'Tool file-system path', type: 'string' }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network',
-        title: 'VPN (IKEv2 / IPSec / SSL / AlwaysOn / TransparentProxy)',
-        payloadType: 'com.apple.vpn.managed',
-        description: 'Configures device-wide IKEv2, Cisco IPSec, L2TP, SSL VPN plugins, iOS AlwaysOn VPN, and macOS TransparentProxy.',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 17.0+, visionOS 1.0+',
-        keys: VPN_COMMON_SUBKEYS
-      },
-
-      // --- THIRD-PARTY ENTERPRISE APPS (FROM UPLOADED Test.mobileconfig) ---
+      // --- ENTERPRISE APPLICATION POLICY SCHEMAS ---
       {
         protocol: 'mdm',
         category: 'Enterprise Apps',
-        title: 'Microsoft Outlook',
-        payloadType: 'com.microsoft.Outlook',
-        description: 'Configures managed preferences for Microsoft Outlook for Mac.',
-        supportedOS: 'macOS Managed App Preferences',
-        rootKvMap: true,
-        keys: []
+        title: 'Mozilla Firefox',
+        payloadType: 'org.mozilla.firefox',
+        description: 'Configures Mozilla Firefox browser policies: General, Add-ons, Bookmarks, Languages, Network (DNSOverHTTPS, Proxy, Ciphers), Privacy, and Security.',
+        supportedOS: 'macOS Application Policy (org.mozilla.firefox)',
+        keys: [
+          { key: 'EnterprisePoliciesEnabled', title: 'Enable Firefox Enterprise Policies', type: 'boolean', required: true, default: true },
+          { key: 'DisableAppUpdate', title: 'Disable application updates', type: 'boolean', default: false },
+          { key: 'AppAutoUpdate', title: 'Enable automatic app updates', type: 'boolean', default: true },
+          { key: 'BlockAboutConfig', title: 'Block access to about:config', type: 'boolean', default: false },
+          { key: 'BlockAboutAddons', title: 'Block access to about:addons', type: 'boolean', default: false },
+          { key: 'BlockAboutProfiles', title: 'Block access to about:profiles', type: 'boolean', default: false },
+          { key: 'BlockAboutSupport', title: 'Block access to about:support', type: 'boolean', default: false },
+          { key: 'DisableTelemetry', title: 'Disable telemetry', type: 'boolean', default: true },
+          { key: 'DisableFirefoxStudies', title: 'Disable Firefox Studies', type: 'boolean', default: true },
+          { key: 'DisablePocket', title: 'Disable Pocket', type: 'boolean', default: true },
+          { key: 'DisableFirefoxAccounts', title: 'Disable Firefox Accounts / Sync', type: 'boolean', default: false },
+          { key: 'DisablePrivateBrowsing', title: 'Disable Private Browsing', type: 'boolean', default: false },
+          { key: 'DisableDeveloperTools', title: 'Disable Developer Tools', type: 'boolean', default: false },
+          { key: 'DisableBuiltinPDFViewer', title: 'Disable built-in PDF viewer', type: 'boolean', default: false },
+          { key: 'DontCheckDefaultBrowser', title: 'Do not check if Firefox is default browser', type: 'boolean', default: true },
+          { key: 'OfferToSaveLogins', title: 'Offer to save logins', type: 'boolean', default: false },
+          { key: 'PasswordManagerEnabled', title: 'Enable Password Manager', type: 'boolean', default: false },
+          { key: 'PictureInPicture', title: 'Enable Picture-in-Picture', type: 'boolean', default: true },
+          { key: 'DisplayBookmarksToolbar', title: 'Display Bookmarks Toolbar', type: 'string', rangelist: ['always', 'never', 'newtab'], default: 'newtab' },
+          { key: 'SSLVersionMin', title: 'Minimum SSL/TLS version', type: 'string', rangelist: ['tls1', 'tls1.1', 'tls1.2', 'tls1.3'], default: 'tls1.2' },
+          { key: 'SSLVersionMax', title: 'Maximum SSL/TLS version', type: 'string', rangelist: ['tls1.2', 'tls1.3'], default: 'tls1.3' },
+          { key: 'RequestedLocales', title: 'Requested locales (e.g. en-US, en-IN)', type: 'array', itemType: 'string' },
+          {
+            key: 'DNSOverHTTPS', title: 'DNS Over HTTPS (DoH)', type: 'dictionary',
+            subkeys: [
+              { key: 'Enabled', title: 'Enable DNS Over HTTPS', type: 'boolean', default: true },
+              { key: 'ProviderURL', title: 'DoH Provider URL', type: 'string', default: 'https://dns.quad9.net/dns-query' },
+              { key: 'Locked', title: 'Lock DNS Over HTTPS Settings', type: 'boolean', default: true },
+              { key: 'ExcludedDomains', title: 'Excluded domains', type: 'array', itemType: 'string' }
+            ]
+          },
+          {
+            key: 'Proxy', title: 'Firefox Proxy Settings', type: 'dictionary',
+            subkeys: [
+              { key: 'Mode', title: 'Proxy Mode', type: 'string', rangelist: ['none', 'system', 'manual', 'autoDetect', 'autoConfig'], default: 'system' },
+              { key: 'HTTPProxy', title: 'HTTP Proxy host:port', type: 'string' },
+              { key: 'SSLProxy', title: 'SSL Proxy host:port', type: 'string' },
+              { key: 'AutoConfigURL', title: 'PAC AutoConfig URL', type: 'string' },
+              { key: 'Passthrough', title: 'Bypass proxy hosts (comma-separated)', type: 'string' },
+              { key: 'Locked', title: 'Lock Proxy Settings', type: 'boolean', default: true }
+            ]
+          },
+          {
+            key: 'PDFjs', title: 'PDF.js Settings', type: 'dictionary',
+            subkeys: [
+              { key: 'Enabled', title: 'Enable PDF.js', type: 'boolean', default: true },
+              { key: 'EnablePermissions', title: 'Enable PDF.js Permissions', type: 'boolean', default: true }
+            ]
+          },
+          {
+            key: 'EncryptedMediaExtensions', title: 'Encrypted Media Extensions (EME)', type: 'dictionary',
+            subkeys: [
+              { key: 'Enabled', title: 'Enable Encrypted Media Permissions', type: 'boolean', default: true },
+              { key: 'Locked', title: 'Lock Encrypted Media Permissions', type: 'boolean', default: false }
+            ]
+          },
+          {
+            key: 'WebsiteFilter', title: 'Website Filter (Block & Exceptions)', type: 'dictionary',
+            subkeys: [
+              { key: 'Block', title: 'Blocked URL match patterns (e.g. *://*.example.org/*)', type: 'array', itemType: 'string' },
+              { key: 'Exceptions', title: 'Allowed exception URL match patterns', type: 'array', itemType: 'string' }
+            ]
+          },
+          {
+            key: 'DisabledCiphers', title: 'Disabled TLS Ciphers (true = disabled)', type: 'dictionary',
+            subkeys: [
+              { key: 'TLS_RSA_WITH_3DES_EDE_CBC_SHA', title: 'Disable TLS_RSA_WITH_3DES_EDE_CBC_SHA', type: 'boolean', default: true },
+              { key: 'TLS_RSA_WITH_AES_128_CBC_SHA', title: 'Disable TLS_RSA_WITH_AES_128_CBC_SHA', type: 'boolean', default: false },
+              { key: 'TLS_RSA_WITH_AES_256_CBC_SHA', title: 'Disable TLS_RSA_WITH_AES_256_CBC_SHA', type: 'boolean', default: false }
+            ]
+          },
+          { key: 'Preferences', title: 'Custom about:config Preferences (key/value)', type: 'kv_map' }
+        ]
       },
       {
         protocol: 'mdm',
         category: 'Enterprise Apps',
         title: 'Google Chrome',
         payloadType: 'com.google.Chrome',
-        description: 'Configures managed enterprise browser policies for Google Chrome.',
-        supportedOS: 'macOS Managed App Preferences',
+        description: 'Configures Google Chrome enterprise policies: General, Content Settings, Extensions, DoH, ProxySettings, ManagedBookmarks, and Safe Browsing.',
+        supportedOS: 'macOS Application Policy (com.google.Chrome)',
         keys: [
           { key: 'HomepageLocation', title: 'Homepage URL', type: 'string', default: 'www.apple.com' },
+          { key: 'HomepageIsNewTabPage', title: 'Use New Tab Page as Homepage', type: 'boolean', default: false },
           { key: 'NewTabPageLocation', title: 'New Tab Page URL', type: 'string', default: 'www.apple.com' },
           { key: 'ShowHomeButton', title: 'Show Home button on toolbar', type: 'boolean', default: true },
+          { key: 'BookmarkBarEnabled', title: 'Enable Bookmark Bar', type: 'boolean', default: true },
           { key: 'DefaultBrowserSettingEnabled', title: 'Set Chrome as default browser', type: 'boolean', default: true },
+          { key: 'RestoreOnStartup', title: 'Action on startup (1=Restore, 4=URLs, 5=New Tab)', type: 'integer', rangelist: [1, 4, 5], default: 5 },
+          { key: 'RestoreOnStartupURLs', title: 'Startup URLs (when RestoreOnStartup = 4)', type: 'array', itemType: 'string' },
           { key: 'BlockThirdPartyCookies', title: 'Block third-party cookies', type: 'boolean', default: true },
           { key: 'DefaultCookiesSetting', title: 'Default cookies setting (1=Allow, 2=Block, 4=Session)', type: 'integer', rangelist: [1, 2, 4], default: 2 },
-          { key: 'RestoreOnStartup', title: 'Action on startup (1=Restore, 4=URLs, 5=New Tab)', type: 'integer', rangelist: [1, 4, 5], default: 5 },
+          { key: 'PasswordManagerEnabled', title: 'Enable Password Manager', type: 'boolean', default: true },
           { key: 'PasswordLeakDetectionEnabled', title: 'Enable password leak detection', type: 'boolean', default: true },
+          { key: 'SafeBrowsingEnabled', title: 'Enable Safe Browsing', type: 'boolean', default: true },
+          { key: 'SafeBrowsingProtectionLevel', title: 'Safe Browsing level (0=Off, 1=Standard, 2=Enhanced)', type: 'integer', rangelist: [0, 1, 2], default: 1 },
           { key: 'ReportSafeBrowsingData', title: 'Report Safe Browsing telemetry', type: 'boolean', default: true },
+          { key: 'CloudManagementEnrollmentToken', title: 'Chrome Browser Cloud Management enrollment token', type: 'string' },
           { key: 'CloudReportingEnabled', title: 'Enable Chrome Browser Cloud Management reporting', type: 'boolean', default: true },
           { key: 'CloudExtensionRequestEnabled', title: 'Allow users to request extensions in cloud', type: 'boolean', default: true },
+          { key: 'ExtensionInstallAllowlist', title: 'Allowed extension IDs', type: 'array', itemType: 'string' },
+          { key: 'ExtensionInstallBlocklist', title: 'Blocked extension IDs (use * to block all)', type: 'array', itemType: 'string' },
+          { key: 'ExtensionInstallForcelist', title: 'Force-installed extensions (extension_id;update_url)', type: 'array', itemType: 'string' },
+          { key: 'URLBlocklist', title: 'Blocked URLs', type: 'array', itemType: 'string' },
+          { key: 'URLAllowlist', title: 'Allowed exception URLs', type: 'array', itemType: 'string' },
+          { key: 'DnsOverHttpsMode', title: 'DNS-over-HTTPS mode', type: 'string', rangelist: ['off', 'automatic', 'secure'], default: 'automatic' },
+          { key: 'DnsOverHttpsTemplates', title: 'DNS-over-HTTPS URI templates', type: 'string' },
+          { key: 'ProxySettings', title: 'Chrome Proxy Settings', type: 'dictionary', subkeys: CHROMIUM_PROXY_SUBKEYS },
+          { key: 'ManagedBookmarks', title: 'Managed Bookmarks', type: 'array', itemType: 'dictionary', subkeys: MANAGED_BOOKMARK_ITEM_SUBKEYS },
           { key: 'AllowWebAuthnWithBrokenTlsCerts', title: 'Allow WebAuthn with broken TLS certs', type: 'boolean', default: true },
           { key: 'DomainReliabilityAllowed', title: 'Allow domain reliability monitoring', type: 'boolean', default: true },
           { key: 'EnterpriseProfileCreationKeepBrowsingData', title: 'Keep browsing data on enterprise profile creation', type: 'boolean', default: true },
           { key: 'NativeMessagingUserLevelHosts', title: 'Allow user-level native messaging hosts', type: 'boolean', default: true },
-          { key: 'ShowCastIconInToolbar', title: 'Show Cast icon in toolbar', type: 'boolean', default: true }
+          { key: 'ShowCastIconInToolbar', title: 'Show Cast icon in toolbar', type: 'boolean', default: true },
+          { key: 'IncognitoModeAvailability', title: 'Incognito mode (0=Enabled, 1=Disabled, 2=Forced)', type: 'integer', rangelist: [0, 1, 2], default: 0 },
+          { key: 'DeveloperToolsAvailability', title: 'Developer Tools (0=Allow except policy, 1=Allow, 2=Disallow)', type: 'integer', rangelist: [0, 1, 2], default: 1 }
         ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Microsoft Edge',
+        payloadType: 'com.microsoft.Edge',
+        description: 'Configures Microsoft Edge enterprise policies: General, Content Settings, SmartScreen, ProxySettings, and Managed Favorites.',
+        supportedOS: 'macOS Application Policy (com.microsoft.Edge / com.microsoft.edgemac)',
+        keys: [
+          { key: 'HomepageLocation', title: 'Homepage URL', type: 'string' },
+          { key: 'HomepageIsNewTabPage', title: 'Use New Tab Page as Homepage', type: 'boolean', default: true },
+          { key: 'NewTabPageLocation', title: 'New Tab Page URL', type: 'string' },
+          { key: 'NewTabPageHideDefaultTopSites', title: 'Hide default top sites on New Tab Page', type: 'boolean', default: true },
+          { key: 'ShowHomeButton', title: 'Show Home button on toolbar', type: 'boolean', default: false },
+          { key: 'FavoritesBarEnabled', title: 'Enable Favorites Bar', type: 'boolean', default: true },
+          { key: 'BlockThirdPartyCookies', title: 'Block third-party cookies', type: 'boolean', default: true },
+          { key: 'DefaultCookiesSetting', title: 'Default cookies setting (1=Allow, 2=Block, 4=Session)', type: 'integer', rangelist: [1, 2, 4] },
+          { key: 'DefaultImagesSetting', title: 'Default images setting (1=Allow, 2=Block)', type: 'integer', rangelist: [1, 2], default: 2 },
+          { key: 'DefaultInsecureContentSetting', title: 'Default insecure content setting (1=Allow, 2=Block)', type: 'integer', rangelist: [1, 2], default: 2 },
+          { key: 'SmartScreenEnabled', title: 'Enable Microsoft Defender SmartScreen', type: 'boolean', default: true },
+          { key: 'SmartScreenPuaEnabled', title: 'Block Potentially Unwanted Apps (PUA)', type: 'boolean', default: true },
+          { key: 'PreventSmartScreenPromptOverride', title: 'Prevent bypassing SmartScreen site warnings', type: 'boolean', default: true },
+          { key: 'PreventSmartScreenPromptOverrideForFiles', title: 'Prevent bypassing SmartScreen download warnings', type: 'boolean', default: true },
+          { key: 'SmartScreenAllowListDomains', title: 'SmartScreen allowlisted domains', type: 'array', itemType: 'string' },
+          { key: 'ExtensionInstallAllowlist', title: 'Allowed extension IDs', type: 'array', itemType: 'string' },
+          { key: 'ExtensionInstallBlocklist', title: 'Blocked extension IDs (use * to block all)', type: 'array', itemType: 'string' },
+          { key: 'ExtensionInstallForcelist', title: 'Force-installed extensions (extension_id;update_url)', type: 'array', itemType: 'string' },
+          { key: 'ProxySettings', title: 'Edge Proxy Settings', type: 'dictionary', subkeys: CHROMIUM_PROXY_SUBKEYS },
+          { key: 'ManagedFavorites', title: 'Managed Favorites', type: 'array', itemType: 'dictionary', subkeys: MANAGED_BOOKMARK_ITEM_SUBKEYS },
+          { key: 'MediaRouterCastAllowAllIPs', title: 'Allow Media Router Cast on all IPs', type: 'boolean', default: true },
+          { key: 'NativeMessagingUserLevelHosts', title: 'Allow user-level native messaging hosts', type: 'boolean', default: true },
+          { key: 'ShowCastIconInToolbar', title: 'Show Cast icon in toolbar', type: 'boolean', default: true },
+          { key: 'InPrivateModeAvailability', title: 'InPrivate mode (0=Enabled, 1=Disabled, 2=Forced)', type: 'integer', rangelist: [0, 1, 2], default: 0 },
+          { key: 'SyncDisabled', title: 'Disable profile sync', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Microsoft AutoUpdate (MAU)',
+        payloadType: 'com.microsoft.autoupdate2',
+        description: 'Configures Microsoft AutoUpdate (MAU) update channel, check frequency, and forced update deadlines for Microsoft 365 & Defender apps.',
+        supportedOS: 'macOS Application Policy (com.microsoft.autoupdate2)',
+        keys: [
+          { key: 'HowToCheck', title: 'Update check mode', type: 'string', rangelist: ['AutomaticDownload', 'AutomaticCheck', 'Manual'], default: 'AutomaticDownload' },
+          { key: 'ChannelName', title: 'Update channel', type: 'string', rangelist: ['Production', 'Preview', 'Beta'], default: 'Production' },
+          { key: 'UpdateCheckFrequency', title: 'Update check interval (minutes)', type: 'integer', default: 720 },
+          { key: 'EnableCheckForUpdatesButton', title: 'Enable Check for Updates button', type: 'boolean', default: true },
+          { key: 'DisableInsiderCheckbox', title: 'Disable Insider program checkbox', type: 'boolean', default: true },
+          { key: 'SendAllTelemetryEnabled', title: 'Send diagnostic telemetry', type: 'boolean', default: false },
+          { key: 'Applications', title: 'Registered Microsoft Applications', type: 'dictionary', subkeys: MAU_APPS_SUBKEYS },
+          { key: 'UpdateDeadline.ApplicationsForcedUpdateSchedule', title: 'Forced Update Deadlines per Application', type: 'dictionary', subkeys: MAU_DEADLINE_SUBKEYS }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Zoom Workplace (us.zoom.xos)',
+        payloadType: 'us.zoom.xos',
+        description: 'Configures enterprise Zoom Workplace client settings on macOS (SSO URL, auto-update, screen sharing, encryption).',
+        supportedOS: 'macOS Application Policy (us.zoom.xos)',
+        rootKvMap: true,
+        keys: []
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Okta Mobile (com.okta.mobile)',
+        payloadType: 'com.okta.mobile',
+        description: 'Configures enterprise Okta Mobile managed preferences.',
+        supportedOS: 'iOS / macOS Application Policy (com.okta.mobile)',
+        rootKvMap: true,
+        keys: []
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Microsoft Outlook',
+        payloadType: 'com.microsoft.Outlook',
+        description: 'Configures managed preferences for Microsoft Outlook for Mac.',
+        supportedOS: 'macOS Application Policy (com.microsoft.Outlook)',
+        rootKvMap: true,
+        keys: []
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Microsoft OneDrive',
+        payloadType: 'com.microsoft.OneDrive',
+        description: 'Configures managed preferences for Microsoft OneDrive on macOS.',
+        supportedOS: 'macOS Application Policy (com.microsoft.OneDrive)',
+        rootKvMap: true,
+        keys: []
       },
       {
         protocol: 'mdm',
@@ -770,7 +621,7 @@
         title: 'Google Software Update Preferences',
         payloadType: 'com.google.Keystone',
         description: 'Configures Google Software Update (Keystone) update check intervals and policies.',
-        supportedOS: 'macOS Managed App Preferences',
+        supportedOS: 'macOS Application Policy (com.google.Keystone)',
         rootKvMap: true,
         keys: []
       },
@@ -780,20 +631,9 @@
         title: 'Google Drive for desktop',
         payloadType: 'com.google.drivefs.settings',
         description: 'Configures managed settings for Google Drive for desktop on macOS.',
-        supportedOS: 'macOS Managed App Preferences',
+        supportedOS: 'macOS Application Policy (com.google.drivefs.settings)',
         rootKvMap: true,
         keys: []
-      },
-      {
-        protocol: 'mdm',
-        category: 'Enterprise Apps',
-        title: 'Firefox',
-        payloadType: 'org.mozilla.firefox',
-        description: 'Enables and configures Mozilla Firefox enterprise policies on macOS.',
-        supportedOS: 'macOS Managed App Preferences',
-        keys: [
-          { key: 'EnterprisePoliciesEnabled', title: 'Enable Firefox Enterprise Policies', type: 'boolean', default: true }
-        ]
       },
       {
         protocol: 'mdm',
@@ -801,26 +641,9 @@
         title: 'Claude (Claude for Desktop)',
         payloadType: 'com.anthropic.claudefordesktop',
         description: 'Configures managed enterprise preferences for Claude for Desktop on macOS.',
-        supportedOS: 'macOS Managed App Preferences',
+        supportedOS: 'macOS Application Policy (com.anthropic.claudefordesktop)',
         rootKvMap: true,
         keys: []
-      },
-      {
-        protocol: 'mdm',
-        category: 'Enterprise Apps',
-        title: 'Microsoft Edge',
-        payloadType: 'com.microsoft.Edge',
-        description: 'Configures managed enterprise browser policies for Microsoft Edge.',
-        supportedOS: 'macOS Managed App Preferences',
-        keys: [
-          { key: 'BlockThirdPartyCookies', title: 'Block third-party cookies', type: 'boolean', default: true },
-          { key: 'DefaultImagesSetting', title: 'Default images setting (1=Allow, 2=Block)', type: 'integer', rangelist: [1, 2], default: 2 },
-          { key: 'DefaultInsecureContentSetting', title: 'Default insecure content setting (1=Allow, 2=Block)', type: 'integer', rangelist: [1, 2], default: 2 },
-          { key: 'MediaRouterCastAllowAllIPs', title: 'Allow Media Router Cast on all IPs', type: 'boolean', default: true },
-          { key: 'NativeMessagingUserLevelHosts', title: 'Allow user-level native messaging hosts', type: 'boolean', default: true },
-          { key: 'NewTabPageHideDefaultTopSites', title: 'Hide default top sites on New Tab Page', type: 'boolean', default: true },
-          { key: 'ShowCastIconInToolbar', title: 'Show Cast icon in toolbar', type: 'boolean', default: true }
-        ]
       },
 
       // --- CORE CLASSIC MDM PROFILES ---
@@ -861,21 +684,6 @@
       },
       {
         protocol: 'mdm',
-        category: 'Network',
-        title: 'Wi-Fi Configuration',
-        payloadType: 'com.apple.wifi.managed',
-        description: 'Configures enterprise or WPA2/WPA3 Wi-Fi networks.',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+',
-        keys: [
-          { key: 'SSID_STR', title: 'Network SSID', type: 'string', required: true, default: 'Corp-WiFi' },
-          { key: 'HIDDEN_NETWORK', title: 'Hidden Network', type: 'boolean', default: false },
-          { key: 'AutoJoin', title: 'Auto Join', type: 'boolean', default: true },
-          { key: 'EncryptionType', title: 'Encryption Type', type: 'string', rangelist: ['WPA', 'WPA2', 'WPA3', 'WEP', 'Any', 'None'], default: 'WPA2' },
-          { key: 'Password', title: 'Pre-Shared Password', type: 'string', default: '' }
-        ]
-      },
-      {
-        protocol: 'mdm',
         category: 'Security & Identity',
         title: 'Passcode',
         payloadType: 'com.apple.mobiledevice.passwordpolicy',
@@ -889,6 +697,22 @@
           { key: 'minComplexChars', title: 'Minimum complex symbol characters (0-4)', type: 'integer', default: 1 },
           { key: 'maxFailedAttempts', title: 'Max failed attempts before wipe/lock (2-11)', type: 'integer', default: 10 },
           { key: 'maxInactivity', title: 'Auto-lock inactivity timeout (minutes)', type: 'integer', default: 5 }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network',
+        title: 'Wi-Fi (Enterprise 802.1X & Hotspot 2.0)',
+        payloadType: 'com.apple.wifi.managed',
+        description: 'Configures WPA2/WPA3 Personal or 802.1X Enterprise Wi-Fi networks.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.2+',
+        keys: [
+          { key: 'SSID_STR', title: 'Network SSID', type: 'string', default: 'Corp-Enterprise-WiFi' },
+          { key: 'HIDDEN_NETWORK', title: 'Hidden network', type: 'boolean', default: false },
+          { key: 'AutoJoin', title: 'Auto join', type: 'boolean', default: true },
+          { key: 'EncryptionType', title: 'Encryption type', type: 'string', rangelist: ['WPA2', 'WPA3', 'WPA', 'WEP', 'Any', 'None'], default: 'WPA2' },
+          { key: 'Password', title: 'Pre-shared password', type: 'string' },
+          { key: 'DisableAssociationMACRandomization', title: 'Disable MAC address randomization', type: 'boolean', default: false }
         ]
       },
 
@@ -1146,6 +970,10 @@
       });
     }
 
+    function toggleAdvancedTopLevel() {
+      document.getElementById('advancedTopLevelPanel').classList.toggle('hidden');
+    }
+
     function loadEnterpriseAppsPreset() {
       switchMode('mdm');
       const presetDomains = [
@@ -1175,6 +1003,7 @@
       const ddmBtn = document.getElementById('modeDdmBtn');
       const bridgedTab = document.getElementById('outTabBridged');
       const primaryTab = document.getElementById('outTabPrimary');
+      const advBtn = document.getElementById('toggleAdvancedTopLevelBtn');
 
       if (mode === 'mdm') {
         mdmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm';
@@ -1188,6 +1017,7 @@
         document.getElementById('metaScopeOrActivation').value = 'System';
         primaryTab.textContent = '.mobileconfig XML';
         bridgedTab.classList.add('hidden');
+        advBtn.classList.remove('hidden');
       } else {
         ddmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm';
         mdmBtn.className = 'px-3 py-1 rounded-md text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900';
@@ -1200,6 +1030,8 @@
         document.getElementById('metaScopeOrActivation').value = 'com.example.activation.main';
         primaryTab.textContent = 'DDM Declarations JSON';
         bridgedTab.classList.remove('hidden');
+        advBtn.classList.add('hidden');
+        document.getElementById('advancedTopLevelPanel').classList.add('hidden');
       }
 
       renderSchemaCatalog();
@@ -1272,7 +1104,7 @@
     }
 
     // =========================================================================
-    // 5. ADDING & RENDERING DYNAMIC FORMS (WITH <date> AND ANY->ARRAY SUPPORT)
+    // 5. ADDING & RENDERING DYNAMIC FORMS
     // =========================================================================
     function buildDefaultValues(keys) {
       const obj = {};
@@ -1433,7 +1265,7 @@
       const item = state.activeItems.find(i => i.instanceId === instanceId);
       if (!item) return;
       const keyName = prompt(
-        mode === 'kv_map' ? 'Enter key name (e.g. AutoUpdate, Department):' :
+        mode === 'kv_map' ? 'Enter preference/property key name:' :
         mode === 'kv_array_map' ? 'Enter Team Identifier (e.g. ABCD123456):' :
         'Enter domain or identifier key:'
       );
@@ -1539,7 +1371,7 @@
                           return `
                             <div class="flex items-center gap-2">
                               <input type="text" value="${escapeHtml(strVal ?? '')}" oninput="updateField('${item.instanceId}', '${sPathStr}', this.value, 'string')"
-                                class="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-slate-50" placeholder="e.g. com.example.extension or NetworkExtension" />
+                                class="flex-1 px-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-slate-50" placeholder="Enter value..." />
                               <button type="button" onclick="removeArrayItem('${item.instanceId}', '${teamPathStr}', ${sIdx})" class="text-slate-400 hover:text-rose-600 px-1">✕</button>
                             </div>
                           `;
@@ -1658,7 +1490,7 @@
                 </div>
                 <button type="button" onclick="addArrayItem('${item.instanceId}', '${pathStr}', '${k.itemType || 'string'}', '${subkeysStr}')"
                   class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 text-[11px] font-semibold hover:bg-sky-100">
-                  + Add ${k.itemType === 'array' ? 'RDN / Group' : 'Item'}
+                  + Add Item
                 </button>
               </div>
               ${k.content ? `<p class="text-[11px] text-slate-500">${escapeHtml(k.content)}</p>` : ''}
@@ -1666,35 +1498,7 @@
                 ${arr.map((entry, idx) => {
                   const elemPath = [...currentPath, idx];
                   const elemPathStr = escapeHtml(JSON.stringify(elemPath));
-                  if (k.itemType === 'array' && k.subkeys) {
-                    const innerArr = Array.isArray(entry) ? entry : [];
-                    return `
-                      <div class="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-1">
-                          <span class="text-[11px] font-bold text-slate-700">Group #${idx + 1}</span>
-                          <div class="flex items-center gap-2">
-                            <button type="button" onclick="addArrayItem('${item.instanceId}', '${elemPathStr}', 'dictionary', '${subkeysStr}')"
-                              class="text-[11px] font-semibold text-sky-600 hover:underline">+ Add Pair</button>
-                            <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-[11px] text-rose-500 hover:underline">Remove</button>
-                          </div>
-                        </div>
-                        <div class="space-y-2 pl-2 border-l-2 border-slate-200">
-                          ${innerArr.map((_, innerIdx) => {
-                            const iconPath = [...elemPath, innerIdx];
-                            return `
-                              <div class="p-2 bg-slate-50 rounded border border-slate-200 space-y-1.5">
-                                <div class="flex justify-between items-center">
-                                  <span class="text-[10px] font-semibold text-slate-500">Pair #${innerIdx + 1}</span>
-                                  <button type="button" onclick="removeArrayItem('${item.instanceId}', '${elemPathStr}', ${innerIdx})" class="text-[10px] text-rose-500">Remove</button>
-                                </div>
-                                ${renderKeyControls(item, k.subkeys, iconPath)}
-                              </div>
-                            `;
-                          }).join('')}
-                        </div>
-                      </div>
-                    `;
-                  } else if (k.itemType === 'dictionary' && k.subkeys) {
+                  if (k.itemType === 'dictionary' && k.subkeys) {
                     return `
                       <div class="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-1">
@@ -1913,6 +1717,11 @@
       const identifier = document.getElementById('metaIdentifier').value || 'com.example.mdm.profile';
       const org = document.getElementById('metaOrg').value || 'Enterprise IT';
       const scope = document.getElementById('metaScopeOrActivation').value || 'System';
+      const description = document.getElementById('metaDescription').value || 'Generated by Apple MDM & DDM Studio';
+      const targetDeviceType = parseInt(document.getElementById('metaTargetDeviceType').value || '0', 10);
+      const removalDisallowed = document.getElementById('metaRemovalDisallowed').checked;
+      const removalDateStr = document.getElementById('metaRemovalDate').value.trim();
+      const consentTextStr = document.getElementById('metaConsentText').value.trim();
 
       const mdmItems = state.activeItems.filter(i => i.schema.protocol === 'mdm');
       const payloadContent = mdmItems.map(item => {
@@ -1930,16 +1739,20 @@
 
       const root = {
         PayloadContent: payloadContent,
-        PayloadDescription: 'Generated by Apple MDM & DDM Studio',
+        PayloadDescription: description,
         PayloadDisplayName: displayName,
         PayloadIdentifier: identifier,
         PayloadOrganization: org,
-        PayloadRemovalDisallowed: false,
+        PayloadRemovalDisallowed: removalDisallowed,
         PayloadScope: scope,
         PayloadType: 'Configuration',
         PayloadUUID: uuidv4(),
         PayloadVersion: 1
       };
+
+      if (targetDeviceType > 0) root.TargetDeviceType = targetDeviceType;
+      if (removalDateStr) root.RemovalDate = { __plistDate: removalDateStr };
+      if (consentTextStr) root.ConsentText = { default: consentTextStr };
 
       return `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n${jsToPlistXml(root, '')}\n</plist>`;
     }
@@ -2029,20 +1842,19 @@
           dlText.textContent = 'ddm-bridged.mobileconfig';
         }
       }
-      updateDeploySnippets();
     }
 
     // =========================================================================
-    // 7. GITHUB REPOSITORY BROWSER & YAML PARSER (apple/device-management)
+    // 7. SCHEMA REPOSITORY BROWSER, YAML PARSER & POLICY PLIST PARSER
     // =========================================================================
     async function fetchGitHubDirectory() {
       const folder = document.getElementById('repoFolderSelect').value;
       const listEl = document.getElementById('repoFileList');
-      listEl.innerHTML = `<div class="p-4 text-xs text-slate-500 text-center">Fetching directory from GitHub API...</div>`;
+      listEl.innerHTML = `<div class="p-4 text-xs text-slate-500 text-center">Fetching schema directory...</div>`;
 
       try {
         const res = await fetch(`https://api.github.com/repos/apple/device-management/contents/${folder}`);
-        if (!res.ok) throw new Error(`GitHub API HTTP ${res.status}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const files = await res.json();
         const yamlFiles = files.filter(f => f.name.endsWith('.yaml'));
 
@@ -2051,12 +1863,12 @@
             <span class="text-xs font-mono text-slate-700">${escapeHtml(f.name)}</span>
             <button onclick="fetchAndLoadRawYaml('${escapeHtml(f.download_url)}')"
               class="px-2.5 py-1 rounded bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white text-[11px] font-semibold transition">
-              Load YAML
+              Load Schema
             </button>
           </div>
         `).join('');
       } catch (err) {
-        listEl.innerHTML = `<div class="p-4 text-xs text-rose-600">Could not reach GitHub API (${escapeHtml(err.message)}). You can paste any raw YAML schema directly below.</div>`;
+        listEl.innerHTML = `<div class="p-4 text-xs text-rose-600">Could not reach remote repository (${escapeHtml(err.message)}). You can paste any raw YAML or XML policy definition directly below.</div>`;
       }
     }
 
@@ -2067,7 +1879,7 @@
         document.getElementById('rawYamlInput').value = text;
         parsePastedYaml();
       } catch (err) {
-        alert('Failed to download YAML file: ' + err.message);
+        alert('Failed to download schema file: ' + err.message);
       }
     }
 
@@ -2118,23 +1930,70 @@
       });
     }
 
+    function normalizePfmSubkeys(pfmSubkeys) {
+      return (pfmSubkeys || []).filter(s => s.pfm_name && !s.pfm_imazing_omit).map(s => {
+        const hasSubs = Array.isArray(s.pfm_subkeys) && s.pfm_subkeys.length > 0;
+        let inferredType = 'string';
+        if (typeof s.pfm_default === 'boolean') inferredType = 'boolean';
+        else if (typeof s.pfm_default === 'number') inferredType = Number.isInteger(s.pfm_default) ? 'integer' : 'real';
+        else if (hasSubs) inferredType = 'dictionary';
+
+        return {
+          key: s.pfm_name,
+          title: s.pfm_title || s.pfm_name,
+          type: inferredType,
+          default: s.pfm_default,
+          rangelist: s.pfm_range_list || (s.pfm_imazing_pretty_range_list ? Object.keys(s.pfm_imazing_pretty_range_list) : undefined),
+          content: s.pfm_description || '',
+          subkeys: hasSubs ? normalizePfmSubkeys(s.pfm_subkeys) : undefined
+        };
+      });
+    }
+
     function parsePastedYaml() {
-      const yamlStr = document.getElementById('rawYamlInput').value.trim();
-      if (!yamlStr) return;
+      const rawStr = document.getElementById('rawYamlInput').value.trim();
+      if (!rawStr) return;
 
       try {
-        const doc = jsyaml.load(yamlStr);
+        if (rawStr.startsWith('<')) {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(rawStr, 'text/xml');
+          const rootDict = xmlDoc.querySelector('plist > dict');
+          const manifest = parsePlistNode(rootDict);
+          const bundleIds = manifest.pfm_imazing_participating_bundle_ids || [];
+          const domain = bundleIds[0] || manifest.pfm_domain || prompt('Enter Application Bundle ID / PayloadType (e.g. org.mozilla.firefox):', 'com.example.app');
+          if (!domain) return;
+
+          const keys = normalizePfmSubkeys(manifest.pfm_subkeys);
+          const schema = {
+            protocol: 'mdm',
+            category: 'Enterprise Apps',
+            title: domain,
+            payloadType: domain,
+            description: manifest.pfm_description || 'Custom application preference schema',
+            supportedOS: `macOS Application Policy (${domain})`,
+            rootKvMap: keys.length === 0,
+            keys
+          };
+          state.schemas.unshift(schema);
+          switchMode('mdm');
+          addSchemaToBuilder(0);
+          closeModal('repoModal');
+          return;
+        }
+
+        const doc = jsyaml.load(rawStr);
         const isDdm = Boolean(doc?.payload?.declarationtype);
         const payloadType = doc?.payload?.declarationtype || doc?.payload?.payloadtype || 'com.apple.custom.payload';
         const isRootKv = Array.isArray(doc.payloadkeys) && doc.payloadkeys.length === 1 && doc.payloadkeys[0].key === 'ANY';
 
         const schema = {
           protocol: isDdm ? 'ddm' : 'mdm',
-          category: 'Imported YAML',
+          category: 'Custom Schemas',
           title: doc.title || payloadType,
           payloadType,
           description: doc.description || '',
-          supportedOS: 'Parsed from apple/device-management YAML',
+          supportedOS: 'Apple Device Management Schema',
           rootKvMap: isRootKv,
           keys: isRootKv ? [] : normalizeYamlKeys(doc.payloadkeys)
         };
@@ -2144,12 +2003,12 @@
         addSchemaToBuilder(0);
         closeModal('repoModal');
       } catch (err) {
-        alert('YAML Parse Error: ' + err.message);
+        alert('Parse Error: ' + err.message);
       }
     }
 
     // =========================================================================
-    // 8. IMPORT, EXPORT & MDM REST API DEPLOYMENT
+    // 8. IMPORT & EXPORT
     // =========================================================================
     function handleFileUpload(e) {
       const file = e.target.files[0];
@@ -2172,7 +2031,7 @@
             if (d.Type === 'com.apple.activation.simple') return;
             const matched = state.schemas.find(s => s.payloadType === d.Type) || {
               protocol: 'ddm',
-              category: 'Imported',
+              category: 'Custom Schemas',
               title: d.Type,
               payloadType: d.Type,
               keys: Object.keys(d.Payload || {}).map(k => ({ key: k, title: k, type: typeof d.Payload[k] }))
@@ -2198,12 +2057,15 @@
           if (parsed.PayloadDisplayName) document.getElementById('metaDisplayName').value = parsed.PayloadDisplayName;
           if (parsed.PayloadIdentifier) document.getElementById('metaIdentifier').value = parsed.PayloadIdentifier;
           if (parsed.PayloadOrganization) document.getElementById('metaOrg').value = parsed.PayloadOrganization;
+          if (parsed.PayloadDescription) document.getElementById('metaDescription').value = parsed.PayloadDescription;
+          if (parsed.TargetDeviceType) document.getElementById('metaTargetDeviceType').value = String(parsed.TargetDeviceType);
+          if (parsed.PayloadRemovalDisallowed !== undefined) document.getElementById('metaRemovalDisallowed').checked = Boolean(parsed.PayloadRemovalDisallowed);
 
           (parsed.PayloadContent || []).forEach(p => {
             const { PayloadType, PayloadVersion, PayloadIdentifier, PayloadUUID, PayloadEnabled, PayloadDisplayName, ...rest } = p;
             const matched = state.schemas.find(s => s.payloadType === PayloadType) || {
               protocol: 'mdm',
-              category: 'Imported',
+              category: 'Custom Schemas',
               title: PayloadDisplayName || PayloadType,
               payloadType: PayloadType,
               rootKvMap: true,
@@ -2272,67 +2134,8 @@
       a.click();
     }
 
-    function updateDeploySnippets() {
-      const vendor = document.getElementById('mdmVendorSelect').value;
-      const urlInput = document.getElementById('mdmEndpointUrl');
-      const token = document.getElementById('mdmApiToken').value || '$MDM_API_TOKEN';
-
-      const defaults = {
-        micromdm: 'https://micromdm.example.com/v1/profiles',
-        fleetdm: 'https://fleet.example.com/api/v1/fleet/configuration_profiles',
-        simplemdm: 'https://a.simplemdm.com/api/v1/custom_configuration_profiles',
-        jamf: 'https://jamf.example.com/JSSResource/osxconfigurationprofiles/id/0',
-        intune: 'https://graph.microsoft.com/v1.0/deviceManagement/deviceConfigurations',
-        custom: urlInput.value
-      };
-      if (document.activeElement !== urlInput && defaults[vendor]) {
-        urlInput.value = defaults[vendor];
-      }
-
-      const isJson = state.protocol === 'ddm' && state.outputFormat === 'primary';
-      const file = isJson ? 'declarations.json' : 'profile.mobileconfig';
-      const contentType = isJson ? 'application/json' : 'application/x-apple-aspen-config';
-
-      document.getElementById('curlSnippetBox').textContent =
-        `curl -X POST "${urlInput.value}" \\\n  -H "Authorization: Bearer ${token}" \\\n  -H "Content-Type: ${contentType}" \\\n  --data-binary @${file}`;
-    }
-
-    async function executeDirectMdmPush() {
-      const url = document.getElementById('mdmEndpointUrl').value;
-      const token = document.getElementById('mdmApiToken').value;
-      const body = document.getElementById('codePreview').textContent;
-      const alertBox = document.getElementById('pushStatusAlert');
-      const isJson = state.protocol === 'ddm' && state.outputFormat === 'primary';
-
-      alertBox.className = 'p-3 rounded-xl text-xs bg-sky-50 text-sky-800 border border-sky-200';
-      alertBox.textContent = 'Sending payload to MDM endpoint...';
-      alertBox.classList.remove('hidden');
-
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': isJson ? 'application/json' : 'application/x-apple-aspen-config'
-          },
-          body
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-        alertBox.className = 'p-3 rounded-xl text-xs bg-emerald-50 text-emerald-800 border border-emerald-200';
-        alertBox.textContent = 'Successfully pushed profile/declaration to MDM server!';
-      } catch (err) {
-        alertBox.className = 'p-3 rounded-xl text-xs bg-rose-50 text-rose-800 border border-rose-200';
-        alertBox.textContent = `Push failed: ${err.message}. Check CORS settings on your MDM API or use the cURL command above.`;
-      }
-    }
-
-    function copyCurlCommand() {
-      navigator.clipboard.writeText(document.getElementById('curlSnippetBox').textContent);
-    }
-
     function openRepoModal() { document.getElementById('repoModal').classList.replace('hidden', 'flex'); }
     function openImportModal() { document.getElementById('importModal').classList.replace('hidden', 'flex'); }
-    function openDeployModal() { updateDeploySnippets(); document.getElementById('deployModal').classList.replace('hidden', 'flex'); }
     function closeModal(id) { document.getElementById(id).classList.replace('flex', 'hidden'); }
 
     function escapeHtml(str) {
