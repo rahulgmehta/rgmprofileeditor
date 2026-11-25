@@ -105,10 +105,10 @@
         </div>
         <div class="relative">
           <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
-          <input id="schemaSearchInput" type="text" oninput="renderSchemaCatalog()" placeholder="Search Wi-Fi, Passcode, Chrome..."
+          <input id="schemaSearchInput" type="text" oninput="renderSchemaCatalog()" placeholder="Search VPN, Wi-Fi, Chrome, TCC..."
             class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500/30 focus:border-sky-500" />
         </div>
-        <div class="flex gap-1 overflow-x-auto pb-0.5" id="categoryFilterBar"></div>
+        <div class="flex gap-1 overflow-x-auto pb-1" id="categoryFilterBar"></div>
       </div>
 
       <div id="schemaList" class="flex-1 overflow-y-auto p-2 space-y-1.5"></div>
@@ -205,7 +205,7 @@
           </div>
           <h3 class="text-base font-bold text-slate-900 mb-1">Start Building Your Apple Profile</h3>
           <p class="text-xs text-slate-500 leading-relaxed mb-5">
-            Click any setting from the left panel to add it to your profile, or start right away with one of these ready-made templates:
+            Search or click any setting from the left catalog (VPN, Wi-Fi, Passcode, TCC, FileVault, Chrome, Edge, Firefox), or start with a quick template:
           </p>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full text-left">
@@ -264,7 +264,7 @@
 
       <!-- Secondary Quick-Download Bar for Declarative DDM Mode -->
       <div id="ddmMobileconfigBanner" class="hidden px-4 py-2 bg-indigo-950/80 border-b border-indigo-800/70 flex items-center justify-between gap-2">
-        <span class="text-[11px] text-indigo-200">Need to install this DDM profile directly on a Mac/iPhone?</span>
+        <span class="text-[11px] text-indigo-200">Install this DDM profile directly on a Mac/iPhone:</span>
         <button onclick="downloadDdmAsMobileconfig()" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-[11px] font-semibold text-white flex items-center gap-1 shrink-0 transition">
           <i data-lucide="file-down" class="w-3 h-3"></i> Download .mobileconfig
         </button>
@@ -367,11 +367,11 @@
       <div class="p-5 space-y-3 text-xs text-slate-600 leading-relaxed">
         <div class="p-3 rounded-xl bg-sky-50 border border-sky-100">
           <div class="font-bold text-sky-900 mb-1">1. Standard Profile (.mobileconfig)</div>
-          <p>Use this mode to configure Wi-Fi, Passcode, Restrictions, VPN, Certificates, or macOS app settings (Chrome, Edge, Firefox, Outlook, Zoom). Click <strong>Download .mobileconfig</strong> when finished.</p>
+          <p>Use this mode to configure Wi-Fi, Passcode, Restrictions, VPN, Certificates, TCC Privacy, or macOS app settings (Chrome, Edge, Firefox, Outlook, Zoom). Click <strong>Download .mobileconfig</strong> when finished.</p>
         </div>
         <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-100">
           <div class="font-bold text-indigo-900 mb-1">2. Declarative DDM (JSON & .mobileconfig)</div>
-          <p>Apple's modern Declarative Device Management lets devices evaluate rules autonomously. You can export raw <strong>declarations.json</strong> for your MDM server, or click <strong>Download .mobileconfig</strong> to wrap your declarations inside Apple's <code class="text-indigo-800">com.apple.declarations</code> profile format for local installation (iOS 17+ / macOS 14+).</p>
+          <p>Apple's modern Declarative Device Management lets devices evaluate rules autonomously. Export raw <strong>JSON</strong> for your MDM server, or click <strong>Download .mobileconfig</strong> to wrap your declarations inside Apple's <code class="text-indigo-800">com.apple.declarations</code> profile format for local installation (iOS 17+ / macOS 14+).</p>
         </div>
         <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
           <div class="font-bold text-slate-800 mb-1">3. Editing Existing Profiles</div>
@@ -388,6 +388,12 @@
     // =========================================================================
     // 1. SHARED REUSABLE SUB-SCHEMAS
     // =========================================================================
+    const RANGES_SUBKEYS = [
+      { key: 'type', title: 'IP Type', type: 'string', rangelist: ['IPv4', 'IPv6'], default: 'IPv4' },
+      { key: 'first', title: 'First IP Address', type: 'string', required: true, default: '10.0.0.1' },
+      { key: 'last', title: 'Last IP Address', type: 'string', required: true, default: '10.0.0.254' }
+    ];
+
     const BINARY_ID_SUBKEYS = [
       { key: 'CDHash', title: 'Code directory hash (40-char SHA)', type: 'string' },
       { key: 'SigningID', title: 'Signing ID', type: 'string' },
@@ -396,31 +402,182 @@
       { key: 'SigningState', title: 'Signing state', type: 'string', rangelist: ['All', 'TestFlight', 'DeveloperID', 'Enterprise', 'AppStore', 'Apple'], default: 'All' }
     ];
 
-    function buildAssetReferenceDict(defaultUrl, defaultContentType, contentTypeOptions) {
-      const ctField = contentTypeOptions
-        ? { key: 'ContentType', title: 'Content type', type: 'string', rangelist: contentTypeOptions, default: defaultContentType }
-        : { key: 'ContentType', title: 'Content type', type: 'string', default: defaultContentType };
-      return {
-        key: 'Reference', title: 'External reference', type: 'dictionary', required: true,
+    const VPN_SA_SUBKEYS = [
+      { key: 'EncryptionAlgorithm', title: 'Encryption algorithm', type: 'string', rangelist: ['DES', '3DES', 'AES-128', 'AES-256', 'AES-128-GCM', 'AES-256-GCM', 'ChaCha20Poly1305'], default: 'AES-256' },
+      { key: 'IntegrityAlgorithm', title: 'Integrity algorithm', type: 'string', rangelist: ['SHA1-96', 'SHA1-160', 'SHA2-256', 'SHA2-384', 'SHA2-512'], default: 'SHA2-256' },
+      { key: 'DiffieHellmanGroup', title: 'Diffie-Hellman group', type: 'integer', rangelist: [1, 2, 5, 14, 15, 16, 17, 18, 19, 20, 21, 31, 32], default: 14 },
+      { key: 'PostQuantumKeyExchangeMethods', title: 'Post-quantum key exchange methods (RFC 9370)', type: 'array', itemType: 'integer', rangelist: [0, 36, 37] },
+      { key: 'LifeTimeInMinutes', title: 'SA lifetime in minutes (10-1440)', type: 'integer', default: 1440 }
+    ];
+
+    const ON_DEMAND_RULES_SUBKEYS = [
+      { key: 'Action', title: 'On demand action', type: 'string', required: true, rangelist: ['Allow', 'Connect', 'Disconnect', 'EvaluateConnection', 'Ignore'], default: 'Connect' },
+      {
+        key: 'ActionParameters', title: 'Action parameters (for EvaluateConnection)', type: 'array', itemType: 'dictionary',
         subkeys: [
-          { key: 'DataURL', title: 'Data URL (https://)', type: 'string', required: true, default: defaultUrl },
-          ctField,
-          { key: 'Size', title: 'Byte size (optional)', type: 'integer' },
-          { key: 'Hash-SHA-256', title: 'SHA-256 hash (hex)', type: 'string' }
+          { key: 'Domains', title: 'Domains', type: 'array', itemType: 'string', required: true },
+          { key: 'DomainAction', title: 'Domain action', type: 'string', required: true, rangelist: ['ConnectIfNeeded', 'NeverConnect'], default: 'ConnectIfNeeded' },
+          { key: 'RequiredDNSServers', title: 'Required DNS servers', type: 'array', itemType: 'string' },
+          { key: 'RequiredURLStringProbe', title: 'Required URL string probe', type: 'string' }
         ]
-      };
-    }
+      },
+      { key: 'DNSDomainMatch', title: 'DNS domain match', type: 'array', itemType: 'string' },
+      { key: 'DNSServerAddressMatch', title: 'DNS server address match', type: 'array', itemType: 'string' },
+      { key: 'InterfaceTypeMatch', title: 'Interface type match', type: 'string', rangelist: ['Ethernet', 'WiFi', 'Cellular'] },
+      { key: 'SSIDMatch', title: 'SSID match', type: 'array', itemType: 'string' },
+      { key: 'URLStringProbe', title: 'URL string probe', type: 'string' }
+    ];
 
-    const ASSET_AUTH_DICT = {
-      key: 'Authentication', title: 'Server authentication', type: 'dictionary',
-      subkeys: [
-        { key: 'Type', title: 'Authentication type', type: 'string', required: true, rangelist: ['MDM', 'None'], default: 'MDM' }
-      ]
-    };
+    const VPN_COMMON_SUBKEYS = [
+      { key: 'UserDefinedName', title: 'VPN Connection Display Name', type: 'string', required: true, default: 'Corporate VPN' },
+      { key: 'VPNType', title: 'VPN Protocol Type', type: 'string', required: true, rangelist: ['IKEv2', 'IPSec', 'L2TP', 'VPN', 'AlwaysOn', 'TransparentProxy'], default: 'IKEv2' },
+      { key: 'VPNSubType', title: 'VPN SubType (Plugin Bundle ID when VPNType = VPN/TransparentProxy)', type: 'string' },
+      {
+        key: 'VendorConfig', title: 'Vendor Configuration', type: 'dictionary',
+        subkeys: [
+          { key: 'Realm', title: 'Realm (Juniper/Pulse)', type: 'string' },
+          { key: 'Role', title: 'Role (Juniper/Pulse)', type: 'string' },
+          { key: 'Group', title: 'Group (Cisco AnyConnect)', type: 'string' },
+          { key: 'LoginGroupOrDomain', title: 'Login group/domain (SonicWALL)', type: 'string' }
+        ]
+      },
+      {
+        key: 'IKEv2', title: 'IKEv2 Settings (when VPNType = IKEv2)', type: 'dictionary',
+        subkeys: [
+          { key: 'RemoteAddress', title: 'VPN Server Address', type: 'string', required: true, default: 'vpn.example.com' },
+          { key: 'LocalIdentifier', title: 'Local Identifier', type: 'string', required: true, default: 'client.example.com' },
+          { key: 'RemoteIdentifier', title: 'Remote Identifier', type: 'string', required: true, default: 'vpn.example.com' },
+          { key: 'AuthenticationMethod', title: 'Authentication Method', type: 'string', required: true, rangelist: ['None', 'SharedSecret', 'Certificate'], default: 'Certificate' },
+          { key: 'PayloadCertificateUUID', title: 'Client Identity Certificate PayloadUUID', type: 'string' },
+          { key: 'SharedSecret', title: 'Shared Secret (when SharedSecret)', type: 'string' },
+          { key: 'ExtendedAuthEnabled', title: 'Enable EAP Authentication (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'AuthName', title: 'EAP Username', type: 'string' },
+          { key: 'AuthPassword', title: 'EAP Password', type: 'string' },
+          { key: 'IncludeAllNetworks', title: 'Include All Networks / Full Tunnel (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'ExcludeLocalNetworks', title: 'Exclude Local Networks (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
+          { key: 'OnDemandEnabled', title: 'Enable VPN On Demand (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'OnDemandRules', title: 'On Demand Rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS },
+          { key: 'EnablePFS', title: 'Enable Perfect Forward Secrecy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
+          { key: 'MTU', title: 'MTU (1280-1400)', type: 'integer', default: 1280 },
+          { key: 'PPK', title: 'Post-Quantum Pre-Shared Key (Base64 <data>)', type: 'data' },
+          { key: 'PPKIdentifier', title: 'Post-Quantum PPK Identifier', type: 'string' },
+          { key: 'IKESecurityAssociationParameters', title: 'IKE SA Parameters', type: 'dictionary', subkeys: VPN_SA_SUBKEYS },
+          { key: 'ChildSecurityAssociationParameters', title: 'Child SA Parameters', type: 'dictionary', subkeys: VPN_SA_SUBKEYS }
+        ]
+      },
+      {
+        key: 'VPN', title: 'SSL / Plugin VPN Settings (when VPNType = VPN)', type: 'dictionary',
+        subkeys: [
+          { key: 'RemoteAddress', title: 'VPN Server Address', type: 'string', required: true, default: 'sslvpn.example.com' },
+          { key: 'AuthenticationMethod', title: 'Authentication Method', type: 'string', rangelist: ['Password', 'Certificate', 'Password+Certificate'], default: 'Password' },
+          { key: 'AuthName', title: 'Username', type: 'string' },
+          { key: 'AuthPassword', title: 'Password', type: 'string' },
+          { key: 'PayloadCertificateUUID', title: 'Certificate PayloadUUID', type: 'string' },
+          { key: 'ProviderBundleIdentifier', title: 'Network Extension Provider Bundle ID', type: 'string' },
+          { key: 'ProviderDesignatedRequirement', title: 'Provider Designated Requirement (macOS)', type: 'string' },
+          { key: 'ProviderType', title: 'Provider Type', type: 'string', rangelist: ['packet-tunnel', 'app-proxy'], default: 'packet-tunnel' },
+          { key: 'OnDemandEnabled', title: 'Enable VPN On Demand (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'OnDemandRules', title: 'On Demand Rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS }
+        ]
+      },
+      {
+        key: 'IPSec', title: 'Cisco IPSec / L2TP IPSec Settings', type: 'dictionary',
+        subkeys: [
+          { key: 'RemoteAddress', title: 'VPN Server Address', type: 'string', default: 'ipsec.example.com' },
+          { key: 'AuthenticationMethod', title: 'Authentication Method', type: 'string', rangelist: ['SharedSecret', 'Certificate'], default: 'SharedSecret' },
+          { key: 'LocalIdentifier', title: 'Group Name (LocalIdentifier)', type: 'string' },
+          { key: 'SharedSecret', title: 'Shared Secret (Base64 <data>)', type: 'data' },
+          { key: 'XAuthEnabled', title: 'XAuth Enabled (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
+          { key: 'XAuthName', title: 'XAuth Username', type: 'string' },
+          { key: 'XAuthPassword', title: 'XAuth Password', type: 'string' },
+          { key: 'PayloadCertificateUUID', title: 'Certificate PayloadUUID', type: 'string' }
+        ]
+      },
+      {
+        key: 'DNS', title: 'VPN DNS Settings', type: 'dictionary',
+        subkeys: [
+          { key: 'DNSProtocol', title: 'DNS Protocol (iOS 14+ / macOS 11+)', type: 'string', required: true, rangelist: ['Cleartext', 'HTTPS', 'TLS'], default: 'Cleartext' },
+          { key: 'ServerAddresses', title: 'DNS Server IP Addresses', type: 'array', itemType: 'string', required: true },
+          { key: 'SearchDomains', title: 'Search Domains', type: 'array', itemType: 'string' },
+          { key: 'DomainName', title: 'Primary Domain Name', type: 'string' },
+          { key: 'SupplementalMatchDomains', title: 'Supplemental Match Domains', type: 'array', itemType: 'string' },
+          { key: 'ServerURL', title: 'DoH Server URL (when HTTPS)', type: 'string' },
+          { key: 'ServerName', title: 'DoT Server Hostname (when TLS)', type: 'string' }
+        ]
+      },
+      {
+        key: 'Proxies', title: 'VPN Proxy Settings', type: 'dictionary',
+        subkeys: [
+          { key: 'HTTPEnable', title: 'Enable HTTP Proxy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'HTTPProxy', title: 'HTTP Proxy Host', type: 'string' },
+          { key: 'HTTPPort', title: 'HTTP Proxy Port', type: 'integer' },
+          { key: 'HTTPSEnable', title: 'Enable HTTPS Proxy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'HTTPSProxy', title: 'HTTPS Proxy Host', type: 'string' },
+          { key: 'HTTPSPort', title: 'HTTPS Proxy Port', type: 'integer' },
+          { key: 'ProxyAutoConfigEnable', title: 'Enable PAC Auto-Config (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+          { key: 'ProxyAutoConfigURLString', title: 'PAC URL', type: 'string' }
+        ]
+      }
+    ];
 
-    const ASSET_ACCESSIBLE_FIELD = {
-      key: 'Accessible', title: 'Keychain accessibility', type: 'string', rangelist: ['Default', 'AfterFirstUnlock'], default: 'Default'
-    };
+    const TCC_IDENTITY_SUBKEYS = [
+      { key: 'Identifier', title: 'App Bundle ID or binary path (case-sensitive)', type: 'string', required: true, default: 'com.example.corpagent' },
+      { key: 'IdentifierType', title: 'Identifier type', type: 'string', required: true, rangelist: ['bundleID', 'path'], default: 'bundleID' },
+      { key: 'CodeRequirement', title: 'Code Requirement (from codesign -display -r -)', type: 'string', required: true, default: 'anchor apple generic' },
+      { key: 'StaticCode', title: 'Static code validation', type: 'boolean', default: false },
+      { key: 'Authorization', title: 'Authorization (macOS 11+, replaces Allowed)', type: 'string', rangelist: ['Allow', 'Deny', 'AllowStandardUserToSetSystemService'], default: 'Allow' },
+      { key: 'Allowed', title: 'Allowed (boolean, omit if Authorization is set)', type: 'boolean' },
+      { key: 'AEReceiverIdentifier', title: 'AppleEvents Receiver Identifier (AppleEvents only)', type: 'string' },
+      { key: 'AEReceiverIdentifierType', title: 'AppleEvents Receiver Type', type: 'string', rangelist: ['bundleID', 'path'] },
+      { key: 'AEReceiverCodeRequirement', title: 'AppleEvents Receiver Code Requirement', type: 'string' }
+    ];
+
+    const TCC_SERVICES_SUBKEYS = [
+      'SystemPolicyAllFiles', 'ScreenCapture', 'Accessibility', 'PostEvent', 'ListenEvent',
+      'SystemPolicySysAdminFiles', 'SystemPolicyDesktopFolder', 'SystemPolicyDocumentsFolder',
+      'SystemPolicyDownloadsFolder', 'SystemPolicyNetworkVolumes', 'SystemPolicyRemovableVolumes',
+      'SystemPolicyAppBundles', 'SystemPolicyAppData', 'AddressBook', 'Calendar', 'Reminders',
+      'Photos', 'Camera', 'Microphone', 'BluetoothAlways', 'SpeechRecognition', 'AppleEvents',
+      'MediaLibrary', 'FileProviderPresence'
+    ].map(svc => ({
+      key: svc, title: svc, type: 'array', itemType: 'dictionary', subkeys: TCC_IDENTITY_SUBKEYS
+    }));
+
+    const X500_RDN_PAIR_SUBKEYS = [
+      { key: 'OID', title: 'Attribute (e.g. C, O, OU, CN)', type: 'string', required: true, default: 'CN' },
+      { key: 'Value', title: 'Value', type: 'string', required: true, default: 'device.example.com' }
+    ];
+
+    const MCX_PREF_ENTRY_SUBKEYS = [
+      { key: 'mcx_preference_settings', title: 'MCX preference settings (key/value pairs)', type: 'kv_map', required: true }
+    ];
+
+    const MCX_SCRIPT_ITEM_SUBKEYS = [
+      { key: 'filename', title: 'Script display filename', type: 'string', required: true, default: 'login-setup.sh' },
+      { key: 'filedata', title: 'Executable script contents (Base64 <data>)', type: 'data', required: true }
+    ];
+
+    const DOCK_TILE_ITEM_SUBKEYS = [
+      { key: 'tile-type', title: 'Tile type', type: 'string', required: true, rangelist: ['file-tile', 'directory-tile', 'url-tile'], default: 'file-tile' },
+      {
+        key: 'tile-data', title: 'Tile data', type: 'dictionary', required: true,
+        subkeys: [
+          { key: 'label', title: 'Label', type: 'string', required: true, default: 'Company Portal' },
+          { key: 'url', title: 'URL or file path', type: 'string', default: 'https://portal.example.com' },
+          { key: 'file-type', title: 'File type (0=URL, 1=File, 3=Directory)', type: 'integer', required: true, rangelist: [0, 1, 3], default: 0 }
+        ]
+      }
+    ];
+
+    const ENERGY_POWER_SETTINGS_SUBKEYS = [
+      { key: 'Display Sleep Timer', title: 'Display sleep timer (minutes, 0 = never)', type: 'integer', default: 15 },
+      { key: 'Disk Sleep Timer', title: 'Disk sleep timer (minutes, 0 = never)', type: 'integer', default: 10 },
+      { key: 'System Sleep Timer', title: 'System sleep timer (minutes, 0 = never)', type: 'integer', default: 30 },
+      { key: 'Wake on LAN', title: 'Wake on LAN (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
+      { key: 'Automatic Restart On Power Loss', title: 'Automatic restart on power loss (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 }
+    ];
+
+    const PSSO_POLICIES = ['AttemptAuthentication', 'RequireAuthentication', 'AllowOfflineGracePeriod', 'AllowAuthenticationGracePeriod', 'RequireTouchID', 'RequireTouchIDOrWatch', 'AllowOpenIDForTouchIDFallback'];
 
     const MAU_APP_PATHS = [
       '/Library/Application Support/Microsoft/MAU2.0/Microsoft AutoUpdate.app',
@@ -480,25 +637,66 @@
       { key: 'children', title: 'Nested folder bookmarks', type: 'array', itemType: 'dictionary', subkeys: MANAGED_BOOKMARK_LEAF }
     ];
 
+    function buildAssetReferenceDict(defaultUrl, defaultContentType, contentTypeOptions) {
+      const ctField = contentTypeOptions
+        ? { key: 'ContentType', title: 'Content type', type: 'string', rangelist: contentTypeOptions, default: defaultContentType }
+        : { key: 'ContentType', title: 'Content type', type: 'string', default: defaultContentType };
+      return {
+        key: 'Reference', title: 'External reference', type: 'dictionary', required: true,
+        subkeys: [
+          { key: 'DataURL', title: 'Data URL (https://)', type: 'string', required: true, default: defaultUrl },
+          ctField,
+          { key: 'Size', title: 'Byte size (optional)', type: 'integer' },
+          { key: 'Hash-SHA-256', title: 'SHA-256 hash (hex)', type: 'string' }
+        ]
+      };
+    }
+
+    const ASSET_AUTH_DICT = {
+      key: 'Authentication', title: 'Server authentication', type: 'dictionary',
+      subkeys: [
+        { key: 'Type', title: 'Authentication type', type: 'string', required: true, rangelist: ['MDM', 'None'], default: 'MDM' }
+      ]
+    };
+
+    const ASSET_ACCESSIBLE_FIELD = {
+      key: 'Accessible', title: 'Keychain accessibility', type: 'string', rangelist: ['Default', 'AfterFirstUnlock'], default: 'Default'
+    };
+
     // =========================================================================
-    // 2. BUILT-IN CATALOG (CLASSIC MDM + APPLICATION POLICIES + DDM)
+    // 2. COMPLETE BUILT-IN CATALOG (ALL UPLOADED MDM, APPS, & DDM SCHEMAS)
     // =========================================================================
     const BUILTIN_SCHEMAS = [
-      // --- ESSENTIALS (TOP FOR FIRST-TIME USERS) ---
+      // --- ESSENTIALS ---
       {
         protocol: 'mdm',
         category: 'Essentials',
-        title: 'Wi-Fi Network',
+        title: 'Wi-Fi Network (Personal & 802.1X Enterprise)',
         payloadType: 'com.apple.wifi.managed',
-        description: 'Connect devices automatically to your corporate WPA2/WPA3 or 802.1X Wi-Fi network.',
+        description: 'Connect devices automatically to corporate WPA2/WPA3 or 802.1X Enterprise Wi-Fi networks.',
         supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+',
         keys: [
           { key: 'SSID_STR', title: 'Wi-Fi Network Name (SSID)', type: 'string', required: true, default: 'Corp-WiFi' },
           { key: 'HIDDEN_NETWORK', title: 'Hidden Network', type: 'boolean', default: false },
           { key: 'AutoJoin', title: 'Join Automatically', type: 'boolean', default: true },
           { key: 'EncryptionType', title: 'Security / Encryption Type', type: 'string', rangelist: ['WPA2', 'WPA3', 'WPA', 'WEP', 'Any', 'None'], default: 'WPA2' },
-          { key: 'Password', title: 'Wi-Fi Password', type: 'string' },
-          { key: 'DisableAssociationMACRandomization', title: 'Disable Private MAC Address Randomization', type: 'boolean', default: false }
+          { key: 'Password', title: 'Wi-Fi Password (Personal)', type: 'string' },
+          { key: 'PayloadCertificateUUID', title: 'Client Identity Certificate PayloadUUID (EAP-TLS)', type: 'string' },
+          { key: 'DisableAssociationMACRandomization', title: 'Disable Private MAC Address Randomization', type: 'boolean', default: false },
+          {
+            key: 'EAPClientConfiguration', title: '802.1X Enterprise EAP Settings', type: 'dictionary',
+            subkeys: [
+              { key: 'AcceptEAPTypes', title: 'Accepted EAP Types (13=TLS, 21=TTLS, 25=PEAP, 43=FAST)', type: 'array', itemType: 'integer', required: true, rangelist: [13, 17, 18, 21, 23, 25, 43], default: [13] },
+              { key: 'UserName', title: 'EAP Username', type: 'string' },
+              { key: 'UserPassword', title: 'EAP Password', type: 'string' },
+              { key: 'OuterIdentity', title: 'Outer Anonymous Identity', type: 'string' },
+              { key: 'TTLSInnerAuthentication', title: 'TTLS Inner Authentication', type: 'string', rangelist: ['MSCHAPv2', 'PAP', 'EAP', 'CHAP', 'MSCHAP'], default: 'MSCHAPv2' },
+              { key: 'PayloadCertificateAnchorUUID', title: 'Trusted RADIUS CA Certificate PayloadUUIDs', type: 'array', itemType: 'string' },
+              { key: 'TLSTrustedServerNames', title: 'Trusted RADIUS Server CNs', type: 'array', itemType: 'string' },
+              { key: 'TLSMinimumVersion', title: 'Minimum TLS Version', type: 'string', rangelist: ['1.0', '1.1', '1.2', '1.3'], default: '1.2' },
+              { key: 'TLSMaximumVersion', title: 'Maximum TLS Version', type: 'string', rangelist: ['1.0', '1.1', '1.2', '1.3'], default: '1.3' }
+            ]
+          }
         ]
       },
       {
@@ -506,16 +704,18 @@
         category: 'Essentials',
         title: 'Passcode & Lock Screen Policy',
         payloadType: 'com.apple.mobiledevice.passwordpolicy',
-        description: 'Require a device passcode and set minimum length, complexity, and auto-lock timeout.',
+        description: 'Require a device passcode and set minimum length, complexity, expiration, and auto-lock timeout.',
         supportedOS: 'iOS 4.0+, macOS 10.7+, visionOS 2.0+, watchOS 10.0+',
         keys: [
           { key: 'forcePIN', title: 'Require Passcode on Device', type: 'boolean', default: true },
           { key: 'allowSimple', title: 'Allow Simple Passcodes (e.g. 1234)', type: 'boolean', default: false },
           { key: 'requireAlphanumeric', title: 'Require Letters & Numbers', type: 'boolean', default: false },
-          { key: 'minLength', title: 'Minimum Passcode Length', type: 'integer', default: 6 },
+          { key: 'minLength', title: 'Minimum Passcode Length (0-16)', type: 'integer', default: 6 },
           { key: 'minComplexChars', title: 'Minimum Special Characters (0-4)', type: 'integer', default: 1 },
-          { key: 'maxFailedAttempts', title: 'Max Failed Attempts Before Wipe/Lock', type: 'integer', default: 10 },
-          { key: 'maxInactivity', title: 'Auto-Lock After Inactivity (Minutes)', type: 'integer', default: 5 }
+          { key: 'maxFailedAttempts', title: 'Max Failed Attempts Before Wipe/Lock (2-11)', type: 'integer', default: 10 },
+          { key: 'maxInactivity', title: 'Auto-Lock After Inactivity (Minutes)', type: 'integer', default: 5 },
+          { key: 'maxPINAgeInDays', title: 'Max Passcode Age (Days, 1-730)', type: 'integer' },
+          { key: 'pinHistory', title: 'Passcode Reuse History Count (1-50)', type: 'integer' }
         ]
       },
       {
@@ -532,7 +732,9 @@
           { key: 'allowUSBRestrictedMode', title: 'Block USB Accessories When Locked', type: 'boolean', default: true },
           { key: 'allowEraseContentAndSettings', title: 'Allow Erase All Content and Settings', type: 'boolean', default: true },
           { key: 'allowCloudBackup', title: 'Allow iCloud Backup', type: 'boolean', default: true },
+          { key: 'allowCloudDocumentSync', title: 'Allow iCloud Drive & Document Sync', type: 'boolean', default: true },
           { key: 'allowAppInstallation', title: 'Allow Installing Apps', type: 'boolean', default: true },
+          { key: 'allowAppRemoval', title: 'Allow Removing Apps', type: 'boolean', default: true },
           { key: 'allowSafari', title: 'Allow Safari Browser', type: 'boolean', default: true },
           { key: 'forceEncryptedBackup', title: 'Require Encrypted Backups', type: 'boolean', default: false }
         ]
@@ -547,101 +749,243 @@
         keys: [
           { key: 'Label', title: 'Shortcut Icon Title', type: 'string', required: true, default: 'Employee Portal' },
           { key: 'URL', title: 'Website URL', type: 'string', required: true, default: 'https://portal.example.com' },
+          { key: 'Icon', title: 'PNG Icon Data (Base64 <data>)', type: 'data' },
           { key: 'FullScreen', title: 'Open as Full-Screen Web App (iOS)', type: 'boolean', default: true },
           { key: 'IsRemovable', title: 'Allow User to Remove Shortcut', type: 'boolean', default: false },
           { key: 'Precomposed', title: 'Precomposed Icon (No Gloss Shine)', type: 'boolean', default: true }
         ]
       },
 
-      // --- ENTERPRISE APPLICATION POLICY SCHEMAS ---
+      // --- NETWORK & VPN ---
       {
         protocol: 'mdm',
-        category: 'Enterprise Apps',
-        title: 'Mozilla Firefox',
-        payloadType: 'org.mozilla.firefox',
-        description: 'Configures Mozilla Firefox browser policies: General, Add-ons, Bookmarks, Network (DNSOverHTTPS, Proxy, Ciphers), Privacy, and Security.',
-        supportedOS: 'macOS Application Policy (org.mozilla.firefox)',
+        category: 'Network & VPN',
+        title: 'VPN (IKEv2 / IPSec / L2TP / SSL / AlwaysOn / TransparentProxy)',
+        payloadType: 'com.apple.vpn.managed',
+        description: 'Configures device-wide IKEv2, Cisco IPSec, L2TP, SSL VPN plugins, iOS AlwaysOn VPN, and macOS TransparentProxy.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 17.0+, visionOS 1.0+',
+        keys: VPN_COMMON_SUBKEYS
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'App-Layer VPN (Per-App VPN)',
+        payloadType: 'com.apple.vpn.managed.applayer',
+        description: 'Configures a Per-App VPN tunnel triggered by managed apps, Safari domains, Associated Domains, or SMB domains.',
+        supportedOS: 'iOS 7.0+, macOS 10.9+, visionOS 1.1+, watchOS 10.0+',
         keys: [
-          { key: 'EnterprisePoliciesEnabled', title: 'Enable Firefox Enterprise Policies', type: 'boolean', required: true, default: true },
-          { key: 'DisableAppUpdate', title: 'Disable application updates', type: 'boolean', default: false },
-          { key: 'AppAutoUpdate', title: 'Enable automatic app updates', type: 'boolean', default: true },
-          { key: 'BlockAboutConfig', title: 'Block access to about:config', type: 'boolean', default: false },
-          { key: 'BlockAboutAddons', title: 'Block access to about:addons', type: 'boolean', default: false },
-          { key: 'BlockAboutProfiles', title: 'Block access to about:profiles', type: 'boolean', default: false },
-          { key: 'BlockAboutSupport', title: 'Block access to about:support', type: 'boolean', default: false },
-          { key: 'DisableTelemetry', title: 'Disable telemetry', type: 'boolean', default: true },
-          { key: 'DisableFirefoxStudies', title: 'Disable Firefox Studies', type: 'boolean', default: true },
-          { key: 'DisablePocket', title: 'Disable Pocket', type: 'boolean', default: true },
-          { key: 'DisableFirefoxAccounts', title: 'Disable Firefox Accounts / Sync', type: 'boolean', default: false },
-          { key: 'DisablePrivateBrowsing', title: 'Disable Private Browsing', type: 'boolean', default: false },
-          { key: 'DisableDeveloperTools', title: 'Disable Developer Tools', type: 'boolean', default: false },
-          { key: 'DisableBuiltinPDFViewer', title: 'Disable built-in PDF viewer', type: 'boolean', default: false },
-          { key: 'DontCheckDefaultBrowser', title: 'Do not check if Firefox is default browser', type: 'boolean', default: true },
-          { key: 'OfferToSaveLogins', title: 'Offer to save logins', type: 'boolean', default: false },
-          { key: 'PasswordManagerEnabled', title: 'Enable Password Manager', type: 'boolean', default: false },
-          { key: 'PictureInPicture', title: 'Enable Picture-in-Picture', type: 'boolean', default: true },
-          { key: 'DisplayBookmarksToolbar', title: 'Display Bookmarks Toolbar', type: 'string', rangelist: ['always', 'never', 'newtab'], default: 'newtab' },
-          { key: 'SSLVersionMin', title: 'Minimum SSL/TLS version', type: 'string', rangelist: ['tls1', 'tls1.1', 'tls1.2', 'tls1.3'], default: 'tls1.2' },
-          { key: 'SSLVersionMax', title: 'Maximum SSL/TLS version', type: 'string', rangelist: ['tls1.2', 'tls1.3'], default: 'tls1.3' },
-          { key: 'RequestedLocales', title: 'Requested locales (e.g. en-US, en-IN)', type: 'array', itemType: 'string' },
-          {
-            key: 'DNSOverHTTPS', title: 'DNS Over HTTPS (DoH)', type: 'dictionary',
-            subkeys: [
-              { key: 'Enabled', title: 'Enable DNS Over HTTPS', type: 'boolean', default: true },
-              { key: 'ProviderURL', title: 'DoH Provider URL', type: 'string', default: 'https://dns.quad9.net/dns-query' },
-              { key: 'Locked', title: 'Lock DNS Over HTTPS Settings', type: 'boolean', default: true },
-              { key: 'ExcludedDomains', title: 'Excluded domains', type: 'array', itemType: 'string' }
-            ]
-          },
-          {
-            key: 'Proxy', title: 'Firefox Proxy Settings', type: 'dictionary',
-            subkeys: [
-              { key: 'Mode', title: 'Proxy Mode', type: 'string', rangelist: ['none', 'system', 'manual', 'autoDetect', 'autoConfig'], default: 'system' },
-              { key: 'HTTPProxy', title: 'HTTP Proxy host:port', type: 'string' },
-              { key: 'SSLProxy', title: 'SSL Proxy host:port', type: 'string' },
-              { key: 'AutoConfigURL', title: 'PAC AutoConfig URL', type: 'string' },
-              { key: 'Passthrough', title: 'Bypass proxy hosts (comma-separated)', type: 'string' },
-              { key: 'Locked', title: 'Lock Proxy Settings', type: 'boolean', default: true }
-            ]
-          },
-          {
-            key: 'PDFjs', title: 'PDF.js Settings', type: 'dictionary',
-            subkeys: [
-              { key: 'Enabled', title: 'Enable PDF.js', type: 'boolean', default: true },
-              { key: 'EnablePermissions', title: 'Enable PDF.js Permissions', type: 'boolean', default: true }
-            ]
-          },
-          {
-            key: 'EncryptedMediaExtensions', title: 'Encrypted Media Extensions (EME)', type: 'dictionary',
-            subkeys: [
-              { key: 'Enabled', title: 'Enable Encrypted Media Permissions', type: 'boolean', default: true },
-              { key: 'Locked', title: 'Lock Encrypted Media Permissions', type: 'boolean', default: false }
-            ]
-          },
-          {
-            key: 'WebsiteFilter', title: 'Website Filter (Block & Exceptions)', type: 'dictionary',
-            subkeys: [
-              { key: 'Block', title: 'Blocked URL match patterns (e.g. *://*.example.org/*)', type: 'array', itemType: 'string' },
-              { key: 'Exceptions', title: 'Allowed exception URL match patterns', type: 'array', itemType: 'string' }
-            ]
-          },
-          {
-            key: 'DisabledCiphers', title: 'Disabled TLS Ciphers (true = disabled)', type: 'dictionary',
-            subkeys: [
-              { key: 'TLS_RSA_WITH_3DES_EDE_CBC_SHA', title: 'Disable TLS_RSA_WITH_3DES_EDE_CBC_SHA', type: 'boolean', default: true },
-              { key: 'TLS_RSA_WITH_AES_128_CBC_SHA', title: 'Disable TLS_RSA_WITH_AES_128_CBC_SHA', type: 'boolean', default: false },
-              { key: 'TLS_RSA_WITH_AES_256_CBC_SHA', title: 'Disable TLS_RSA_WITH_AES_256_CBC_SHA', type: 'boolean', default: false }
-            ]
-          },
-          { key: 'Preferences', title: 'Custom about:config Preferences (key/value)', type: 'kv_map' }
+          { key: 'VPNUUID', title: 'Per-App VPN UUID (referenced by managed apps)', type: 'string', required: true, default: '11111111-2222-4333-8444-555555555555' },
+          { key: 'OnDemandMatchAppEnabled', title: 'Auto-connect VPN when associated apps use network', type: 'boolean', default: true },
+          { key: 'SafariDomains', title: 'Safari domains triggering VPN', type: 'array', itemType: 'string' },
+          { key: 'AssociatedDomains', title: 'Associated domains triggering VPN', type: 'array', itemType: 'string' },
+          { key: 'ExcludedDomains', title: 'Excluded domains', type: 'array', itemType: 'string' },
+          { key: 'SMBDomains', title: 'SMB domains accessible via VPN', type: 'array', itemType: 'string' },
+          ...VPN_COMMON_SUBKEYS
         ]
       },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'App-to-App-Layer VPN Mapping (macOS)',
+        payloadType: 'com.apple.vpn.managed.appmapping',
+        description: 'Maps macOS applications and helper tools to a Per-App VPNUUID.',
+        supportedOS: 'macOS 10.9+',
+        keys: [
+          {
+            key: 'AppLayerVPNMapping', title: 'App-to-VPN mappings', type: 'array', itemType: 'dictionary', required: true,
+            subkeys: [
+              { key: 'Identifier', title: 'App bundle identifier', type: 'string', required: true, default: 'com.example.corpapp' },
+              { key: 'VPNUUID', title: 'Target Per-App VPNUUID', type: 'string', required: true, default: '11111111-2222-4333-8444-555555555555' },
+              { key: 'SigningIdentifier', title: 'Code signature signing identifier', type: 'string', required: true, default: 'com.example.corpapp' },
+              { key: 'DesignatedRequirement', title: 'Designated Requirement', type: 'string', required: true, default: 'anchor apple generic' },
+              { key: 'Path', title: 'Executable path (optional)', type: 'string' }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'DNS Settings (Encrypted DoH / DoT)',
+        payloadType: 'com.apple.dnsSettings.managed',
+        description: 'Configures DNS-over-HTTPS (HTTPS) or DNS-over-TLS (TLS) with OnDemand rules.',
+        supportedOS: 'iOS 14.0+, macOS 11.0+, visionOS 1.0+',
+        keys: [
+          {
+            key: 'DNSSettings', title: 'DNS Settings', type: 'dictionary', required: true,
+            subkeys: [
+              { key: 'DNSProtocol', title: 'DNS Protocol', type: 'string', required: true, rangelist: ['HTTPS', 'TLS'], default: 'HTTPS' },
+              { key: 'ServerURL', title: 'DoH Server URL (https://)', type: 'string', default: 'https://dns.quad9.net/dns-query' },
+              { key: 'ServerName', title: 'DoT Server Hostname', type: 'string' },
+              { key: 'ServerAddresses', title: 'DNS Server IP Addresses', type: 'array', itemType: 'string' },
+              { key: 'SupplementalMatchDomains', title: 'Supplemental Match Domains', type: 'array', itemType: 'string' }
+            ]
+          },
+          { key: 'OnDemandRules', title: 'On Demand Rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS },
+          { key: 'ProhibitDisablement', title: 'Prohibit User from Disabling (Supervised)', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'DNS Proxy',
+        payloadType: 'com.apple.dnsProxy.managed',
+        description: 'Configures a Network Extension DNS proxy provider.',
+        supportedOS: 'iOS 11.0+, macOS 10.15+, visionOS 1.1+',
+        keys: [
+          { key: 'AppBundleIdentifier', title: 'App Bundle Identifier', type: 'string', required: true, default: 'com.example.dnsproxy' },
+          { key: 'ProviderBundleIdentifier', title: 'Provider Bundle Identifier', type: 'string' },
+          { key: 'ProviderDesignatedRequirement', title: 'Provider Designated Requirement (macOS)', type: 'string' },
+          { key: 'DNSProxyUUID', title: 'DNS Proxy UUID (iOS 16+)', type: 'string' },
+          { key: 'ProviderConfiguration', title: 'Vendor Provider Configuration (key/value)', type: 'kv_map' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'Global HTTP Proxy',
+        payloadType: 'com.apple.proxy.http.global',
+        description: 'Configures a device-wide Manual or Automatic (PAC) HTTP proxy on supervised devices.',
+        supportedOS: 'iOS 6.0+, macOS 10.9+, tvOS 9.0+, visionOS 2.0+',
+        keys: [
+          { key: 'ProxyType', title: 'Proxy Type', type: 'string', rangelist: ['Manual', 'Auto'], default: 'Manual' },
+          { key: 'ProxyServer', title: 'Proxy Server Hostname/IP (Manual)', type: 'string', default: 'proxy.example.com' },
+          { key: 'ProxyServerPort', title: 'Proxy Server Port (Manual)', type: 'integer', default: 8080 },
+          { key: 'ProxyUsername', title: 'Proxy Username', type: 'string' },
+          { key: 'ProxyPassword', title: 'Proxy Password', type: 'string' },
+          { key: 'ProxyPACURL', title: 'Proxy PAC URL (Auto)', type: 'string' },
+          { key: 'ProxyPACFallbackAllowed', title: 'Allow Direct Fallback if PAC Unreachable', type: 'boolean', default: false },
+          { key: 'ProxyCaptiveLoginAllowed', title: 'Allow Captive Portal Login Bypass', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'Network Proxy Configuration (macOS)',
+        payloadType: 'com.apple.SystemConfiguration',
+        description: 'Configures HTTP, HTTPS, FTP, SOCKS, or PAC network proxies and bypass lists on macOS.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          {
+            key: 'Proxies', title: 'Proxy Settings', type: 'dictionary', required: true,
+            subkeys: [
+              { key: 'HTTPEnable', title: 'Enable HTTP Proxy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
+              { key: 'HTTPProxy', title: 'HTTP Proxy Host/IP', type: 'string', default: 'proxy.example.com' },
+              { key: 'HTTPPort', title: 'HTTP Proxy Port', type: 'integer', default: 8080 },
+              { key: 'HTTPSEnable', title: 'Enable HTTPS Proxy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
+              { key: 'HTTPSProxy', title: 'HTTPS Proxy Host/IP', type: 'string', default: 'proxy.example.com' },
+              { key: 'HTTPSPort', title: 'HTTPS Proxy Port', type: 'integer', default: 8443 },
+              { key: 'ProxyAutoConfigEnable', title: 'Enable PAC Auto-Config (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
+              { key: 'ProxyAutoConfigURLString', title: 'PAC File URL', type: 'string' },
+              { key: 'ExceptionsList', title: 'Bypass Proxy Hosts & Domains (e.g. *.local)', type: 'array', itemType: 'string' }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'Relay (MASQUE Network Relay)',
+        payloadType: 'com.apple.relay.managed',
+        description: 'Configures HTTP/2 and HTTP/3 MASQUE Network Relays with domain routing.',
+        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.0+',
+        keys: [
+          {
+            key: 'Relays', title: 'Relay Servers', type: 'array', itemType: 'dictionary', required: true,
+            subkeys: [
+              { key: 'HTTP3RelayURL', title: 'HTTP/3 Relay URL', type: 'string', default: 'https://relay.example.com/.well-known/masque/udp/{target_host}/{target_port}/' },
+              { key: 'HTTP2RelayURL', title: 'HTTP/2 Relay URL', type: 'string' },
+              { key: 'PayloadCertificateUUID', title: 'Client Certificate PayloadUUID', type: 'string' }
+            ]
+          },
+          { key: 'MatchDomains', title: 'Match Domains', type: 'array', itemType: 'string' },
+          { key: 'ExcludedDomains', title: 'Excluded Domains', type: 'array', itemType: 'string' },
+          { key: 'UIToggleEnabled', title: 'Allow User UI Toggle', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'Web Content Filter',
+        payloadType: 'com.apple.webcontent-filter',
+        description: 'Configures Safari web filtering, allow/deny URL lists, or Network Extension filter plugins.',
+        supportedOS: 'iOS 7.0+, macOS 10.15+, visionOS 1.1+',
+        keys: [
+          { key: 'FilterType', title: 'Filter Type (macOS supports Plugin only)', type: 'string', rangelist: ['BuiltIn', 'Plugin'], default: 'BuiltIn' },
+          { key: 'AutoFilterEnabled', title: 'Enable Automatic Adult Content Filter (BuiltIn)', type: 'boolean', default: true },
+          { key: 'PermittedURLs', title: 'Permitted URLs', type: 'array', itemType: 'string' },
+          { key: 'DenyListURLs', title: 'Denied URLs', type: 'array', itemType: 'string' },
+          { key: 'UserDefinedName', title: 'Filter Display Name (Plugin)', type: 'string' },
+          { key: 'PluginBundleID', title: 'Plugin Bundle ID (Plugin)', type: 'string' },
+          { key: 'FilterSockets', title: 'Filter Socket Traffic (Plugin)', type: 'boolean', default: false },
+          { key: 'FilterDataProviderBundleIdentifier', title: 'Data Provider Bundle ID', type: 'string' },
+          { key: 'FilterDataProviderDesignatedRequirement', title: 'Data Provider Designated Requirement', type: 'string' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'Domains (Managed Email & Web Domains)',
+        payloadType: 'com.apple.domains',
+        description: 'Defines managed email domains, managed web domains, and Safari Password AutoFill domains.',
+        supportedOS: 'iOS 8.0+, macOS 10.10+, visionOS 2.0+',
+        keys: [
+          { key: 'EmailDomains', title: 'Managed Email Domains', type: 'array', itemType: 'string' },
+          { key: 'WebDomains', title: 'Managed Web Domains (iOS / visionOS)', type: 'array', itemType: 'string' },
+          { key: 'SafariPasswordAutoFillDomains', title: 'Safari AutoFill Allowed Domains (iOS)', type: 'array', itemType: 'string' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'Cellular & Private 5G/LTE',
+        payloadType: 'com.apple.cellular',
+        description: 'Configures cellular AttachAPN and data APNs.',
+        supportedOS: 'iOS 7.0+, watchOS 3.2+',
+        keys: [
+          {
+            key: 'AttachAPN', title: 'Attach APN Configuration', type: 'dictionary',
+            subkeys: [
+              { key: 'Name', title: 'Attach APN Name', type: 'string', required: true, default: 'ims' },
+              { key: 'AuthenticationType', title: 'Authentication Type', type: 'string', rangelist: ['CHAP', 'PAP'], default: 'PAP' }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: '802.1X: Global Ethernet',
+        payloadType: 'com.apple.globalethernet.managed',
+        description: 'Configures the default fallback global 802.1X Ethernet interface.',
+        supportedOS: 'iOS 17.0+, macOS 10.13+, tvOS 17.0+',
+        keys: [
+          { key: 'Interface', title: 'Interface Type', type: 'string', rangelist: ['GlobalEthernet'], default: 'GlobalEthernet' },
+          { key: 'SetupModes', title: 'Setup Mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
+          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (key/value)', type: 'kv_map' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: '802.1X: First Active Ethernet',
+        payloadType: 'com.apple.firstactiveethernet.managed',
+        description: 'Configures 802.1X wired authentication for the first active Ethernet interface on macOS.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          { key: 'Interface', title: 'Interface Type', type: 'string', rangelist: ['FirstActiveEthernet'], default: 'FirstActiveEthernet' },
+          { key: 'SetupModes', title: 'Setup Mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
+          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (key/value)', type: 'kv_map' }
+        ]
+      },
+
+      // --- ENTERPRISE APPS ---
       {
         protocol: 'mdm',
         category: 'Enterprise Apps',
         title: 'Google Chrome',
         payloadType: 'com.google.Chrome',
-        description: 'Configures Google Chrome enterprise policies: General, Browser Sign-In & Domain Restrictions, Content Settings, Extensions, DoH, ProxySettings, and Safe Browsing.',
+        description: 'Configures Google Chrome enterprise policies: Browser Sign-In & Domain Restrictions, Homepage, Cookies, Extensions, DoH, Proxy, and Safe Browsing.',
         supportedOS: 'macOS Application Policy (com.google.Chrome)',
         keys: [
           { key: 'BrowserSignin', title: 'Browser Sign-In Requirement (0=Disabled, 1=Enable, 2=Force)', type: 'integer', rangelist: [0, 1, 2], default: 2 },
@@ -685,6 +1029,56 @@
       {
         protocol: 'mdm',
         category: 'Enterprise Apps',
+        title: 'Mozilla Firefox',
+        payloadType: 'org.mozilla.firefox',
+        description: 'Configures Mozilla Firefox browser policies: General, Add-ons, Bookmarks, Network (DNSOverHTTPS, Proxy, Ciphers), Privacy, and Security.',
+        supportedOS: 'macOS Application Policy (org.mozilla.firefox)',
+        keys: [
+          { key: 'EnterprisePoliciesEnabled', title: 'Enable Firefox Enterprise Policies', type: 'boolean', required: true, default: true },
+          { key: 'DisableAppUpdate', title: 'Disable application updates', type: 'boolean', default: false },
+          { key: 'AppAutoUpdate', title: 'Enable automatic app updates', type: 'boolean', default: true },
+          { key: 'BlockAboutConfig', title: 'Block access to about:config', type: 'boolean', default: false },
+          { key: 'BlockAboutAddons', title: 'Block access to about:addons', type: 'boolean', default: false },
+          { key: 'DisableTelemetry', title: 'Disable telemetry', type: 'boolean', default: true },
+          { key: 'DisableFirefoxStudies', title: 'Disable Firefox Studies', type: 'boolean', default: true },
+          { key: 'DisablePocket', title: 'Disable Pocket', type: 'boolean', default: true },
+          { key: 'DisableFirefoxAccounts', title: 'Disable Firefox Accounts / Sync', type: 'boolean', default: false },
+          { key: 'DisablePrivateBrowsing', title: 'Disable Private Browsing', type: 'boolean', default: false },
+          { key: 'DisableDeveloperTools', title: 'Disable Developer Tools', type: 'boolean', default: false },
+          { key: 'DontCheckDefaultBrowser', title: 'Do not check if Firefox is default browser', type: 'boolean', default: true },
+          { key: 'OfferToSaveLogins', title: 'Offer to save logins', type: 'boolean', default: false },
+          { key: 'PasswordManagerEnabled', title: 'Enable Password Manager', type: 'boolean', default: false },
+          { key: 'PictureInPicture', title: 'Enable Picture-in-Picture', type: 'boolean', default: true },
+          { key: 'DisplayBookmarksToolbar', title: 'Display Bookmarks Toolbar', type: 'string', rangelist: ['always', 'never', 'newtab'], default: 'newtab' },
+          { key: 'SSLVersionMin', title: 'Minimum SSL/TLS version', type: 'string', rangelist: ['tls1', 'tls1.1', 'tls1.2', 'tls1.3'], default: 'tls1.2' },
+          { key: 'SSLVersionMax', title: 'Maximum SSL/TLS version', type: 'string', rangelist: ['tls1.2', 'tls1.3'], default: 'tls1.3' },
+          { key: 'RequestedLocales', title: 'Requested locales (e.g. en-US, en-IN)', type: 'array', itemType: 'string' },
+          {
+            key: 'DNSOverHTTPS', title: 'DNS Over HTTPS (DoH)', type: 'dictionary',
+            subkeys: [
+              { key: 'Enabled', title: 'Enable DNS Over HTTPS', type: 'boolean', default: true },
+              { key: 'ProviderURL', title: 'DoH Provider URL', type: 'string', default: 'https://dns.quad9.net/dns-query' },
+              { key: 'Locked', title: 'Lock DNS Over HTTPS Settings', type: 'boolean', default: true },
+              { key: 'ExcludedDomains', title: 'Excluded domains', type: 'array', itemType: 'string' }
+            ]
+          },
+          {
+            key: 'Proxy', title: 'Firefox Proxy Settings', type: 'dictionary',
+            subkeys: [
+              { key: 'Mode', title: 'Proxy Mode', type: 'string', rangelist: ['none', 'system', 'manual', 'autoDetect', 'autoConfig'], default: 'system' },
+              { key: 'HTTPProxy', title: 'HTTP Proxy host:port', type: 'string' },
+              { key: 'SSLProxy', title: 'SSL Proxy host:port', type: 'string' },
+              { key: 'AutoConfigURL', title: 'PAC AutoConfig URL', type: 'string' },
+              { key: 'Passthrough', title: 'Bypass proxy hosts (comma-separated)', type: 'string' },
+              { key: 'Locked', title: 'Lock Proxy Settings', type: 'boolean', default: true }
+            ]
+          },
+          { key: 'Preferences', title: 'Custom about:config Preferences (key/value)', type: 'kv_map' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
         title: 'Microsoft Edge',
         payloadType: 'com.microsoft.Edge',
         description: 'Configures Microsoft Edge enterprise policies: General, Content Settings, SmartScreen, ProxySettings, and Managed Favorites.',
@@ -697,24 +1091,15 @@
           { key: 'ShowHomeButton', title: 'Show Home button on toolbar', type: 'boolean', default: false },
           { key: 'FavoritesBarEnabled', title: 'Enable Favorites Bar', type: 'boolean', default: true },
           { key: 'BlockThirdPartyCookies', title: 'Block third-party cookies', type: 'boolean', default: true },
-          { key: 'DefaultCookiesSetting', title: 'Default cookies setting (1=Allow, 2=Block, 4=Session)', type: 'integer', rangelist: [1, 2, 4] },
           { key: 'DefaultImagesSetting', title: 'Default images setting (1=Allow, 2=Block)', type: 'integer', rangelist: [1, 2], default: 2 },
           { key: 'DefaultInsecureContentSetting', title: 'Default insecure content setting (1=Allow, 2=Block)', type: 'integer', rangelist: [1, 2], default: 2 },
           { key: 'SmartScreenEnabled', title: 'Enable Microsoft Defender SmartScreen', type: 'boolean', default: true },
           { key: 'SmartScreenPuaEnabled', title: 'Block Potentially Unwanted Apps (PUA)', type: 'boolean', default: true },
-          { key: 'PreventSmartScreenPromptOverride', title: 'Prevent bypassing SmartScreen site warnings', type: 'boolean', default: true },
-          { key: 'PreventSmartScreenPromptOverrideForFiles', title: 'Prevent bypassing SmartScreen download warnings', type: 'boolean', default: true },
-          { key: 'SmartScreenAllowListDomains', title: 'SmartScreen allowlisted domains', type: 'array', itemType: 'string' },
-          { key: 'ExtensionInstallAllowlist', title: 'Allowed extension IDs', type: 'array', itemType: 'string' },
-          { key: 'ExtensionInstallBlocklist', title: 'Blocked extension IDs (use * to block all)', type: 'array', itemType: 'string' },
-          { key: 'ExtensionInstallForcelist', title: 'Force-installed extensions (extension_id;update_url)', type: 'array', itemType: 'string' },
           { key: 'ProxySettings', title: 'Edge Proxy Settings', type: 'dictionary', subkeys: CHROMIUM_PROXY_SUBKEYS },
           { key: 'ManagedFavorites', title: 'Managed Favorites', type: 'array', itemType: 'dictionary', subkeys: MANAGED_BOOKMARK_ITEM_SUBKEYS },
           { key: 'MediaRouterCastAllowAllIPs', title: 'Allow Media Router Cast on all IPs', type: 'boolean', default: true },
           { key: 'NativeMessagingUserLevelHosts', title: 'Allow user-level native messaging hosts', type: 'boolean', default: true },
-          { key: 'ShowCastIconInToolbar', title: 'Show Cast icon in toolbar', type: 'boolean', default: true },
-          { key: 'InPrivateModeAvailability', title: 'InPrivate mode (0=Enabled, 1=Disabled, 2=Forced)', type: 'integer', rangelist: [0, 1, 2], default: 0 },
-          { key: 'SyncDisabled', title: 'Disable profile sync', type: 'boolean', default: false }
+          { key: 'ShowCastIconInToolbar', title: 'Show Cast icon in toolbar', type: 'boolean', default: true }
         ]
       },
       {
@@ -722,7 +1107,7 @@
         category: 'Enterprise Apps',
         title: 'Microsoft AutoUpdate (MAU)',
         payloadType: 'com.microsoft.autoupdate2',
-        description: 'Configures Microsoft AutoUpdate (MAU) update channel, check frequency, and forced update deadlines for Microsoft 365 & Defender apps.',
+        description: 'Configures Microsoft AutoUpdate (MAU) update channel, check frequency, and forced update deadlines.',
         supportedOS: 'macOS Application Policy (com.microsoft.autoupdate2)',
         keys: [
           { key: 'HowToCheck', title: 'Update check mode', type: 'string', rangelist: ['AutomaticDownload', 'AutomaticCheck', 'Manual'], default: 'AutomaticDownload' },
@@ -730,7 +1115,6 @@
           { key: 'UpdateCheckFrequency', title: 'Update check interval (minutes)', type: 'integer', default: 720 },
           { key: 'EnableCheckForUpdatesButton', title: 'Enable Check for Updates button', type: 'boolean', default: true },
           { key: 'DisableInsiderCheckbox', title: 'Disable Insider program checkbox', type: 'boolean', default: true },
-          { key: 'SendAllTelemetryEnabled', title: 'Send diagnostic telemetry', type: 'boolean', default: false },
           { key: 'Applications', title: 'Registered Microsoft Applications', type: 'dictionary', subkeys: MAU_APPS_SUBKEYS },
           { key: 'UpdateDeadline.ApplicationsForcedUpdateSchedule', title: 'Forced Update Deadlines per Application', type: 'dictionary', subkeys: MAU_DEADLINE_SUBKEYS }
         ]
@@ -740,7 +1124,7 @@
         category: 'Enterprise Apps',
         title: 'Zoom Workplace (us.zoom.xos)',
         payloadType: 'us.zoom.xos',
-        description: 'Configures enterprise Zoom Workplace client settings on macOS (SSO URL, auto-update, screen sharing, encryption).',
+        description: 'Configures enterprise Zoom Workplace client settings on macOS.',
         supportedOS: 'macOS Application Policy (us.zoom.xos)',
         rootKvMap: true,
         keys: []
@@ -778,7 +1162,7 @@
       {
         protocol: 'mdm',
         category: 'Enterprise Apps',
-        title: 'Google Software Update Preferences',
+        title: 'Google Software Update (Keystone)',
         payloadType: 'com.google.Keystone',
         description: 'Configures Google Software Update (Keystone) update check intervals and policies.',
         supportedOS: 'macOS Application Policy (com.google.Keystone)',
@@ -806,21 +1190,684 @@
         keys: []
       },
 
-      // --- ADDITIONAL MDM PROFILES ---
+      // --- SECURITY, PRIVACY & CERTIFICATES ---
       {
         protocol: 'mdm',
-        category: 'Security & Identity',
-        title: 'MDM (Enrollment Payload)',
+        category: 'Security & Privacy',
+        title: 'Privacy Preferences Policy Control (TCC)',
+        payloadType: 'com.apple.TCC.configuration-profile-policy',
+        description: 'Pre-approves or denies macOS TCC privacy permissions (Full Disk Access, Screen Recording, Accessibility, AppleEvents, Camera, Mic, Folders).',
+        supportedOS: 'macOS 10.14+ (User-Approved MDM)',
+        keys: [
+          { key: 'Services', title: 'TCC Privacy Services', type: 'dictionary', required: true, subkeys: TCC_SERVICES_SUBKEYS }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'FDE FileVault',
+        payloadType: 'com.apple.MCX.FileVault2',
+        description: 'Enables or disables FileVault 2 full-disk encryption on macOS with personal/institutional recovery keys.',
+        supportedOS: 'macOS 10.9+ (UAMDM required on 10.15+)',
+        keys: [
+          { key: 'Enable', title: 'Enable or Disable FileVault', type: 'string', required: true, rangelist: ['On', 'Off'], default: 'On' },
+          { key: 'Defer', title: 'Defer Enabling Until User Logs Out', type: 'boolean', default: true },
+          { key: 'UserEntersMissingInfo', title: 'Prompt User for Missing Username/Password', type: 'boolean', default: true },
+          { key: 'UseRecoveryKey', title: 'Create Personal Recovery Key (PRK)', type: 'boolean', default: true },
+          { key: 'ShowRecoveryKey', title: 'Show Personal Recovery Key to User', type: 'boolean', default: true },
+          { key: 'ForceEnableInSetupAssistant', title: 'Force Enable During Setup Assistant (macOS 14+ ADE)', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'FDE Recovery Key Escrow',
+        payloadType: 'com.apple.security.FDERecoveryKeyEscrow',
+        description: 'Encrypts the FileVault Personal Recovery Key with an escrow certificate for MDM retrieval.',
+        supportedOS: 'macOS 10.13+',
+        keys: [
+          { key: 'Location', title: 'Escrow Location Description', type: 'string', required: true, default: 'RGM IT Security Vault' },
+          { key: 'EncryptCertPayloadUUID', title: 'PKCS #1 Encryption Certificate PayloadUUID', type: 'string', required: true, default: '00000000-0000-0000-0000-000000000000' },
+          { key: 'DeviceKey', title: 'Custom Device Lookup Key (optional)', type: 'string' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Firewall (macOS Application Firewall)',
+        payloadType: 'com.apple.security.firewall',
+        description: 'Enables macOS Application Firewall, stealth mode, block-all-incoming, and per-app connection rules.',
+        supportedOS: 'macOS 10.12+',
+        keys: [
+          { key: 'EnableFirewall', title: 'Enable Application Firewall', type: 'boolean', required: true, default: true },
+          { key: 'BlockAllIncoming', title: 'Block All Incoming Connections', type: 'boolean', default: false },
+          { key: 'EnableStealthMode', title: 'Enable Stealth Mode', type: 'boolean', default: true },
+          { key: 'AllowSigned', title: 'Allow Built-In Signed Software (macOS 12.3+)', type: 'boolean', default: true },
+          { key: 'AllowSignedApp', title: 'Allow Downloaded Signed Software (macOS 12.3+)', type: 'boolean', default: true },
+          {
+            key: 'Applications', title: 'Application Firewall Rules', type: 'array', itemType: 'dictionary',
+            subkeys: [
+              { key: 'BundleID', title: 'App Bundle Identifier', type: 'string', required: true },
+              { key: 'Allowed', title: 'Allow Incoming Connections', type: 'boolean', required: true, default: true }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'System Extensions',
+        payloadType: 'com.apple.system-extension-policy',
+        description: 'Approves macOS System Extensions (Driver, Network, EndpointSecurity) without user prompts.',
+        supportedOS: 'macOS 10.15+ (User-Approved MDM)',
+        keys: [
+          { key: 'AllowUserOverrides', title: 'Allow Users to Approve Additional Extensions', type: 'boolean', default: true },
+          { key: 'AllowedTeamIdentifiers', title: 'Allowed Team IDs', type: 'array', itemType: 'string' },
+          { key: 'AllowedSystemExtensionTypes', title: 'Allowed Extension Types per Team ID', type: 'kv_array_map' },
+          { key: 'AllowedSystemExtensions', title: 'Allowed System Extension Bundle IDs per Team ID', type: 'kv_array_map' },
+          { key: 'NonRemovableSystemExtensions', title: 'Non-Removable System Extensions per Team ID (macOS 15+)', type: 'kv_array_map' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Kernel Extensions (KEXT)',
+        payloadType: 'com.apple.syspolicy.kernel-extension-policy',
+        description: 'Allows loading legacy macOS kernel extensions by Team ID or Bundle ID.',
+        supportedOS: 'macOS 10.13.2+ (User-Approved MDM)',
+        keys: [
+          { key: 'AllowUserOverrides', title: 'Allow Users to Approve Additional KEXTs', type: 'boolean', default: false },
+          { key: 'AllowedTeamIdentifiers', title: 'Allowed Team IDs', type: 'array', itemType: 'string' },
+          { key: 'AllowedKernelExtensions', title: 'Allowed KEXT Bundle IDs per Team ID', type: 'kv_array_map' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Gatekeeper (System Policy Control)',
+        payloadType: 'com.apple.systempolicy.control',
+        description: 'Configures macOS Gatekeeper app assessment policy.',
+        supportedOS: 'macOS 10.8+',
+        keys: [
+          { key: 'EnableAssessment', title: 'Enable Gatekeeper Assessment', type: 'boolean', default: true },
+          { key: 'AllowIdentifiedDevelopers', title: 'Allow Identified Developers (in addition to App Store)', type: 'boolean', default: true },
+          { key: 'EnableXProtectMalwareUpload', title: 'Allow XProtect Malware Upload Prompt (macOS 15+)', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Certificate (Root CA)',
+        payloadType: 'com.apple.security.root',
+        description: 'Installs a trusted Root CA certificate.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
+        keys: [
+          { key: 'PayloadCertificateFileName', title: 'Certificate Filename', type: 'string', default: 'enterprise-root-ca.cer' },
+          { key: 'PayloadContent', title: 'Certificate Binary Data (Base64 <data>)', type: 'data', required: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Certificate (PEM)',
+        payloadType: 'com.apple.security.pem',
+        description: 'Installs a PEM-formatted certificate without private key.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
+        keys: [
+          { key: 'PayloadCertificateFileName', title: 'Certificate Filename', type: 'string', default: 'intermediate-ca.pem' },
+          { key: 'PayloadContent', title: 'Certificate Binary Data (Base64 <data>)', type: 'data', required: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Certificate (PKCS #1)',
+        payloadType: 'com.apple.security.pkcs1',
+        description: 'Installs a DER-encoded PKCS #1 certificate.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
+        keys: [
+          { key: 'PayloadCertificateFileName', title: 'Certificate Filename', type: 'string', default: 'certificate.cer' },
+          { key: 'PayloadContent', title: 'Certificate Binary Data (Base64 <data>)', type: 'data', required: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Certificate (PKCS #12 Identity)',
+        payloadType: 'com.apple.security.pkcs12',
+        description: 'Installs a password-protected PKCS #12 client identity certificate (.p12 / .pfx).',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
+        keys: [
+          { key: 'PayloadCertificateFileName', title: 'Identity Filename', type: 'string', default: 'client-identity.p12' },
+          { key: 'PayloadContent', title: 'PKCS #12 Identity Data (Base64 <data>)', type: 'data', required: true },
+          { key: 'Password', title: 'PKCS #12 Passphrase', type: 'string' },
+          { key: 'AllowAllAppsAccess', title: 'Allow All Apps Access to Private Key (macOS)', type: 'boolean', default: false },
+          { key: 'KeyIsExtractable', title: 'Private Key Extractable in Keychain (macOS)', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'SCEP Certificate Enrollment',
+        payloadType: 'com.apple.security.scep',
+        description: 'Automates requesting a client identity certificate from a SCEP server.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
+        keys: [
+          {
+            key: 'PayloadContent', title: 'SCEP Configuration', type: 'dictionary', required: true,
+            subkeys: [
+              { key: 'URL', title: 'SCEP Server URL', type: 'string', required: true, default: 'https://scep.example.com/certsrv/mscep/mscep.dll' },
+              { key: 'Name', title: 'CA Name', type: 'string', default: 'Corp-Issuing-CA' },
+              { key: 'Challenge', title: 'SCEP Challenge Secret', type: 'string' },
+              { key: 'Keysize', title: 'RSA Key Size', type: 'integer', rangelist: [1024, 2048, 4096], default: 2048 },
+              { key: 'Key Type', title: 'Key Type', type: 'string', rangelist: ['RSA'], default: 'RSA' },
+              { key: 'Key Usage', title: 'Key Usage Bitmask (1=Sign, 4=Encrypt, 5=Both)', type: 'integer', default: 5 },
+              { key: 'Subject', title: 'X.500 Subject (RDN Pairs)', type: 'array', itemType: 'array', subkeys: X500_RDN_PAIR_SUBKEYS }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'ACME Certificate Enrollment',
+        payloadType: 'com.apple.security.acme',
+        description: 'Configures Automated Certificate Management Environment (ACME) enrollment with hardware-bound Secure Enclave keys.',
+        supportedOS: 'iOS 16.0+, macOS 13.1+, tvOS 16.0+, visionOS 1.0+, watchOS 9.0+',
+        keys: [
+          { key: 'DirectoryURL', title: 'ACME Directory URL (https://)', type: 'string', required: true, default: 'https://acme.example.com/directory' },
+          { key: 'ClientIdentifier', title: 'Client Identifier', type: 'string', required: true, default: 'device-acme-token-001' },
+          { key: 'KeyType', title: 'Key Pair Type', type: 'string', required: true, rangelist: ['ECSECPrimeRandom', 'RSA'], default: 'ECSECPrimeRandom' },
+          { key: 'KeySize', title: 'Key Size (256/384/521 for EC; 2048/4096 for RSA)', type: 'integer', required: true, default: 384 },
+          { key: 'HardwareBound', title: 'Hardware-Bound Secure Enclave Key', type: 'boolean', required: true, default: true },
+          { key: 'Attest', title: 'Provide Device WebAuthn Attestation', type: 'boolean', default: true },
+          { key: 'Subject', title: 'X.500 Subject (RDN Pairs)', type: 'array', itemType: 'array', required: true, subkeys: X500_RDN_PAIR_SUBKEYS }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'SmartCard Policy',
+        payloadType: 'com.apple.security.smartcard',
+        description: 'Configures smart card pairing, certificate trust checks, and mandatory smart card login on macOS.',
+        supportedOS: 'macOS 10.12.4+',
+        keys: [
+          { key: 'UserPairing', title: 'Prompt User for Smart Card Pairing', type: 'boolean', default: true },
+          { key: 'allowSmartCard', title: 'Allow Smart Cards for Login & Auth', type: 'boolean', default: true },
+          { key: 'checkCertificateTrust', title: 'Certificate Trust Check (0=Off, 1=Valid, 2=Soft, 3=Hard)', type: 'integer', rangelist: [0, 1, 2, 3], default: 0 },
+          { key: 'enforceSmartCard', title: 'Require Smart Card for All Logins', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Extensible Single Sign-On & Platform SSO',
+        payloadType: 'com.apple.extensiblesso',
+        description: 'Configures an SSO app extension (Redirect or Credential) and macOS Platform SSO.',
+        supportedOS: 'iOS 13.0+, macOS 10.15+ (Platform SSO 14.0+), visionOS 1.1+',
+        keys: [
+          { key: 'ExtensionIdentifier', title: 'Extension Bundle Identifier', type: 'string', required: true, default: 'com.example.app.sso-extension' },
+          { key: 'TeamIdentifier', title: 'Team Identifier (macOS)', type: 'string', default: 'ABCD123456' },
+          { key: 'Type', title: 'SSO Type', type: 'string', required: true, rangelist: ['Redirect', 'Credential'], default: 'Redirect' },
+          { key: 'URLs', title: 'Identity Provider URL Prefixes (Redirect)', type: 'array', itemType: 'string' },
+          { key: 'Hosts', title: 'Authenticated Hosts/Domains (Credential)', type: 'array', itemType: 'string' },
+          {
+            key: 'PlatformSSO', title: 'Platform SSO (macOS 14+)', type: 'dictionary',
+            subkeys: [
+              { key: 'AuthenticationMethod', title: 'Authentication Method', type: 'string', rangelist: ['Password', 'UserSecureEnclaveKey', 'SmartCard', 'OpenID'], default: 'Password' },
+              { key: 'UseSharedDeviceKeys', title: 'Use Shared Device Keys', type: 'boolean', default: false },
+              { key: 'AccountDisplayName', title: 'Account Display Name', type: 'string', default: 'Corporate Account' },
+              { key: 'FileVaultPolicy', title: 'FileVault Unlock Policy', type: 'array', itemType: 'string', rangelist: PSSO_POLICIES },
+              { key: 'LoginPolicy', title: 'Login Window Policy', type: 'array', itemType: 'string', rangelist: PSSO_POLICIES },
+              { key: 'UnlockPolicy', title: 'Screensaver Unlock Policy', type: 'array', itemType: 'string', rangelist: [...PSSO_POLICIES, 'AllowTouchIDOrWatchForUnlock'] }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Kerberos SSO Extension',
+        payloadType: 'com.apple.extensiblesso',
+        description: 'Configures Apple’s built-in Kerberos SSO extension for Active Directory realms.',
+        supportedOS: 'iOS 13.0+, macOS 10.15+, visionOS 1.1+',
+        keys: [
+          { key: 'ExtensionIdentifier', title: 'Extension Identifier', type: 'string', required: true, rangelist: ['com.apple.AppSSOKerberos.KerberosExtension'], default: 'com.apple.AppSSOKerberos.KerberosExtension' },
+          { key: 'TeamIdentifier', title: 'Team Identifier', type: 'string', required: true, rangelist: ['apple'], default: 'apple' },
+          { key: 'Type', title: 'SSO Type', type: 'string', required: true, rangelist: ['Credential'], default: 'Credential' },
+          { key: 'Realm', title: 'Kerberos Realm (UPPERCASE)', type: 'string', required: true, default: 'CORP.EXAMPLE.COM' },
+          { key: 'Hosts', title: 'Hosts / Domain Suffixes (e.g. .corp.example.com)', type: 'array', itemType: 'string' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Profile Removal Password',
+        payloadType: 'com.apple.profileRemovalPassword',
+        description: 'Requires a password when a user attempts to remove a locked configuration profile.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+',
+        keys: [
+          { key: 'RemovalPassword', title: 'Profile Removal Password', type: 'string', default: 'RemoveMe@2026' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'MDM Enrollment Payload',
         payloadType: 'com.apple.mdm',
-        description: 'Configures the core Mobile Device Management (MDM) check-in URL, server URL, APNs topic, identity certificate, and access rights.',
+        description: 'Configures the core Mobile Device Management (MDM) check-in URL, server URL, APNs topic, and identity certificate.',
         supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.1+, watchOS 10.0+',
         keys: [
-          { key: 'IdentityCertificateUUID', title: 'Identity certificate / SCEP PayloadUUID', type: 'string', required: true, default: '00000000-0000-0000-0000-000000000000' },
+          { key: 'IdentityCertificateUUID', title: 'Identity Certificate / SCEP PayloadUUID', type: 'string', required: true, default: '00000000-0000-0000-0000-000000000000' },
           { key: 'Topic', title: 'APNs Push Topic (com.apple.mgmt.*)', type: 'string', required: true, default: 'com.apple.mgmt.External.00000000-0000-0000-0000-000000000000' },
           { key: 'ServerURL', title: 'MDM Server URL (https://)', type: 'string', required: true, default: 'https://mdm.example.com/mdm/connect' },
           { key: 'CheckInURL', title: 'MDM Check-In URL (https://)', type: 'string', default: 'https://mdm.example.com/mdm/checkin' },
-          { key: 'SignMessage', title: 'Sign device messages', type: 'boolean', default: true },
-          { key: 'AccessRights', title: 'Access rights bitmask', type: 'integer', default: 8191 }
+          { key: 'SignMessage', title: 'Sign Device Messages', type: 'boolean', default: true },
+          { key: 'AccessRights', title: 'Access Rights Bitmask', type: 'integer', default: 8191 }
+        ]
+      },
+
+      // --- ACCOUNTS ---
+      {
+        protocol: 'mdm',
+        category: 'Accounts',
+        title: 'Exchange ActiveSync (EAS)',
+        payloadType: 'com.apple.eas.account',
+        description: 'Configures an Exchange ActiveSync account on iOS and visionOS.',
+        supportedOS: 'iOS 4.0+, visionOS 1.1+',
+        keys: [
+          { key: 'EmailAddress', title: 'Email Address', type: 'string', default: 'user@example.com' },
+          { key: 'Host', title: 'Exchange Server Host', type: 'string', default: 'outlook.office365.com' },
+          { key: 'SSL', title: 'Use SSL', type: 'boolean', default: true },
+          { key: 'OAuth', title: 'Use OAuth', type: 'boolean', default: true },
+          { key: 'UserName', title: 'Username', type: 'string' },
+          { key: 'Password', title: 'Password (omit if OAuth is true)', type: 'string' },
+          { key: 'MailNumberOfPastDaysToSync', title: 'Past Days of Mail to Sync (0 = unlimited)', type: 'integer', rangelist: [0, 1, 3, 7, 14, 31], default: 7 }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Accounts',
+        title: 'Mail (IMAP / POP)',
+        payloadType: 'com.apple.mail.managed',
+        description: 'Configures an IMAP or POP email account.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, visionOS 1.1+',
+        keys: [
+          { key: 'EmailAccountDescription', title: 'Account Description', type: 'string', default: 'Corporate Email' },
+          { key: 'EmailAccountName', title: 'Sender Display Name', type: 'string', default: 'Jane Doe' },
+          { key: 'EmailAccountType', title: 'Account Protocol', type: 'string', required: true, rangelist: ['EmailTypeIMAP', 'EmailTypePOP'], default: 'EmailTypeIMAP' },
+          { key: 'EmailAddress', title: 'Email Address', type: 'string', default: 'jane.doe@example.com' },
+          { key: 'IncomingMailServerHostName', title: 'Incoming Mail Server', type: 'string', required: true, default: 'imap.example.com' },
+          { key: 'IncomingMailServerPortNumber', title: 'Incoming Port', type: 'integer', default: 993 },
+          { key: 'IncomingMailServerUseSSL', title: 'Incoming Use SSL', type: 'boolean', default: true },
+          { key: 'IncomingMailServerAuthentication', title: 'Incoming Authentication', type: 'string', required: true, rangelist: ['EmailAuthNone', 'EmailAuthPassword', 'EmailAuthCRAMMD5', 'EmailAuthNTLM', 'EmailAuthHTTPMD5'], default: 'EmailAuthPassword' },
+          { key: 'OutgoingMailServerHostName', title: 'Outgoing SMTP Server', type: 'string', required: true, default: 'smtp.example.com' },
+          { key: 'OutgoingMailServerPortNumber', title: 'Outgoing Port', type: 'integer', default: 587 },
+          { key: 'OutgoingMailServerUseSSL', title: 'Outgoing Use SSL', type: 'boolean', default: true },
+          { key: 'OutgoingMailServerAuthentication', title: 'Outgoing Authentication', type: 'string', required: true, rangelist: ['EmailAuthNone', 'EmailAuthPassword', 'EmailAuthCRAMMD5', 'EmailAuthNTLM', 'EmailAuthHTTPMD5'], default: 'EmailAuthPassword' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Accounts',
+        title: 'Google Workspace Account',
+        payloadType: 'com.apple.google-oauth',
+        description: 'Configures a Google Workspace account on iOS and visionOS.',
+        supportedOS: 'iOS 9.3+, visionOS 1.1+',
+        keys: [
+          { key: 'AccountDescription', title: 'Account Description', type: 'string', default: 'Corporate Google Account' },
+          { key: 'AccountName', title: 'Full Name', type: 'string', default: 'Jane Doe' },
+          { key: 'EmailAddress', title: 'Google Email Address', type: 'string', required: true, default: 'jane.doe@example.com' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Accounts',
+        title: 'CalDAV Calendar Account',
+        payloadType: 'com.apple.caldav.account',
+        description: 'Configures a CalDAV Calendar account.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, visionOS 1.1+',
+        keys: [
+          { key: 'CalDAVAccountDescription', title: 'Account Description', type: 'string', default: 'Corporate Calendar' },
+          { key: 'CalDAVHostName', title: 'Server Hostname', type: 'string', required: true, default: 'caldav.example.com' },
+          { key: 'CalDAVUsername', title: 'Username', type: 'string', default: 'jdoe' },
+          { key: 'CalDAVUseSSL', title: 'Use SSL', type: 'boolean', default: true },
+          { key: 'CalDAVPort', title: 'Port Number', type: 'integer', default: 443 }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Accounts',
+        title: 'CardDAV Contacts Account',
+        payloadType: 'com.apple.carddav.account',
+        description: 'Configures a CardDAV Contacts account.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, visionOS 1.1+',
+        keys: [
+          { key: 'CardDAVAccountDescription', title: 'Account Description', type: 'string', default: 'Corporate Contacts' },
+          { key: 'CardDAVHostName', title: 'Server Hostname', type: 'string', required: true, default: 'carddav.example.com' },
+          { key: 'CardDAVUsername', title: 'Username', type: 'string', default: 'jdoe' },
+          { key: 'CardDAVUseSSL', title: 'Use SSL', type: 'boolean', default: true },
+          { key: 'CardDAVPort', title: 'Port Number', type: 'integer', default: 443 }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Accounts',
+        title: 'Subscribed Calendar Feed',
+        payloadType: 'com.apple.subscribedcalendar.account',
+        description: 'Configures read-only subscribed .ics calendar feeds.',
+        supportedOS: 'iOS 4.0+, visionOS 1.1+',
+        keys: [
+          { key: 'SubCalAccountDescription', title: 'Calendar Description', type: 'string', default: 'Company Holidays' },
+          { key: 'SubCalAccountHostName', title: 'Calendar Feed URL', type: 'string', required: true, default: 'https://calendar.example.com/holidays.ics' },
+          { key: 'SubCalAccountUseSSL', title: 'Use SSL', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Accounts',
+        title: 'LDAP Directory Account',
+        payloadType: 'com.apple.ldap.account',
+        description: 'Configures an LDAP directory account for Contacts lookup.',
+        supportedOS: 'iOS 4.0+, macOS 10.7+, visionOS 1.1+',
+        keys: [
+          { key: 'LDAPAccountDescription', title: 'Account Description', type: 'string', default: 'Corporate Directory' },
+          { key: 'LDAPAccountHostName', title: 'Server Hostname', type: 'string', required: true, default: 'ldap.example.com' },
+          { key: 'LDAPAccountUserName', title: 'Bind Username', type: 'string' },
+          { key: 'LDAPAccountUseSSL', title: 'Use SSL', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Accounts',
+        title: 'Active Directory Bind (macOS)',
+        payloadType: 'com.apple.DirectoryService.managed',
+        description: 'Binds macOS to an Active Directory (AD) domain.',
+        supportedOS: 'macOS 10.8+',
+        keys: [
+          { key: 'HostName', title: 'Active Directory Domain', type: 'string', required: true, default: 'corp.example.com' },
+          { key: 'UserName', title: 'Domain Bind Username', type: 'string', default: 'svc_macbind' },
+          { key: 'Password', title: 'Domain Bind Password', type: 'string' },
+          { key: 'ADOrganizationalUnit', title: 'Organizational Unit (OU)', type: 'string', default: 'OU=Macs,DC=corp,DC=example,DC=com' }
+        ]
+      },
+
+      // --- MACOS SYSTEM & DESKTOP ---
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Dock Settings',
+        payloadType: 'com.apple.dock',
+        description: 'Configures macOS Dock size, position, autohide, and pinned apps/folders.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          { key: 'tilesize', title: 'Tile Size (16-128)', type: 'integer', default: 48 },
+          { key: 'size-immutable', title: 'Lock Dock Size', type: 'boolean', default: false },
+          { key: 'orientation', title: 'Dock Position', type: 'string', rangelist: ['bottom', 'left', 'right'], default: 'bottom' },
+          { key: 'autohide', title: 'Automatically Hide & Show Dock', type: 'boolean', default: false },
+          { key: 'show-recents', title: 'Show Recent Applications', type: 'boolean', default: true },
+          { key: 'contents-immutable', title: 'Lock Dock Items', type: 'boolean', default: false },
+          { key: 'static-apps', title: 'Locked Applications Side Items', type: 'array', itemType: 'dictionary', subkeys: DOCK_TILE_ITEM_SUBKEYS },
+          { key: 'static-others', title: 'Locked Folders/URLs Side Items', type: 'array', itemType: 'dictionary', subkeys: DOCK_TILE_ITEM_SUBKEYS }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Finder Settings',
+        payloadType: 'com.apple.finder',
+        description: 'Configures macOS Finder restrictions and Desktop icon visibility.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          { key: 'ProhibitConnectTo', title: 'Disable Connect to Server (Cmd+K)', type: 'boolean', default: false },
+          { key: 'ProhibitGoToFolder', title: 'Disable Go to Folder', type: 'boolean', default: false },
+          { key: 'ShowExternalHardDrivesOnDesktop', title: 'Show External Drives on Desktop', type: 'boolean', default: true },
+          { key: 'ShowHardDrivesOnDesktop', title: 'Show Internal Hard Drives on Desktop', type: 'boolean', default: false },
+          { key: 'ShowMountedServersOnDesktop', title: 'Show Mounted File Servers on Desktop', type: 'boolean', default: false },
+          { key: 'WarnOnEmptyTrash', title: 'Warn Before Emptying Trash', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Desktop Wallpaper',
+        payloadType: 'com.apple.desktop',
+        description: 'Configures and locks the macOS desktop wallpaper picture path.',
+        supportedOS: 'macOS 10.10+',
+        keys: [
+          { key: 'override-picture-path', title: 'Desktop Picture File Path', type: 'string', default: '/Library/Desktop Pictures/CorporateWallpaper.heic' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Login Window',
+        payloadType: 'com.apple.loginwindow',
+        description: 'Configures macOS Login Window UI, user lists, login banner text, and power buttons.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          { key: 'SHOWFULLNAME', title: 'Show Name & Password Fields Instead of User List', type: 'boolean', default: false },
+          { key: 'HideLocalUsers', title: 'Hide Local Users', type: 'boolean', default: false },
+          { key: 'IncludeNetworkUser', title: 'Show Network Users', type: 'boolean', default: false },
+          { key: 'LoginwindowText', title: 'Login Window Banner Message', type: 'string', default: 'Authorized Corporate Use Only.' },
+          { key: 'ShutDownDisabled', title: 'Disable Shut Down Button', type: 'boolean', default: false },
+          { key: 'RestartDisabled', title: 'Disable Restart Button', type: 'boolean', default: false },
+          { key: 'SleepDisabled', title: 'Disable Sleep Button', type: 'boolean', default: false },
+          { key: 'DisableConsoleAccess', title: 'Disable >console Command-Line Login', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Service Management (Managed Login Items)',
+        payloadType: 'com.apple.servicemanagement',
+        description: 'Auto-enables and locks macOS 13+ background login items, daemons, and agents.',
+        supportedOS: 'macOS 13.0+ (User-Approved MDM)',
+        keys: [
+          {
+            key: 'Rules', title: 'Service Management Rules', type: 'array', itemType: 'dictionary', required: true,
+            subkeys: [
+              { key: 'RuleType', title: 'Rule Match Type', type: 'string', required: true, rangelist: ['BundleIdentifier', 'BundleIdentifierPrefix', 'Label', 'LabelPrefix', 'TeamIdentifier'], default: 'TeamIdentifier' },
+              { key: 'RuleValue', title: 'Rule Match Value', type: 'string', required: true, default: 'ABCD123456' },
+              { key: 'Comment', title: 'Rule Comment', type: 'string', default: 'Allow enterprise background agent' }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Login Items (Legacy Managed Apps)',
+        payloadType: 'com.apple.loginitems.managed',
+        description: 'Configures applications that automatically launch at user login on macOS.',
+        supportedOS: 'macOS 10.13+',
+        keys: [
+          {
+            key: 'AutoLaunchedApplicationDictionary-managed', title: 'Managed Login Items', type: 'array', itemType: 'dictionary', required: true,
+            subkeys: [
+              { key: 'Path', title: 'Application Path or URL', type: 'string', required: true, default: '/Applications/CompanyPortal.app' },
+              { key: 'Hide', title: 'Hide in Login Items List', type: 'boolean', default: false }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Login Window: Scripts',
+        payloadType: 'com.apple.mcxloginscripts',
+        description: 'Configures managed executable scripts to run at user login and logout.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          { key: 'loginscripts', title: 'Login Scripts', type: 'array', itemType: 'dictionary', subkeys: MCX_SCRIPT_ITEM_SUBKEYS },
+          { key: 'logoutscripts', title: 'Logout Scripts', type: 'array', itemType: 'dictionary', subkeys: MCX_SCRIPT_ITEM_SUBKEYS }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Managed Preferences (Custom MCX Domain)',
+        payloadType: 'com.apple.ManagedClient.preferences',
+        description: 'Configures Forced and Set-Once application preference domains on macOS.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          {
+            key: 'PayloadContent', title: 'Application Preference Domains', type: 'dynamic_dict', required: true,
+            subkeys: [
+              { key: 'Forced', title: 'Forced Preferences', type: 'array', itemType: 'dictionary', subkeys: MCX_PREF_ENTRY_SUBKEYS },
+              { key: 'Set-Once', title: 'Set-Once Preferences', type: 'array', itemType: 'dictionary', subkeys: MCX_PREF_ENTRY_SUBKEYS }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Energy Saver',
+        payloadType: 'com.apple.MCX',
+        description: 'Configures macOS desktop/portable AC and battery sleep timers and Wake on LAN.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          { key: 'SleepDisabled', title: 'Disable System Sleep Completely', type: 'boolean', default: false },
+          { key: 'com.apple.EnergySaver.desktop.ACPower', title: 'Desktop AC Power Settings', type: 'dictionary', subkeys: ENERGY_POWER_SETTINGS_SUBKEYS },
+          { key: 'com.apple.EnergySaver.portable.ACPower', title: 'MacBook AC Power Settings', type: 'dictionary', subkeys: ENERGY_POWER_SETTINGS_SUBKEYS },
+          { key: 'com.apple.EnergySaver.portable.BatteryPower', title: 'MacBook Battery Power Settings', type: 'dictionary', subkeys: ENERGY_POWER_SETTINGS_SUBKEYS }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Time Machine Backup',
+        payloadType: 'com.apple.MCX.TimeMachine',
+        description: 'Configures automated Time Machine backups and destination URL.',
+        supportedOS: 'macOS 10.7+',
+        keys: [
+          { key: 'BackupDestURL', title: 'Backup Destination URL', type: 'string', required: true, default: 'smb://timemachine.example.com/Backups' },
+          { key: 'AutoBackup', title: 'Perform Automatic Backups', type: 'boolean', default: true },
+          { key: 'MobileBackups', title: 'Create Local APFS Snapshots When Disconnected', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Time Server & Time Zone',
+        payloadType: 'com.apple.MCX',
+        description: 'Configures the NTP time server and timezone on macOS.',
+        supportedOS: 'macOS 10.12.4+',
+        keys: [
+          { key: 'timeServer', title: 'NTP Time Server Hostname', type: 'string', default: 'time.apple.com' },
+          { key: 'timeZone', title: 'Time Zone (e.g. Asia/Kolkata, America/New_York)', type: 'string', default: 'Asia/Kolkata' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Setup Assistant Skip Panes',
+        payloadType: 'com.apple.SetupAssistant.managed',
+        description: 'Skips Setup Assistant panes on iOS 14+ and macOS 10.12+.',
+        supportedOS: 'iOS 14.0+, macOS 10.12+',
+        keys: [
+          { key: 'SkipSetupItems', title: 'Setup Assistant Panes to Skip', type: 'array', itemType: 'string' },
+          { key: 'SkipCloudSetup', title: 'Skip Apple Account Pane (macOS < 15)', type: 'boolean', default: false },
+          { key: 'SkipSiriSetup', title: 'Skip Siri Pane (macOS < 15)', type: 'boolean', default: false },
+          { key: 'SkipPrivacySetup', title: 'Skip Privacy Pane (macOS < 15)', type: 'boolean', default: false },
+          { key: 'SkipTouchIDSetup', title: 'Skip Touch ID Pane (macOS < 15)', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Screensaver & Lock Grace Period',
+        payloadType: 'com.apple.screensaver',
+        description: 'Configures macOS screen saver module, idle activation time, and password lock grace period.',
+        supportedOS: 'macOS 10.11+',
+        keys: [
+          { key: 'moduleName', title: 'Screen Saver Module Name', type: 'string', required: true, default: 'Flurry' },
+          { key: 'loginWindowModulePath', title: 'Screen Saver Module Path', type: 'string', default: '/System/Library/Screen Savers/Flurry.saver' },
+          { key: 'idleTime', title: 'Idle Time Before Activation (Seconds)', type: 'integer', default: 300 },
+          { key: 'askForPassword', title: 'Require Password to Unlock Screen Saver', type: 'boolean', default: true },
+          { key: 'askForPasswordDelay', title: 'Password Grace Period (Seconds, 0 = Immediate)', type: 'integer', default: 0 }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Font Installation',
+        payloadType: 'com.apple.font',
+        description: 'Installs a TrueType (.ttf) or OpenType (.otf) font file encoded as Base64 <data>.',
+        supportedOS: 'iOS 7.0+, macOS 10.9+, visionOS 2.0+',
+        keys: [
+          { key: 'Name', title: 'Font Display Name', type: 'string', default: 'Corporate Sans Regular' },
+          { key: 'Font', title: 'Font File Contents (.ttf / .otf Base64 <data>)', type: 'data', required: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Notifications Policy',
+        payloadType: 'com.apple.notificationsettings',
+        description: 'Enforces per-app notification banners, Lock Screen, Notification Center, badges, and sounds.',
+        supportedOS: 'iOS 9.3+, macOS 10.15+',
+        keys: [
+          {
+            key: 'NotificationSettings', title: 'Per-App Notification Settings', type: 'array', itemType: 'dictionary', required: true,
+            subkeys: [
+              { key: 'BundleIdentifier', title: 'App Bundle Identifier', type: 'string', required: true, default: 'com.example.corpapp' },
+              { key: 'NotificationsEnabled', title: 'Enable Notifications', type: 'boolean', default: true },
+              { key: 'ShowInNotificationCenter', title: 'Show in Notification Center', type: 'boolean', default: true },
+              { key: 'ShowInLockScreen', title: 'Show on Lock Screen', type: 'boolean', default: true },
+              { key: 'AlertType', title: 'Alert Type (0=None, 1=Banner, 2=Persistent)', type: 'integer', rangelist: [0, 1, 2], default: 1 },
+              { key: 'BadgesEnabled', title: 'Enable Badges', type: 'boolean', default: true },
+              { key: 'SoundsEnabled', title: 'Enable Sounds', type: 'boolean', default: true }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'AirPrint Printers',
+        payloadType: 'com.apple.airprint',
+        description: 'Configures AirPrint printer IP addresses, resource paths, ports, and TLS.',
+        supportedOS: 'iOS 7.0+, macOS 10.10+, visionOS 2.0+',
+        keys: [
+          {
+            key: 'AirPrint', title: 'AirPrint Printers', type: 'array', itemType: 'dictionary', required: true,
+            subkeys: [
+              { key: 'IPAddress', title: 'Printer IP Address or Hostname', type: 'string', required: true, default: '10.10.20.50' },
+              { key: 'ResourcePath', title: 'IPP Resource Path', type: 'string', required: true, default: 'ipp/print' },
+              { key: 'Port', title: 'Port Number', type: 'integer', default: 631 },
+              { key: 'ForceTLS', title: 'Force TLS', type: 'boolean', default: true }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Lock Screen Asset Tag & Footnote (iOS)',
+        payloadType: 'com.apple.shareddeviceconfiguration',
+        description: 'Displays an Asset Tag and "If Lost, Return To" message on the supervised iOS Lock Screen.',
+        supportedOS: 'iOS 9.3+ (Supervised)',
+        keys: [
+          { key: 'AssetTagInformation', title: 'Asset Tag Information', type: 'string', default: 'Asset ID: RGM-IPAD-0042' },
+          { key: 'LockScreenFootnote', title: 'Lock Screen Footnote Message', type: 'string', default: 'Property of RGM IT. If found, please return.' }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'macOS System',
+        title: 'Single App Mode (App Lock)',
+        payloadType: 'com.apple.app.lock',
+        description: 'Locks a supervised iOS or tvOS device into a single kiosk app.',
+        supportedOS: 'iOS 6.0+, tvOS 10.2+ (Supervised)',
+        keys: [
+          {
+            key: 'App', title: 'Locked App Configuration', type: 'dictionary', required: true,
+            subkeys: [
+              { key: 'Identifier', title: 'App Bundle Identifier', type: 'string', required: true, default: 'com.example.kioskapp' }
+            ]
+          }
         ]
       },
 
@@ -1653,7 +2700,35 @@
                 ${arr.map((entry, idx) => {
                   const elemPath = [...currentPath, idx];
                   const elemPathStr = escapeHtml(JSON.stringify(elemPath));
-                  if (k.itemType === 'dictionary' && k.subkeys) {
+                  if (k.itemType === 'array' && k.subkeys) {
+                    const innerArr = Array.isArray(entry) ? entry : [];
+                    return `
+                      <div class="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-100 pb-1">
+                          <span class="text-[11px] font-bold text-slate-700">Group #${idx + 1}</span>
+                          <div class="flex items-center gap-2">
+                            <button type="button" onclick="addArrayItem('${item.instanceId}', '${elemPathStr}', 'dictionary', '${subkeysStr}')"
+                              class="text-[11px] font-semibold text-sky-600 hover:underline">+ Add Pair</button>
+                            <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-[11px] text-rose-500 hover:underline">Remove</button>
+                          </div>
+                        </div>
+                        <div class="space-y-2 pl-2 border-l-2 border-slate-200">
+                          ${innerArr.map((_, innerIdx) => {
+                            const iconPath = [...elemPath, innerIdx];
+                            return `
+                              <div class="p-2 bg-slate-50 rounded border border-slate-200 space-y-1.5">
+                                <div class="flex justify-between items-center">
+                                  <span class="text-[10px] font-semibold text-slate-500">Pair #${innerIdx + 1}</span>
+                                  <button type="button" onclick="removeArrayItem('${item.instanceId}', '${elemPathStr}', ${innerIdx})" class="text-[10px] text-rose-500">Remove</button>
+                                </div>
+                                ${renderKeyControls(item, k.subkeys, iconPath)}
+                              </div>
+                            `;
+                          }).join('')}
+                        </div>
+                      </div>
+                    `;
+                  } else if (k.itemType === 'dictionary' && k.subkeys) {
                     return `
                       <div class="p-2.5 bg-white border border-slate-200 rounded-lg space-y-2">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-1">
