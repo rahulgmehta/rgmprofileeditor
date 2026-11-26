@@ -36,17 +36,17 @@
 
     <!-- Interactive 3-Step Progress Indicator -->
     <nav class="hidden md:flex items-center gap-2 bg-slate-100/90 px-3 py-1.5 rounded-xl border border-slate-200/80">
-      <button onclick="goToStep(1)" id="stepBtn1" class="flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-semibold transition bg-white text-sky-700 shadow-2xs">
+      <button type="button" onclick="goToStep(1)" id="stepBtn1" class="flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-semibold transition bg-white text-sky-700 shadow-sm">
         <span class="w-5 h-5 rounded-full bg-sky-600 text-white text-[11px] font-bold flex items-center justify-center">1</span>
         <span>Select OS & Type</span>
       </button>
-      <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-      <button onclick="goToStep(2)" id="stepBtn2" class="flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-medium transition text-slate-500 hover:text-slate-800">
+      <span class="text-slate-400 text-xs">›</span>
+      <button type="button" onclick="goToStep(2)" id="stepBtn2" class="flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-medium transition text-slate-500 hover:text-slate-800">
         <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 text-[11px] font-bold flex items-center justify-center">2</span>
         <span>Choose Policies</span>
       </button>
-      <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
-      <button onclick="goToStep(3)" id="stepBtn3" class="flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-medium transition text-slate-500 hover:text-slate-800">
+      <span class="text-slate-400 text-xs">›</span>
+      <button type="button" onclick="goToStep(3)" id="stepBtn3" class="flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-medium transition text-slate-500 hover:text-slate-800">
         <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 text-[11px] font-bold flex items-center justify-center">3</span>
         <span>Profile Details & Export</span>
       </button>
@@ -54,17 +54,14 @@
 
     <!-- Utility Actions -->
     <div class="flex items-center gap-2">
-      <button onclick="resetWorkspace()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-700 flex items-center gap-1.5 transition" title="Start a fresh profile">
-        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-        <span>New / Reset</span>
+      <button type="button" onclick="resetWorkspace()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-700 flex items-center gap-1.5 transition">
+        <span>↺ New / Reset</span>
       </button>
-      <button onclick="openRepoModal()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition">
-        <i data-lucide="plus-square" class="w-3.5 h-3.5 text-slate-500"></i>
-        <span>Custom Schema</span>
+      <button type="button" onclick="openRepoModal()" class="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition">
+        <span>+ Custom Schema</span>
       </button>
-      <button onclick="openImportModal()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 shadow-sm transition">
-        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
-        <span>Import</span>
+      <button type="button" onclick="openImportModal()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white flex items-center gap-1.5 shadow-sm transition">
+        <span>↑ Import</span>
       </button>
     </div>
   </header>
@@ -78,60 +75,114 @@
         <span class="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-sky-100 text-sky-800">Step 1 of 3</span>
         <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Which Apple OS profile do you want to create?</h2>
         <p class="text-xs text-slate-500 max-w-xl mx-auto">
-          Select the target Apple operating system and profile format. We will filter the policy catalog to show only settings supported on that platform.
+          Select the profile format below, then click your target Apple operating system to choose policies.
         </p>
       </div>
 
       <!-- Format Selector Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <button onclick="selectWizardProtocol('mdm')" id="wizProtoMdm"
-          class="p-4 rounded-2xl border-2 border-sky-600 bg-white text-left shadow-xs transition flex items-start gap-3.5">
-          <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
-            <i data-lucide="file-code-2" class="w-5 h-5"></i>
+        <button type="button" onclick="selectWizardProtocol('mdm')" id="wizProtoMdm"
+          class="p-4 rounded-2xl border-2 border-sky-600 bg-sky-50/30 text-left shadow-sm transition flex items-start gap-3.5 cursor-pointer">
+          <div class="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0 font-bold text-xs">
+            XML
           </div>
           <div>
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               <span class="text-sm font-bold text-slate-900">Standard Configuration Profile (.mobileconfig)</span>
-              <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-sky-100 text-sky-800">Recommended</span>
+              <span id="badgeProtoMdm" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-sky-600 text-white">Selected</span>
             </div>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
               Classic Apple XML profile for Wi-Fi, Passcode, Restrictions, VPN, Certificates, TCC Privacy, and macOS Enterprise Apps (Chrome, Edge, Firefox, Outlook).
             </p>
           </div>
         </button>
 
-        <button onclick="selectWizardProtocol('ddm')" id="wizProtoDdm"
-          class="p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-400 text-left transition flex items-start gap-3.5">
-          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
-            <i data-lucide="cpu" class="w-5 h-5"></i>
+        <button type="button" onclick="selectWizardProtocol('ddm')" id="wizProtoDdm"
+          class="p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-400 text-left transition flex items-start gap-3.5 cursor-pointer">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 font-bold text-xs">
+            DDM
           </div>
           <div>
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               <span class="text-sm font-bold text-slate-900">Declarative Device Management (DDM)</span>
-              <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">JSON & .mobileconfig</span>
+              <span id="badgeProtoDdm" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">JSON & .mobileconfig</span>
             </div>
-            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
               Modern autonomous declarations for iOS 17+ and macOS 14+. Export as raw <strong>JSON</strong> or wrapped inside a local <strong>.mobileconfig</strong> profile.
             </p>
           </div>
         </button>
       </div>
 
-      <!-- Target OS Cards -->
+      <!-- Hardcoded Target OS Cards (Always Visible Immediately) -->
       <div>
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 text-center">Choose Target Operating System</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="stage1OsGrid"></div>
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 text-center">Choose Target Operating System</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="stage1OsGrid">
+          <button type="button" data-os="iOS" onclick="chooseTargetOSAndProceed('iOS')"
+            class="os-card p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-500 hover:bg-sky-50/40 hover:shadow-sm transition flex flex-col items-center text-center group cursor-pointer">
+            <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg transition">
+              📱
+            </div>
+            <div class="text-xs font-bold text-slate-900">iOS / iPadOS</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">iPhone & iPad</div>
+          </button>
+
+          <button type="button" data-os="macOS" onclick="chooseTargetOSAndProceed('macOS')"
+            class="os-card p-4 rounded-2xl border-2 border-sky-600 bg-sky-50/40 hover:border-sky-500 hover:shadow-sm transition flex flex-col items-center text-center group cursor-pointer">
+            <div class="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center mb-2.5 text-lg transition">
+              💻
+            </div>
+            <div class="text-xs font-bold text-slate-900">macOS</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">MacBook & Desktop</div>
+          </button>
+
+          <button type="button" data-os="tvOS" onclick="chooseTargetOSAndProceed('tvOS')"
+            class="os-card p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-500 hover:bg-sky-50/40 hover:shadow-sm transition flex flex-col items-center text-center group cursor-pointer">
+            <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg transition">
+              📺
+            </div>
+            <div class="text-xs font-bold text-slate-900">tvOS</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Apple TV</div>
+          </button>
+
+          <button type="button" data-os="visionOS" onclick="chooseTargetOSAndProceed('visionOS')"
+            class="os-card p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-500 hover:bg-sky-50/40 hover:shadow-sm transition flex flex-col items-center text-center group cursor-pointer">
+            <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg transition">
+              🥽
+            </div>
+            <div class="text-xs font-bold text-slate-900">visionOS</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Apple Vision Pro</div>
+          </button>
+
+          <button type="button" data-os="watchOS" onclick="chooseTargetOSAndProceed('watchOS')"
+            class="os-card p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-500 hover:bg-sky-50/40 hover:shadow-sm transition flex flex-col items-center text-center group cursor-pointer">
+            <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg transition">
+              ⌚
+            </div>
+            <div class="text-xs font-bold text-slate-900">watchOS</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Apple Watch</div>
+          </button>
+
+          <button type="button" data-os="All" onclick="chooseTargetOSAndProceed('All')"
+            class="os-card p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-500 hover:bg-sky-50/40 hover:shadow-sm transition flex flex-col items-center text-center group cursor-pointer">
+            <div class="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg transition">
+              🗂️
+            </div>
+            <div class="text-xs font-bold text-slate-900">All Platforms</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Multi-OS Catalog</div>
+          </button>
+        </div>
       </div>
 
       <!-- Quick Start Shortcuts -->
       <div class="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
         <span class="text-xs text-slate-500">Or jump straight in with a pre-built template:</span>
         <div class="flex flex-wrap gap-2">
-          <button onclick="loadStarterEssentials()" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-sky-400 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition">
-            <i data-lucide="wifi" class="w-3.5 h-3.5 text-sky-600"></i> Wi-Fi + Passcode Starter
+          <button type="button" onclick="loadStarterEssentials()" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-sky-400 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition cursor-pointer">
+            <span>📶 Wi-Fi + Passcode Starter</span>
           </button>
-          <button onclick="loadEnterpriseAppsPreset()" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-indigo-400 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition">
-            <i data-lucide="app-window" class="w-3.5 h-3.5 text-indigo-600"></i> macOS Enterprise Apps Suite
+          <button type="button" onclick="loadEnterpriseAppsPreset()" class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-indigo-400 text-xs font-semibold text-slate-700 flex items-center gap-1.5 transition cursor-pointer">
+            <span>🖥️ macOS Enterprise Apps Suite</span>
           </button>
         </div>
       </div>
@@ -153,13 +204,11 @@
 
       <div class="flex items-center gap-2">
         <div class="relative w-64">
-          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
-          <input id="stage2SearchInput" type="text" oninput="renderStage2Catalog()" placeholder="Filter policies (e.g. VPN, Wi-Fi, Chrome)..."
-            class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
+          <input id="stage2SearchInput" type="text" oninput="renderStage2Catalog()" placeholder="Filter policies (VPN, Wi-Fi, Chrome)..."
+            class="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-sky-500" />
         </div>
-        <button onclick="goToStep(3)" class="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition">
-          <span>Next: Profile Details & Configure</span>
-          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        <button type="button" onclick="goToStep(3)" class="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition cursor-pointer">
+          <span>Next: Profile Details & Configure →</span>
         </button>
       </div>
     </div>
@@ -173,18 +222,17 @@
     </div>
 
     <!-- Bottom Selected Policies Tray -->
-    <div class="bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between gap-4 shrink-0 shadow-xs">
+    <div class="bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between gap-4 shrink-0 shadow-sm">
       <div class="flex items-center gap-2 overflow-x-auto min-w-0">
         <span class="text-xs font-bold text-slate-700 shrink-0" id="selectedCountLabel">0 Policies Selected:</span>
         <div id="selectedPillsTray" class="flex items-center gap-1.5 overflow-x-auto"></div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
-        <button onclick="goToStep(1)" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50">
+        <button type="button" onclick="goToStep(1)" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 cursor-pointer">
           ← Change OS
         </button>
-        <button onclick="goToStep(3)" class="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
-          <span>Continue to Profile Details</span>
-          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        <button type="button" onclick="goToStep(3)" class="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition cursor-pointer">
+          <span>Continue to Profile Details →</span>
         </button>
       </div>
     </div>
@@ -205,14 +253,14 @@
               <h2 class="text-sm font-bold text-slate-900" id="metaHeaderLabel">Profile Details & Policy Settings</h2>
             </div>
             <div class="flex items-center gap-3">
-              <button onclick="goToStep(2)" class="text-xs font-semibold text-sky-600 hover:text-sky-800 flex items-center gap-1">
-                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add / Remove Policies
+              <button type="button" onclick="goToStep(2)" class="text-xs font-semibold text-sky-600 hover:text-sky-800 cursor-pointer">
+                + Add / Remove Policies
               </button>
-              <button id="toggleAdvancedTopLevelBtn" onclick="toggleAdvancedTopLevel()" class="text-xs font-medium text-slate-600 hover:text-slate-900 flex items-center gap-1">
-                <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i> Advanced Options
+              <button type="button" id="toggleAdvancedTopLevelBtn" onclick="toggleAdvancedTopLevel()" class="text-xs font-medium text-slate-600 hover:text-slate-900 cursor-pointer">
+                Advanced Options
               </button>
-              <button onclick="regenerateAllUUIDs()" class="text-xs font-medium text-slate-500 hover:text-slate-800 flex items-center gap-1">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> New UUIDs
+              <button type="button" onclick="regenerateAllUUIDs()" class="text-xs font-medium text-slate-500 hover:text-slate-800 cursor-pointer">
+                New UUIDs
               </button>
             </div>
           </div>
@@ -284,7 +332,7 @@
           <div id="emptyStage3Notice" class="hidden bg-white rounded-2xl border border-slate-200 p-8 text-center max-w-md mx-auto">
             <h3 class="text-sm font-bold text-slate-800 mb-1">No Policies Added Yet</h3>
             <p class="text-xs text-slate-500 mb-4">Go back to Step 2 to pick at least one setting to configure.</p>
-            <button onclick="goToStep(2)" class="px-4 py-2 rounded-lg bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700">
+            <button type="button" onclick="goToStep(2)" class="px-4 py-2 rounded-lg bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700 cursor-pointer">
               ← Back to Policy Selection
             </button>
           </div>
@@ -296,23 +344,21 @@
       <aside class="w-[450px] bg-slate-900 text-slate-100 flex flex-col shrink-0 border-l border-slate-800">
         <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between gap-2">
           <div class="flex items-center gap-1" id="outputFormatTabs">
-            <button onclick="setOutputFormat('primary')" id="outTabPrimary"
-              class="px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400">
+            <button type="button" onclick="setOutputFormat('primary')" id="outTabPrimary"
+              class="px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400 cursor-pointer">
               .mobileconfig XML
             </button>
-            <button onclick="setOutputFormat('ddm_mobileconfig')" id="outTabDdmMobileconfig"
-              class="px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white hidden">
+            <button type="button" onclick="setOutputFormat('ddm_mobileconfig')" id="outTabDdmMobileconfig"
+              class="px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white hidden cursor-pointer">
               .mobileconfig (DDM)
             </button>
           </div>
 
           <div class="flex items-center gap-1.5">
-            <button onclick="copyOutput()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1 transition">
-              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <button type="button" onclick="copyOutput()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 flex items-center gap-1 transition cursor-pointer">
               <span id="copyBtnText">Copy</span>
             </button>
-            <button onclick="downloadOutput()" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white flex items-center gap-1 shadow-xs transition">
-              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <button type="button" onclick="downloadOutput()" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-xs font-semibold text-white flex items-center gap-1 shadow-sm transition cursor-pointer">
               <span id="downloadBtnText">Download .mobileconfig</span>
             </button>
           </div>
@@ -321,15 +367,13 @@
         <!-- Secondary Quick-Download Bar for Declarative DDM Mode -->
         <div id="ddmMobileconfigBanner" class="hidden px-4 py-2 bg-indigo-950/80 border-b border-indigo-800/70 flex items-center justify-between gap-2">
           <span class="text-[11px] text-indigo-200">Install DDM profile directly on device:</span>
-          <button onclick="downloadDdmAsMobileconfig()" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-[11px] font-semibold text-white flex items-center gap-1 shrink-0 transition">
-            <i data-lucide="file-down" class="w-3 h-3"></i> Download .mobileconfig
+          <button type="button" onclick="downloadDdmAsMobileconfig()" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-[11px] font-semibold text-white shrink-0 transition cursor-pointer">
+            Download .mobileconfig
           </button>
         </div>
 
         <div class="px-4 py-2 bg-slate-950/60 border-b border-slate-800 flex items-center justify-between text-[11px]">
-          <span class="flex items-center gap-1.5 text-emerald-400 font-medium">
-            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Ready to Export
-          </span>
+          <span class="text-emerald-400 font-medium">✓ Ready to Export</span>
           <span id="serverTokenBadge" class="font-mono text-slate-400 truncate max-w-[190px]"></span>
         </div>
 
@@ -339,16 +383,11 @@
   </section>
 
   <!-- MODAL 1: Add Custom Schema / Application Policy -->
-  <div id="repoModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+  <div id="repoModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh]">
       <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <i data-lucide="plus-square" class="w-4 h-4 text-sky-600"></i>
-          <h3 class="text-sm font-bold text-slate-900">Add Custom Apple Schema or Application Policy</h3>
-        </div>
-        <button onclick="closeModal('repoModal')" class="text-slate-400 hover:text-slate-700">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+        <h3 class="text-sm font-bold text-slate-900">Add Custom Apple Schema or Application Policy</h3>
+        <button type="button" onclick="closeModal('repoModal')" class="text-slate-400 hover:text-slate-700 font-bold">✕</button>
       </div>
 
       <div class="p-5 space-y-4 overflow-y-auto flex-1">
@@ -360,8 +399,8 @@
             <option value="declarative/declarations/activations">Declarative DDM Activations</option>
             <option value="declarative/declarations/management">Declarative DDM Management</option>
           </select>
-          <button onclick="fetchGitHubDirectory()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1.5">
-            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Browse Online Catalog
+          <button type="button" onclick="fetchGitHubDirectory()" class="px-3 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800">
+            Browse Online Catalog
           </button>
         </div>
 
@@ -377,8 +416,8 @@
       </div>
 
       <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-        <button onclick="closeModal('repoModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900">Cancel</button>
-        <button onclick="parsePastedYaml()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-700 text-white">
+        <button type="button" onclick="closeModal('repoModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900">Cancel</button>
+        <button type="button" onclick="parsePastedYaml()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-700 text-white">
           Parse & Add to Builder
         </button>
       </div>
@@ -386,13 +425,11 @@
   </div>
 
   <!-- MODAL 2: Import Existing .mobileconfig or DDM JSON -->
-  <div id="importModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+  <div id="importModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-xl overflow-hidden">
       <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between">
         <h3 class="text-sm font-bold text-slate-900">Import Existing .mobileconfig or DDM JSON</h3>
-        <button onclick="closeModal('importModal')" class="text-slate-400 hover:text-slate-700">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+        <button type="button" onclick="closeModal('importModal')" class="text-slate-400 hover:text-slate-700 font-bold">✕</button>
       </div>
       <div class="p-5 space-y-3">
         <input type="file" id="importFileInput" accept=".mobileconfig,.plist,.xml,.json" onchange="handleFileUpload(event)"
@@ -401,23 +438,23 @@
           class="w-full p-3 text-xs font-mono border border-slate-200 rounded-xl focus:outline-none focus:border-sky-500"></textarea>
       </div>
       <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-        <button onclick="closeModal('importModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600">Cancel</button>
-        <button onclick="importFromText()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Import Profile</button>
+        <button type="button" onclick="closeModal('importModal')" class="px-3 py-1.5 text-xs font-medium text-slate-600">Cancel</button>
+        <button type="button" onclick="importFromText()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Import Profile</button>
       </div>
     </div>
   </div>
 
   <script>
     // =========================================================================
-    // 1. SHARED REUSABLE SUB-SCHEMAS
+    // 1. SAFE ICON HELPER & SHARED REUSABLE SUB-SCHEMAS
     // =========================================================================
-    const BINARY_ID_SUBKEYS = [
-      { key: 'CDHash', title: 'Code directory hash (40-char SHA)', type: 'string' },
-      { key: 'SigningID', title: 'Signing ID', type: 'string' },
-      { key: 'TeamID', title: 'Team ID (or *APPLE*)', type: 'string' },
-      { key: 'PathPrefix', title: 'Path prefix', type: 'string' },
-      { key: 'SigningState', title: 'Signing state', type: 'string', rangelist: ['All', 'TestFlight', 'DeveloperID', 'Enterprise', 'AppStore', 'Apple'], default: 'All' }
-    ];
+    function safeIcons() {
+      try {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      } catch (e) {}
+    }
 
     const VPN_SA_SUBKEYS = [
       { key: 'EncryptionAlgorithm', title: 'Encryption algorithm', type: 'string', rangelist: ['DES', '3DES', 'AES-128', 'AES-256', 'AES-128-GCM', 'AES-256-GCM', 'ChaCha20Poly1305'], default: 'AES-256' },
@@ -468,10 +505,7 @@
           { key: 'AuthName', title: 'Username', type: 'string' },
           { key: 'AuthPassword', title: 'Password', type: 'string' },
           { key: 'PayloadCertificateUUID', title: 'Certificate PayloadUUID', type: 'string' },
-          { key: 'ProviderBundleIdentifier', title: 'Network Extension Provider Bundle ID', type: 'string' },
-          { key: 'ProviderDesignatedRequirement', title: 'Provider Designated Requirement (macOS)', type: 'string' },
-          { key: 'OnDemandEnabled', title: 'Enable VPN On Demand (0 or 1)', type: 'integer', rangelist: [0, 1], default: 0 },
-          { key: 'OnDemandRules', title: 'On Demand Rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS }
+          { key: 'ProviderBundleIdentifier', title: 'Network Extension Provider Bundle ID', type: 'string' }
         ]
       },
       {
@@ -483,8 +517,7 @@
           { key: 'SharedSecret', title: 'Shared Secret (Base64 <data>)', type: 'data' },
           { key: 'XAuthEnabled', title: 'XAuth Enabled (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
           { key: 'XAuthName', title: 'XAuth Username', type: 'string' },
-          { key: 'XAuthPassword', title: 'XAuth Password', type: 'string' },
-          { key: 'PayloadCertificateUUID', title: 'Certificate PayloadUUID', type: 'string' }
+          { key: 'XAuthPassword', title: 'XAuth Password', type: 'string' }
         ]
       }
     ];
@@ -500,8 +533,7 @@
       'SystemPolicyAllFiles', 'ScreenCapture', 'Accessibility', 'PostEvent', 'ListenEvent',
       'SystemPolicySysAdminFiles', 'SystemPolicyDesktopFolder', 'SystemPolicyDocumentsFolder',
       'SystemPolicyDownloadsFolder', 'SystemPolicyNetworkVolumes', 'SystemPolicyRemovableVolumes',
-      'SystemPolicyAppBundles', 'SystemPolicyAppData', 'AddressBook', 'Calendar', 'Reminders',
-      'Photos', 'Camera', 'Microphone', 'BluetoothAlways', 'SpeechRecognition', 'AppleEvents'
+      'AddressBook', 'Calendar', 'Reminders', 'Photos', 'Camera', 'Microphone', 'AppleEvents'
     ].map(svc => ({
       key: svc, title: svc, type: 'array', itemType: 'dictionary', subkeys: TCC_IDENTITY_SUBKEYS
     }));
@@ -509,18 +541,6 @@
     const X500_RDN_PAIR_SUBKEYS = [
       { key: 'OID', title: 'Attribute (e.g. C, O, OU, CN)', type: 'string', required: true, default: 'CN' },
       { key: 'Value', title: 'Value', type: 'string', required: true, default: 'device.example.com' }
-    ];
-
-    const DOCK_TILE_ITEM_SUBKEYS = [
-      { key: 'tile-type', title: 'Tile type', type: 'string', required: true, rangelist: ['file-tile', 'directory-tile', 'url-tile'], default: 'file-tile' },
-      {
-        key: 'tile-data', title: 'Tile data', type: 'dictionary', required: true,
-        subkeys: [
-          { key: 'label', title: 'Label', type: 'string', required: true, default: 'Company Portal' },
-          { key: 'url', title: 'URL or file path', type: 'string', default: 'https://portal.example.com' },
-          { key: 'file-type', title: 'File type (0=URL, 1=File, 3=Directory)', type: 'integer', required: true, rangelist: [0, 1, 3], default: 0 }
-        ]
-      }
     ];
 
     const CHROMIUM_PROXY_SUBKEYS = [
@@ -550,10 +570,6 @@
       subkeys: [{ key: 'Type', title: 'Authentication type', type: 'string', required: true, rangelist: ['MDM', 'None'], default: 'MDM' }]
     };
 
-    const ASSET_ACCESSIBLE_FIELD = {
-      key: 'Accessible', title: 'Keychain accessibility', type: 'string', rangelist: ['Default', 'AfterFirstUnlock'], default: 'Default'
-    };
-
     // =========================================================================
     // 2. COMPLETE BUILT-IN CATALOG
     // =========================================================================
@@ -575,7 +591,7 @@
           { key: 'EncryptionType', title: 'Security / Encryption Type', type: 'string', rangelist: ['WPA2', 'WPA3', 'WPA', 'WEP', 'Any', 'None'], default: 'WPA2' },
           { key: 'Password', title: 'Wi-Fi Password (Personal)', type: 'string' },
           { key: 'PayloadCertificateUUID', title: 'Client Identity Certificate PayloadUUID (EAP-TLS)', type: 'string' },
-          { key: 'DisableAssociationMACRandomization', title: 'Disable Private MAC Randomization', type: 'boolean', default: false },
+          { key: 'DisableAssociationMACRandomization', title: 'Disable Private MAC Address Randomization', type: 'boolean', default: false },
           {
             key: 'EAPClientConfiguration', title: '802.1X Enterprise EAP Settings', type: 'dictionary',
             subkeys: [
@@ -685,27 +701,6 @@
       {
         protocol: 'mdm',
         category: 'Network & VPN',
-        title: 'App-to-App-Layer VPN Mapping (macOS)',
-        payloadType: 'com.apple.vpn.managed.appmapping',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Maps macOS applications and helper tools to a Per-App VPNUUID.',
-        supportedOS: 'macOS 10.9+',
-        keys: [
-          {
-            key: 'AppLayerVPNMapping', title: 'App-to-VPN mappings', type: 'array', itemType: 'dictionary', required: true,
-            subkeys: [
-              { key: 'Identifier', title: 'App bundle identifier', type: 'string', required: true, default: 'com.example.corpapp' },
-              { key: 'VPNUUID', title: 'Target Per-App VPNUUID', type: 'string', required: true, default: '11111111-2222-4333-8444-555555555555' },
-              { key: 'SigningIdentifier', title: 'Code signature signing identifier', type: 'string', required: true, default: 'com.example.corpapp' },
-              { key: 'DesignatedRequirement', title: 'Designated Requirement', type: 'string', required: true, default: 'anchor apple generic' }
-            ]
-          }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
         title: 'DNS Settings (Encrypted DoH / DoT)',
         payloadType: 'com.apple.dnsSettings.managed',
         platforms: ['iOS', 'macOS', 'visionOS'],
@@ -724,7 +719,6 @@
               { key: 'SupplementalMatchDomains', title: 'Supplemental Match Domains', type: 'array', itemType: 'string' }
             ]
           },
-          { key: 'OnDemandRules', title: 'On Demand Rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS },
           { key: 'ProhibitDisablement', title: 'Prohibit User from Disabling (Supervised Only)', type: 'boolean', default: false }
         ]
       },
@@ -742,30 +736,7 @@
           { key: 'ProxyType', title: 'Proxy Type', type: 'string', rangelist: ['Manual', 'Auto'], default: 'Manual' },
           { key: 'ProxyServer', title: 'Proxy Server Hostname/IP (Manual)', type: 'string', default: 'proxy.example.com' },
           { key: 'ProxyServerPort', title: 'Proxy Server Port (Manual)', type: 'integer', default: 8080 },
-          { key: 'ProxyUsername', title: 'Proxy Username', type: 'string' },
-          { key: 'ProxyPassword', title: 'Proxy Password', type: 'string' },
           { key: 'ProxyPACURL', title: 'Proxy PAC URL (Auto)', type: 'string' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: 'Relay (MASQUE Network Relay)',
-        payloadType: 'com.apple.relay.managed',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS'],
-        supervision: 'none',
-        description: 'Configures HTTP/2 and HTTP/3 MASQUE Network Relays with domain routing.',
-        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.0+',
-        keys: [
-          {
-            key: 'Relays', title: 'Relay Servers', type: 'array', itemType: 'dictionary', required: true,
-            subkeys: [
-              { key: 'HTTP3RelayURL', title: 'HTTP/3 Relay URL', type: 'string', default: 'https://relay.example.com/.well-known/masque/udp/{target_host}/{target_port}/' },
-              { key: 'HTTP2RelayURL', title: 'HTTP/2 Relay URL', type: 'string' }
-            ]
-          },
-          { key: 'MatchDomains', title: 'Match Domains', type: 'array', itemType: 'string' },
-          { key: 'ExcludedDomains', title: 'Excluded Domains', type: 'array', itemType: 'string' }
         ]
       },
       {
@@ -783,24 +754,7 @@
           { key: 'SafariHistoryRetentionEnabled', title: 'Enforce Safari History Retention (Supervised on iOS/visionOS)', type: 'boolean', default: true },
           { key: 'AutoFilterEnabled', title: 'Enable Automatic Adult Content Filter (BuiltIn)', type: 'boolean', default: true },
           { key: 'PermittedURLs', title: 'Permitted URLs', type: 'array', itemType: 'string' },
-          { key: 'DenyListURLs', title: 'Denied URLs', type: 'array', itemType: 'string' },
-          { key: 'UserDefinedName', title: 'Filter Display Name (Plugin)', type: 'string' },
-          { key: 'PluginBundleID', title: 'Plugin Bundle ID (Plugin)', type: 'string' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: '802.1X: Global Ethernet',
-        payloadType: 'com.apple.globalethernet.managed',
-        platforms: ['iOS', 'macOS', 'tvOS'],
-        supervision: 'none',
-        description: 'Configures the default fallback global 802.1X Ethernet interface.',
-        supportedOS: 'iOS 17.0+, macOS 10.13+, tvOS 17.0+',
-        keys: [
-          { key: 'Interface', title: 'Interface Type', type: 'string', rangelist: ['GlobalEthernet'], default: 'GlobalEthernet' },
-          { key: 'SetupModes', title: 'Setup Mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
-          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (key/value)', type: 'kv_map' }
+          { key: 'DenyListURLs', title: 'Denied URLs', type: 'array', itemType: 'string' }
         ]
       },
 
@@ -843,7 +797,7 @@
         payloadType: 'org.mozilla.firefox',
         platforms: ['macOS'],
         supervision: 'none',
-        description: 'Configures Mozilla Firefox browser policies: General, Add-ons, Bookmarks, Network (DNSOverHTTPS, Proxy), Privacy, and Security.',
+        description: 'Configures Mozilla Firefox browser policies on macOS.',
         supportedOS: 'macOS Application Policy (org.mozilla.firefox)',
         keys: [
           { key: 'EnterprisePoliciesEnabled', title: 'Enable Firefox Enterprise Policies', type: 'boolean', required: true, default: true },
@@ -851,8 +805,6 @@
           { key: 'DisableFirefoxStudies', title: 'Disable Firefox Studies', type: 'boolean', default: true },
           { key: 'DisablePocket', title: 'Disable Pocket', type: 'boolean', default: true },
           { key: 'DontCheckDefaultBrowser', title: 'Do not check if Firefox is default browser', type: 'boolean', default: true },
-          { key: 'OfferToSaveLogins', title: 'Offer to save logins', type: 'boolean', default: false },
-          { key: 'PasswordManagerEnabled', title: 'Enable Password Manager', type: 'boolean', default: false },
           { key: 'Preferences', title: 'Custom about:config Preferences (key/value)', type: 'kv_map' }
         ]
       },
@@ -863,7 +815,7 @@
         payloadType: 'com.microsoft.Edge',
         platforms: ['macOS'],
         supervision: 'none',
-        description: 'Configures Microsoft Edge enterprise policies: Content Settings, SmartScreen, ProxySettings, and New Tab Page.',
+        description: 'Configures Microsoft Edge enterprise policies on macOS.',
         supportedOS: 'macOS Application Policy (com.microsoft.Edge)',
         keys: [
           { key: 'BlockThirdPartyCookies', title: 'Block third-party cookies', type: 'boolean', default: true },
@@ -883,7 +835,7 @@
         payloadType: 'com.microsoft.autoupdate2',
         platforms: ['macOS'],
         supervision: 'none',
-        description: 'Configures Microsoft AutoUpdate (MAU) update channel, check frequency, and forced update deadlines.',
+        description: 'Configures Microsoft AutoUpdate (MAU) update channel and check frequency.',
         supportedOS: 'macOS Application Policy (com.microsoft.autoupdate2)',
         keys: [
           { key: 'HowToCheck', title: 'Update check mode', type: 'string', rangelist: ['AutomaticDownload', 'AutomaticCheck', 'Manual'], default: 'AutomaticDownload' },
@@ -930,30 +882,6 @@
       {
         protocol: 'mdm',
         category: 'Enterprise Apps',
-        title: 'Microsoft OneDrive',
-        payloadType: 'com.microsoft.OneDrive',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures managed preferences for Microsoft OneDrive on macOS.',
-        supportedOS: 'macOS Application Policy (com.microsoft.OneDrive)',
-        rootKvMap: true,
-        keys: []
-      },
-      {
-        protocol: 'mdm',
-        category: 'Enterprise Apps',
-        title: 'Google Software Update (Keystone)',
-        payloadType: 'com.google.Keystone',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures Google Software Update (Keystone) update check intervals and policies.',
-        supportedOS: 'macOS Application Policy (com.google.Keystone)',
-        rootKvMap: true,
-        keys: []
-      },
-      {
-        protocol: 'mdm',
-        category: 'Enterprise Apps',
         title: 'Google Drive for desktop',
         payloadType: 'com.google.drivefs.settings',
         platforms: ['macOS'],
@@ -985,7 +913,7 @@
         platforms: ['macOS'],
         supervision: 'partial',
         supervisionNote: 'Requires a Supervised Mac or User-Approved MDM (UAMDM). Cannot be installed manually.',
-        description: 'Pre-approves or denies macOS TCC privacy permissions (Full Disk Access, Screen Recording, Accessibility, AppleEvents, Camera, Mic, Folders).',
+        description: 'Pre-approves or denies macOS TCC privacy permissions (Full Disk Access, Screen Recording, Accessibility, AppleEvents, Camera, Mic).',
         supportedOS: 'macOS 10.14+ (Supervised / UAMDM)',
         keys: [
           { key: 'Services', title: 'TCC Privacy Services', type: 'dictionary', required: true, subkeys: TCC_SERVICES_SUBKEYS }
@@ -999,15 +927,14 @@
         platforms: ['macOS'],
         supervision: 'partial',
         supervisionNote: 'Enabling FileVault requires Supervised / UAMDM on macOS 10.15+. ForceEnableInSetupAssistant requires ADE (DEP).',
-        description: 'Enables or disables FileVault 2 full-disk encryption on macOS with personal/institutional recovery keys.',
+        description: 'Enables or disables FileVault 2 full-disk encryption on macOS.',
         supportedOS: 'macOS 10.9+ (Supervised / UAMDM)',
         keys: [
           { key: 'Enable', title: 'Enable or Disable FileVault', type: 'string', required: true, rangelist: ['On', 'Off'], default: 'On' },
           { key: 'Defer', title: 'Defer Enabling Until User Logs Out', type: 'boolean', default: true },
           { key: 'UserEntersMissingInfo', title: 'Prompt User for Missing Username/Password', type: 'boolean', default: true },
           { key: 'UseRecoveryKey', title: 'Create Personal Recovery Key (PRK)', type: 'boolean', default: true },
-          { key: 'ShowRecoveryKey', title: 'Show Personal Recovery Key to User', type: 'boolean', default: true },
-          { key: 'ForceEnableInSetupAssistant', title: 'Force Enable During Setup Assistant (ADE/DEP)', type: 'boolean', default: false }
+          { key: 'ShowRecoveryKey', title: 'Show Personal Recovery Key to User', type: 'boolean', default: true }
         ]
       },
       {
@@ -1017,7 +944,7 @@
         payloadType: 'com.apple.security.firewall',
         platforms: ['macOS'],
         supervision: 'none',
-        description: 'Enables macOS Application Firewall, stealth mode, block-all-incoming, and per-app connection rules.',
+        description: 'Enables macOS Application Firewall and stealth mode.',
         supportedOS: 'macOS 10.12+',
         keys: [
           { key: 'EnableFirewall', title: 'Enable Application Firewall', type: 'boolean', required: true, default: true },
@@ -1033,12 +960,11 @@
         platforms: ['macOS'],
         supervision: 'partial',
         supervisionNote: 'Requires a Supervised Mac or User-Approved MDM (UAMDM).',
-        description: 'Approves macOS System Extensions (Driver, Network, EndpointSecurity) without user prompts.',
+        description: 'Approves macOS System Extensions without user prompts.',
         supportedOS: 'macOS 10.15+ (Supervised / UAMDM)',
         keys: [
           { key: 'AllowUserOverrides', title: 'Allow Users to Approve Additional Extensions', type: 'boolean', default: true },
           { key: 'AllowedTeamIdentifiers', title: 'Allowed Team IDs', type: 'array', itemType: 'string' },
-          { key: 'AllowedSystemExtensionTypes', title: 'Allowed Extension Types per Team ID', type: 'kv_array_map' },
           { key: 'AllowedSystemExtensions', title: 'Allowed System Extension Bundle IDs per Team ID', type: 'kv_array_map' }
         ]
       },
@@ -1054,21 +980,6 @@
         keys: [
           { key: 'PayloadCertificateFileName', title: 'Certificate Filename', type: 'string', default: 'enterprise-root-ca.cer' },
           { key: 'PayloadContent', title: 'Certificate Binary Data (Base64 <data>)', type: 'data', required: true }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'Certificate (PKCS #12 Identity)',
-        payloadType: 'com.apple.security.pkcs12',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'Installs a password-protected PKCS #12 client identity certificate (.p12 / .pfx).',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
-        keys: [
-          { key: 'PayloadCertificateFileName', title: 'Identity Filename', type: 'string', default: 'client-identity.p12' },
-          { key: 'PayloadContent', title: 'PKCS #12 Identity Data (Base64 <data>)', type: 'data', required: true },
-          { key: 'Password', title: 'PKCS #12 Passphrase', type: 'string' }
         ]
       },
       {
@@ -1095,24 +1006,6 @@
       {
         protocol: 'mdm',
         category: 'Security & Privacy',
-        title: 'ACME Certificate Enrollment',
-        payloadType: 'com.apple.security.acme',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'Configures Automated Certificate Management Environment (ACME) enrollment with hardware-bound Secure Enclave keys.',
-        supportedOS: 'iOS 16.0+, macOS 13.1+, tvOS 16.0+, visionOS 1.0+, watchOS 9.0+',
-        keys: [
-          { key: 'DirectoryURL', title: 'ACME Directory URL (https://)', type: 'string', required: true, default: 'https://acme.example.com/directory' },
-          { key: 'ClientIdentifier', title: 'Client Identifier', type: 'string', required: true, default: 'device-acme-token-001' },
-          { key: 'KeyType', title: 'Key Pair Type', type: 'string', required: true, rangelist: ['ECSECPrimeRandom', 'RSA'], default: 'ECSECPrimeRandom' },
-          { key: 'KeySize', title: 'Key Size', type: 'integer', required: true, default: 384 },
-          { key: 'HardwareBound', title: 'Hardware-Bound Secure Enclave Key', type: 'boolean', required: true, default: true },
-          { key: 'Subject', title: 'X.500 Subject (RDN Pairs)', type: 'array', itemType: 'array', required: true, subkeys: X500_RDN_PAIR_SUBKEYS }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
         title: 'Profile Removal Password',
         payloadType: 'com.apple.profileRemovalPassword',
         platforms: ['iOS', 'macOS', 'tvOS'],
@@ -1125,39 +1018,7 @@
         ]
       },
 
-      // --- SYSTEM & DEVICES (iOS, macOS, tvOS, visionOS, watchOS) ---
-      {
-        protocol: 'mdm',
-        category: 'System & Devices',
-        title: 'Dock Settings (macOS)',
-        payloadType: 'com.apple.dock',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures macOS Dock size, position, autohide, and pinned apps/folders.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'tilesize', title: 'Tile Size (16-128)', type: 'integer', default: 48 },
-          { key: 'orientation', title: 'Dock Position', type: 'string', rangelist: ['bottom', 'left', 'right'], default: 'bottom' },
-          { key: 'autohide', title: 'Automatically Hide & Show Dock', type: 'boolean', default: false },
-          { key: 'contents-immutable', title: 'Lock Dock Items', type: 'boolean', default: false },
-          { key: 'static-apps', title: 'Locked Applications Side Items', type: 'array', itemType: 'dictionary', subkeys: DOCK_TILE_ITEM_SUBKEYS }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'System & Devices',
-        title: 'Home Screen Layout (iOS / tvOS)',
-        payloadType: 'com.apple.homescreenlayout',
-        platforms: ['iOS', 'tvOS'],
-        supervision: 'required',
-        supervisionNote: 'Requires a Supervised iOS or tvOS device.',
-        description: 'Locks the Home Screen and Dock layout of apps, folders, and web clips.',
-        supportedOS: 'iOS 9.3+, tvOS 11.0+ (Supervised)',
-        keys: [
-          { key: 'Dock', title: 'Dock Items (max 4 on iPhone)', type: 'array', itemType: 'dictionary', subkeys: HOME_SCREEN_ICON_SUBKEYS },
-          { key: 'Pages', title: 'Home Screen Pages', type: 'array', itemType: 'array', required: true, subkeys: HOME_SCREEN_ICON_SUBKEYS }
-        ]
-      },
+      // --- SYSTEM & DEVICES ---
       {
         protocol: 'mdm',
         category: 'System & Devices',
@@ -1210,20 +1071,6 @@
           }
         ]
       },
-      {
-        protocol: 'mdm',
-        category: 'System & Devices',
-        title: 'Conference Room Display (tvOS)',
-        payloadType: 'com.apple.conferenceroomdisplay',
-        platforms: ['tvOS'],
-        supervision: 'required',
-        supervisionNote: 'Requires a Supervised Apple TV (tvOS 10.2+).',
-        description: 'Locks Apple TV into Conference Room Display mode with a custom on-screen message.',
-        supportedOS: 'tvOS 10.2+ (Supervised)',
-        keys: [
-          { key: 'Message', title: 'Custom On-Screen Message', type: 'string', default: 'Connect to Corporate Wi-Fi and select this Apple TV via AirPlay.' }
-        ]
-      },
 
       // --- DECLARATIVE DEVICE MANAGEMENT (DDM) ---
       {
@@ -1273,28 +1120,13 @@
         payloadType: 'com.apple.configuration.network.vpn.ikev2',
         platforms: ['iOS', 'macOS', 'tvOS', 'visionOS'],
         supervision: 'none',
-        description: 'Declarative IKEv2 VPN configuration with On-Demand and Post-Quantum cryptography.',
+        description: 'Declarative IKEv2 VPN configuration.',
         supportedOS: 'iOS 27.0+, macOS 27.0+, tvOS 27.0+, visionOS 27.0+',
         keys: [
           { key: 'VisibleName', title: 'Visible name', type: 'string', required: true, default: 'Corporate IKEv2 VPN' },
           { key: 'HostName', title: 'Server host name', type: 'string', required: true, default: 'vpn.example.com' },
           { key: 'LocalIdentifier', title: 'Local identifier', type: 'string', required: true, default: 'client.example.com' },
           { key: 'RemoteIdentifier', title: 'Remote identifier', type: 'string', required: true, default: 'vpn.example.com' }
-        ]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Network & VPN',
-        title: 'Network: VPN: AlwaysOn',
-        payloadType: 'com.apple.configuration.network.vpn.always-on',
-        platforms: ['iOS', 'visionOS'],
-        supervision: 'required',
-        supervisionNote: 'Always-On VPN requires a Supervised device.',
-        description: 'Configures Always-On IKEv2 VPN tunnels across Cellular and Wi-Fi.',
-        supportedOS: 'iOS 27.0+, visionOS 27.0+ (Supervised)',
-        keys: [
-          { key: 'VisibleName', title: 'Visible name', type: 'string', required: true, default: 'Always-On Corporate VPN' },
-          { key: 'UIToggleEnabled', title: 'Allow user UI toggle', type: 'boolean', default: false }
         ]
       },
       {
@@ -1344,14 +1176,14 @@
     // =========================================================================
     // 3. 3-STAGE WIZARD STATE & NAVIGATION
     // =========================================================================
-    const OS_CARDS = [
-      { id: 'iOS', label: 'iOS / iPadOS', icon: 'smartphone', targetDeviceType: '1', desc: 'iPhone & iPad' },
-      { id: 'macOS', label: 'macOS', icon: 'laptop', targetDeviceType: '5', desc: 'MacBook & Desktop' },
-      { id: 'tvOS', label: 'tvOS', icon: 'tv', targetDeviceType: '4', desc: 'Apple TV' },
-      { id: 'visionOS', label: 'visionOS', icon: 'glasses', targetDeviceType: '6', desc: 'Apple Vision Pro' },
-      { id: 'watchOS', label: 'watchOS', icon: 'watch', targetDeviceType: '2', desc: 'Apple Watch' },
-      { id: 'All', label: 'All Platforms', icon: 'layers', targetDeviceType: '0', desc: 'Multi-OS Catalog' }
-    ];
+    const OS_TARGET_MAP = {
+      'iOS': '1',
+      'macOS': '5',
+      'tvOS': '4',
+      'visionOS': '6',
+      'watchOS': '2',
+      'All': '0'
+    };
 
     let state = {
       currentStep: 1,
@@ -1377,6 +1209,41 @@
       return btoa(bin);
     }
 
+    function highlightStage1Cards() {
+      const mdmCard = document.getElementById('wizProtoMdm');
+      const ddmCard = document.getElementById('wizProtoDdm');
+      const badgeMdm = document.getElementById('badgeProtoMdm');
+      const badgeDdm = document.getElementById('badgeProtoDdm');
+
+      if (state.protocol === 'mdm') {
+        mdmCard.className = 'p-4 rounded-2xl border-2 border-sky-600 bg-sky-50/30 text-left shadow-sm transition flex items-start gap-3.5 cursor-pointer';
+        ddmCard.className = 'p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-400 text-left transition flex items-start gap-3.5 cursor-pointer';
+        badgeMdm.textContent = 'Selected';
+        badgeMdm.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-sky-600 text-white';
+        badgeDdm.textContent = 'JSON & .mobileconfig';
+        badgeDdm.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700';
+      } else {
+        ddmCard.className = 'p-4 rounded-2xl border-2 border-indigo-600 bg-indigo-50/30 text-left shadow-sm transition flex items-start gap-3.5 cursor-pointer';
+        mdmCard.className = 'p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-400 text-left transition flex items-start gap-3.5 cursor-pointer';
+        badgeDdm.textContent = 'Selected';
+        badgeDdm.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-600 text-white';
+        badgeMdm.textContent = 'Classic XML';
+        badgeMdm.className = 'text-[10px] font-semibold px-2 py-0.5 rounded bg-sky-50 text-sky-700';
+      }
+
+      document.querySelectorAll('.os-card').forEach(btn => {
+        const isSelected = btn.getAttribute('data-os') === state.selectedOS;
+        const iconBox = btn.querySelector('div:first-child');
+        if (isSelected) {
+          btn.className = 'os-card p-4 rounded-2xl border-2 border-sky-600 bg-sky-50/40 hover:border-sky-500 hover:shadow-sm transition flex flex-col items-center text-center group cursor-pointer';
+          if (iconBox) iconBox.className = 'w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center mb-2.5 text-lg transition';
+        } else {
+          btn.className = 'os-card p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-500 hover:bg-sky-50/40 hover:shadow-sm transition flex flex-col items-center text-center group cursor-pointer';
+          if (iconBox) iconBox.className = 'w-11 h-11 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg transition';
+        }
+      });
+    }
+
     function goToStep(stepNum) {
       state.currentStep = stepNum;
       [1, 2, 3].forEach(n => {
@@ -1385,7 +1252,7 @@
         if (n === stepNum) {
           sec.classList.remove('hidden');
           if (n === 2 || n === 3) sec.classList.add('flex');
-          btn.className = 'flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-semibold transition bg-white text-sky-700 shadow-2xs';
+          btn.className = 'flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-semibold transition bg-white text-sky-700 shadow-sm';
           btn.querySelector('span:first-child').className = 'w-5 h-5 rounded-full bg-sky-600 text-white text-[11px] font-bold flex items-center justify-center';
         } else {
           sec.classList.add('hidden');
@@ -1403,13 +1270,13 @@
         pill.classList.add('hidden');
       }
 
-      if (stepNum === 1) renderStage1();
+      if (stepNum === 1) highlightStage1Cards();
       if (stepNum === 2) renderStage2Catalog();
       if (stepNum === 3) {
         renderActiveItems();
         refreshOutput();
       }
-      lucide.createIcons();
+      safeIcons();
     }
 
     function selectWizardProtocol(mode) {
@@ -1417,16 +1284,12 @@
       state.selectedCategory = 'All';
       state.outputFormat = 'primary';
 
-      const mdmCard = document.getElementById('wizProtoMdm');
-      const ddmCard = document.getElementById('wizProtoDdm');
       const ddmMcTab = document.getElementById('outTabDdmMobileconfig');
       const primaryTab = document.getElementById('outTabPrimary');
       const advBtn = document.getElementById('toggleAdvancedTopLevelBtn');
       const ddmBanner = document.getElementById('ddmMobileconfigBanner');
 
       if (mode === 'mdm') {
-        mdmCard.className = 'p-4 rounded-2xl border-2 border-sky-600 bg-white text-left shadow-xs transition flex items-start gap-3.5';
-        ddmCard.className = 'p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-400 text-left transition flex items-start gap-3.5';
         document.getElementById('metaNameLabel').textContent = 'Profile Name (Shown on Device)';
         document.getElementById('metaIdentLabel').textContent = 'Unique Identifier (Reverse-DNS)';
         document.getElementById('metaExtraLabel').textContent = 'Install Scope (System / User)';
@@ -1436,8 +1299,6 @@
         ddmBanner.classList.add('hidden');
         advBtn.classList.remove('hidden');
       } else {
-        ddmCard.className = 'p-4 rounded-2xl border-2 border-indigo-600 bg-white text-left shadow-xs transition flex items-start gap-3.5';
-        mdmCard.className = 'p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-sky-400 text-left transition flex items-start gap-3.5';
         document.getElementById('metaNameLabel').textContent = 'Profile / Blueprint Name';
         document.getElementById('metaIdentLabel').textContent = 'Base Identifier Prefix';
         document.getElementById('metaExtraLabel').textContent = 'Activation Identifier';
@@ -1447,34 +1308,18 @@
         ddmBanner.classList.remove('hidden');
         advBtn.classList.add('hidden');
       }
+
+      highlightStage1Cards();
     }
 
     function chooseTargetOSAndProceed(osId) {
       state.selectedOS = osId;
       state.selectedCategory = 'All';
-      const card = OS_CARDS.find(c => c.id === osId);
-      if (card && document.getElementById('metaTargetDeviceType')) {
-        document.getElementById('metaTargetDeviceType').value = card.targetDeviceType;
-      }
+      const targetVal = OS_TARGET_MAP[osId] || '0';
+      const targetEl = document.getElementById('metaTargetDeviceType');
+      if (targetEl) targetEl.value = targetVal;
+      highlightStage1Cards();
       goToStep(2);
-    }
-
-    function renderStage1() {
-      const grid = document.getElementById('stage1OsGrid');
-      grid.innerHTML = OS_CARDS.map(os => {
-        const active = state.selectedOS === os.id;
-        return `
-          <button onclick="chooseTargetOSAndProceed('${os.id}')"
-            class="p-4 rounded-2xl border-2 ${active ? 'border-sky-600 bg-sky-50/40' : 'border-slate-200 bg-white hover:border-sky-400 hover:shadow-xs'} transition flex flex-col items-center text-center group">
-            <div class="w-11 h-11 rounded-xl ${active ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700 group-hover:bg-sky-600 group-hover:text-white'} flex items-center justify-center mb-2.5 transition">
-              <i data-lucide="${os.icon}" class="w-5 h-5"></i>
-            </div>
-            <div class="text-xs font-bold text-slate-900">${os.label}</div>
-            <div class="text-[11px] text-slate-500 mt-0.5">${os.desc}</div>
-          </button>
-        `;
-      }).join('');
-      lucide.createIcons();
     }
 
     function resetWorkspace() {
@@ -1531,12 +1376,12 @@
     function renderSupervisionBadge(schema) {
       if (schema.supervision === 'required') {
         return `<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-300" title="${escapeHtml(schema.supervisionNote || 'Requires a Supervised device')}">
-          <i data-lucide="lock" class="w-2.5 h-2.5"></i> Supervision Required
+          🔒 Supervision Required
         </span>`;
       }
       if (schema.supervision === 'partial') {
         return `<span class="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200" title="${escapeHtml(schema.supervisionNote || 'Some keys require Supervision or UAMDM')}">
-          <i data-lucide="shield-alert" class="w-2.5 h-2.5"></i> Supervised / UAMDM Keys
+          ⚠️ Supervised / UAMDM Keys
         </span>`;
       }
       return '';
@@ -1563,8 +1408,8 @@
 
       document.getElementById('stage2CategoryBar').innerHTML = categories.map(cat => {
         const active = state.selectedCategory === cat;
-        return `<button onclick="state.selectedCategory='${cat}';renderStage2Catalog()"
-          class="px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition ${active ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}">
+        return `<button type="button" onclick="state.selectedCategory='${cat}';renderStage2Catalog()"
+          class="px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer ${active ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}">
           ${cat}
         </button>`;
       }).join('');
@@ -1584,7 +1429,7 @@
           const countAdded = state.activeItems.filter(i => i.schema.payloadType === schema.payloadType && i.schema.title === schema.title).length;
           const platforms = getSchemaPlatforms(schema);
           return `
-            <div class="bg-white rounded-2xl border ${countAdded ? 'border-sky-400 ring-1 ring-sky-200' : 'border-slate-200'} p-4 flex flex-col justify-between gap-3 hover:shadow-xs transition">
+            <div class="bg-white rounded-2xl border ${countAdded ? 'border-sky-400 ring-1 ring-sky-200' : 'border-slate-200'} p-4 flex flex-col justify-between gap-3 hover:shadow-sm transition">
               <div>
                 <div class="flex items-start justify-between gap-2">
                   <div>
@@ -1601,9 +1446,9 @@
                   ${renderSupervisionBadge(schema)}
                   ${platforms.slice(0, 3).map(p => `<span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">${p}</span>`).join('')}
                 </div>
-                <button onclick="addSchemaToBuilder(${globalIdx})"
-                  class="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 hover:border-sky-600 text-xs font-semibold flex items-center gap-1 shrink-0 transition">
-                  <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Policy
+                <button type="button" onclick="addSchemaToBuilder(${globalIdx})"
+                  class="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white border border-sky-200 hover:border-sky-600 text-xs font-semibold flex items-center gap-1 shrink-0 transition cursor-pointer">
+                  + Add Policy
                 </button>
               </div>
             </div>
@@ -1618,12 +1463,12 @@
         ? activeForProto.map(item => `
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-200 text-[11px] font-semibold whitespace-nowrap">
               ${escapeHtml(item.schema.title)}
-              <button onclick="removeActiveItem('${item.instanceId}')" class="text-sky-500 hover:text-rose-600">✕</button>
+              <button type="button" onclick="removeActiveItem('${item.instanceId}')" class="text-sky-500 hover:text-rose-600 cursor-pointer">✕</button>
             </span>
           `).join('')
         : `<span class="text-xs text-slate-400">None yet — click "+ Add Policy" on any card above.</span>`;
 
-      lucide.createIcons();
+      safeIcons();
     }
 
     function setOutputFormat(fmt) {
@@ -1631,11 +1476,11 @@
       const p = document.getElementById('outTabPrimary');
       const m = document.getElementById('outTabDdmMobileconfig');
       if (fmt === 'primary') {
-        p.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400';
-        m.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white';
+        p.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-sky-400 cursor-pointer';
+        m.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white cursor-pointer';
       } else {
-        m.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-indigo-400';
-        p.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white';
+        m.className = 'px-2.5 py-1 rounded text-xs font-semibold bg-slate-800 text-indigo-400 cursor-pointer';
+        p.className = 'px-2.5 py-1 rounded text-xs font-semibold text-slate-400 hover:text-white cursor-pointer';
       }
       refreshOutput();
     }
@@ -1732,11 +1577,8 @@
         curr = curr[path[i]];
       }
       const last = path[path.length - 1];
-      if (value === undefined) {
-        delete curr[last];
-      } else {
-        curr[last] = value;
-      }
+      if (value === undefined) delete curr[last];
+      else curr[last] = value;
     }
 
     function updateField(instanceId, pathJson, rawVal, fieldType) {
@@ -1761,11 +1603,8 @@
       if (!item) return;
       const path = JSON.parse(pathJson);
       const existing = getNestedValue(item.values, path);
-      if (existing !== undefined) {
-        setNestedValue(item.values, path, undefined);
-      } else {
-        setNestedValue(item.values, path, buildDefaultValues(JSON.parse(subkeysJson)));
-      }
+      if (existing !== undefined) setNestedValue(item.values, path, undefined);
+      else setNestedValue(item.values, path, buildDefaultValues(JSON.parse(subkeysJson)));
       renderActiveItems();
       refreshOutput();
     }
@@ -2110,19 +1949,18 @@
               <div class="text-[11px] text-slate-500 mt-0.5">${escapeHtml(item.schema.supportedOS || '')}</div>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-              <button onclick="toggleItemTechMeta('${item.instanceId}')" class="px-2 py-1 rounded-lg text-[11px] font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition">
+              <button type="button" onclick="toggleItemTechMeta('${item.instanceId}')" class="px-2 py-1 rounded-lg text-[11px] font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition">
                 ${item.showTechMeta ? 'Hide IDs' : 'IDs'}
               </button>
-              <button onclick="removeActiveItem('${item.instanceId}')" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Remove">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              <button type="button" onclick="removeActiveItem('${item.instanceId}')" class="px-2 py-1 rounded-lg text-xs text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Remove">
+                ✕
               </button>
             </div>
           </div>
 
           ${item.schema.supervisionNote ? `
             <div class="px-4 py-2 bg-amber-50/80 border-b border-amber-200/70 flex items-center gap-2 text-[11px] text-amber-900">
-              <i data-lucide="info" class="w-3.5 h-3.5 text-amber-600 shrink-0"></i>
-              <span>${escapeHtml(item.schema.supervisionNote)}</span>
+              <span>ℹ️ ${escapeHtml(item.schema.supervisionNote)}</span>
             </div>
           ` : ''}
 
@@ -2151,7 +1989,7 @@
         </div>
       `).join('');
 
-      lucide.createIcons();
+      safeIcons();
     }
 
     function itemMetaUpdate(instanceId, field, value) {
@@ -2360,7 +2198,7 @@
         listEl.innerHTML = yamlFiles.map(f => `
           <div class="px-3.5 py-2 flex items-center justify-between hover:bg-white transition">
             <span class="text-xs font-mono text-slate-700">${escapeHtml(f.name)}</span>
-            <button onclick="fetchAndLoadRawYaml('${escapeHtml(f.download_url)}')"
+            <button type="button" onclick="fetchAndLoadRawYaml('${escapeHtml(f.download_url)}')"
               class="px-2.5 py-1 rounded bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white text-[11px] font-semibold transition">
               Load Schema
             </button>
@@ -2667,7 +2505,6 @@
 
     selectWizardProtocol('mdm');
     goToStep(1);
-    lucide.createIcons();
   </script>
 </body>
 </html>
