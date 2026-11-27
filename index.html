@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title> Apple MDM & Declarative DDM </title>
+  <title>RGM Profile Editor — Apple MDM & Declarative DDM Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <style>
@@ -11,111 +11,9 @@
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      box-sizing: border-box;
-    }
-
-    /* Fallback layout utilities in case Tailwind CDN is blocked offline */
-    .hidden { display: none !important; }
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    .flex-1 { flex: 1 1 0%; }
-    .flex-wrap { flex-wrap: wrap; }
-    .items-center { align-items: center; }
-    .items-start { align-items: flex-start; }
-    .justify-between { justify-content: space-between; }
-    .justify-center { justify-content: center; }
-    .justify-end { justify-content: flex-end; }
-    .shrink-0 { flex-shrink: 0; }
-    .min-w-0 { min-width: 0; }
-    .w-full { width: 100%; }
-    .h-screen { height: 100vh; }
-    .h-full { height: 100%; }
-    .overflow-hidden { overflow: hidden; }
-    .overflow-y-auto { overflow-y: auto; }
-    .overflow-x-auto { overflow-x: auto; }
-    .grid { display: grid; }
-    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .gap-1 { gap: 0.25rem; }
-    .gap-1\.5 { gap: 0.375rem; }
-    .gap-2 { gap: 0.5rem; }
-    .gap-3 { gap: 0.75rem; }
-    .gap-3\.5 { gap: 0.875rem; }
-    .gap-4 { gap: 1rem; }
-    .space-y-1 > * + * { margin-top: 0.25rem; }
-    .space-y-1\.5 > * + * { margin-top: 0.375rem; }
-    .space-y-2 > * + * { margin-top: 0.5rem; }
-    .space-y-2\.5 > * + * { margin-top: 0.625rem; }
-    .space-y-3 > * + * { margin-top: 0.75rem; }
-    .space-y-4 > * + * { margin-top: 1rem; }
-    .space-y-6 > * + * { margin-top: 1.5rem; }
-    .p-2 { padding: 0.5rem; }
-    .p-2\.5 { padding: 0.625rem; }
-    .p-3 { padding: 0.75rem; }
-    .p-4 { padding: 1rem; }
-    .p-5 { padding: 1.25rem; }
-    .p-6 { padding: 1.5rem; }
-    .p-8 { padding: 2rem; }
-    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-    .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
-    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-    .px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
-    .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .py-0\.5 { padding-top: 0.125rem; padding-bottom: 0.125rem; }
-    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-    .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
-    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
-    .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-    .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
-    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-    .rounded-lg { border-radius: 0.5rem; }
-    .rounded-xl { border-radius: 0.75rem; }
-    .rounded-2xl { border-radius: 1rem; }
-    .rounded-3xl { border-radius: 1.5rem; }
-    .rounded-full { border-radius: 9999px; }
-    .text-left { text-align: left; }
-    .text-center { text-align: center; }
-    .text-\[9px\] { font-size: 9px; }
-    .text-\[10px\] { font-size: 10px; }
-    .text-\[11px\] { font-size: 11px; }
-    .text-xs { font-size: 0.75rem; line-height: 1rem; }
-    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-    .text-lg { font-size: 1.125rem; }
-    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-    .font-medium { font-weight: 500; }
-    .font-semibold { font-weight: 600; }
-    .font-bold { font-weight: 700; }
-    .cursor-pointer { cursor: pointer; pointer-events: auto; }
-    .fixed { position: fixed; }
-    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-    .z-20 { z-index: 20; }
-    .z-50 { z-index: 50; }
-    .max-w-md { max-width: 28rem; }
-    .max-w-xl { max-width: 36rem; }
-    .max-w-2xl { max-width: 42rem; }
-    .max-w-4xl { max-width: 56rem; }
-    .max-w-6xl { max-width: 72rem; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-
-    @media (min-width: 640px) {
-      .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-    @media (min-width: 768px) {
-      .md\:flex { display: flex; }
-      .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .md\:col-span-4 { grid-column: span 4 / span 4; }
-    }
-    @media (min-width: 1024px) {
-      .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .lg\:grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
     }
 
     body {
-      margin: 0;
       background:
         radial-gradient(circle at 12% 18%, rgba(56, 189, 248, 0.28) 0%, transparent 42%),
         radial-gradient(circle at 86% 14%, rgba(129, 140, 248, 0.28) 0%, transparent 45%),
@@ -124,94 +22,90 @@
       color: #0f172a;
     }
 
-    button, a, input, select, textarea, label {
-      pointer-events: auto;
-    }
-
     /* Apple Liquid Glass Surfaces */
     .liquid-bar {
-      background: rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.62);
       backdrop-filter: blur(28px) saturate(190%);
       -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.75);
       box-shadow:
         0 4px 24px -4px rgba(15, 23, 42, 0.06),
         inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
     }
 
     .liquid-footer-bar {
-      background: rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.68);
       backdrop-filter: blur(28px) saturate(190%);
       -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border-top: 1px solid rgba(255, 255, 255, 0.85);
+      border-top: 1px solid rgba(255, 255, 255, 0.8);
       box-shadow:
         0 -6px 28px -6px rgba(15, 23, 42, 0.07),
         inset 0 1px 0 0 rgba(255, 255, 255, 0.92);
     }
 
     .liquid-card {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.76) 0%, rgba(255, 255, 255, 0.50) 100%);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.48) 100%);
       backdrop-filter: blur(26px) saturate(185%);
       -webkit-backdrop-filter: blur(26px) saturate(185%);
-      border: 1px solid rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.82);
       box-shadow:
         0 10px 30px -8px rgba(15, 23, 42, 0.08),
         0 2px 6px -1px rgba(15, 23, 42, 0.04),
         inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
         inset 0 -1px 1px 0 rgba(148, 163, 184, 0.15);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
 
     .liquid-card:hover {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0.65) 100%);
-      border-color: rgba(255, 255, 255, 1);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.60) 100%);
+      border-color: rgba(255, 255, 255, 0.98);
       box-shadow:
-        0 16px 36px -8px rgba(2, 132, 199, 0.16),
+        0 16px 36px -8px rgba(2, 132, 199, 0.14),
         0 4px 10px -2px rgba(15, 23, 42, 0.05),
         inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1);
     }
 
     .liquid-card-selected {
-      background: linear-gradient(145deg, rgba(240, 249, 255, 0.90) 0%, rgba(224, 242, 254, 0.68) 100%) !important;
+      background: linear-gradient(145deg, rgba(240, 249, 255, 0.88) 0%, rgba(224, 242, 254, 0.65) 100%) !important;
       backdrop-filter: blur(28px) saturate(200%);
       -webkit-backdrop-filter: blur(28px) saturate(200%);
-      border: 1.5px solid rgba(2, 132, 199, 0.7) !important;
+      border: 1.5px solid rgba(2, 132, 199, 0.65) !important;
       box-shadow:
-        0 14px 32px -6px rgba(2, 132, 199, 0.22),
+        0 14px 32px -6px rgba(2, 132, 199, 0.20),
         inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.98),
-        inset 0 0 16px rgba(56, 189, 248, 0.14) !important;
+        inset 0 0 16px rgba(56, 189, 248, 0.12) !important;
     }
 
     .liquid-card-selected-indigo {
-      background: linear-gradient(145deg, rgba(238, 242, 255, 0.90) 0%, rgba(224, 231, 255, 0.68) 100%) !important;
+      background: linear-gradient(145deg, rgba(238, 242, 255, 0.88) 0%, rgba(224, 231, 255, 0.65) 100%) !important;
       backdrop-filter: blur(28px) saturate(200%);
       -webkit-backdrop-filter: blur(28px) saturate(200%);
-      border: 1.5px solid rgba(79, 70, 229, 0.7) !important;
+      border: 1.5px solid rgba(79, 70, 229, 0.65) !important;
       box-shadow:
-        0 14px 32px -6px rgba(79, 70, 229, 0.22),
+        0 14px 32px -6px rgba(79, 70, 229, 0.20),
         inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.98),
         inset 0 0 16px rgba(129, 140, 248, 0.14) !important;
     }
 
     .liquid-well {
-      background: rgba(255, 255, 255, 0.48);
+      background: rgba(255, 255, 255, 0.45);
       backdrop-filter: blur(18px) saturate(165%);
       -webkit-backdrop-filter: blur(18px) saturate(165%);
-      border: 1px solid rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.72);
       box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.8);
     }
 
     .liquid-input {
-      background: rgba(255, 255, 255, 0.76);
+      background: rgba(255, 255, 255, 0.72);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(203, 213, 225, 0.8);
+      border: 1px solid rgba(203, 213, 225, 0.75);
       box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.85);
       transition: all 0.18s ease;
     }
 
     .liquid-input:focus {
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255, 255, 255, 0.94);
       border-color: #0284c7;
       box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.16), inset 0 1px 1px rgba(255, 255, 255, 1);
       outline: none;
@@ -235,7 +129,7 @@
     }
 
     .liquid-dark-glass {
-      background: rgba(15, 23, 42, 0.86);
+      background: rgba(15, 23, 42, 0.84);
       backdrop-filter: blur(30px) saturate(180%);
       -webkit-backdrop-filter: blur(30px) saturate(180%);
       border-left: 1px solid rgba(255, 255, 255, 0.14);
@@ -243,10 +137,10 @@
     }
 
     .liquid-modal {
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.84);
       backdrop-filter: blur(32px) saturate(195%);
       -webkit-backdrop-filter: blur(32px) saturate(195%);
-      border: 1px solid rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.92);
       box-shadow:
         0 24px 56px -12px rgba(15, 23, 42, 0.25),
         inset 0 1.5px 1px rgba(255, 255, 255, 1);
@@ -258,14 +152,14 @@
     ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.75); }
   </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="h-screen flex flex-col overflow-hidden select-none sm:select-auto">
 
   <!-- Top Navigation & 3-Stage Stepper Bar -->
   <header class="liquid-bar px-5 py-2.5 flex items-center justify-between shrink-0 z-20">
     <div class="flex items-center gap-3">
-      <button type="button" onclick="window.goToStep(1)" class="w-9 h-9 rounded-2xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-md border border-white/40 font-bold text-sm tracking-tight cursor-pointer">
+      <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-md border border-white/40 font-bold text-sm tracking-tight cursor-pointer" onclick="goToStep(1)">
         RGM
-      </button>
+      </div>
       <div>
         <div class="flex items-center gap-2">
           <h1 class="text-sm font-bold tracking-tight text-slate-900">RGM Profile Editor</h1>
@@ -277,17 +171,17 @@
 
     <!-- Interactive 3-Step Progress Indicator -->
     <nav class="hidden md:flex items-center gap-2 liquid-well px-3 py-1.5 rounded-2xl">
-      <button type="button" onclick="window.goToStep(1)" id="stepBtn1" class="flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-bold transition bg-white/90 text-sky-700 shadow-xs border border-white cursor-pointer">
+      <button type="button" onclick="goToStep(1)" id="stepBtn1" class="flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-bold transition bg-white/90 text-sky-700 shadow-xs border border-white cursor-pointer">
         <span class="w-5 h-5 rounded-full bg-sky-600 text-white text-[11px] font-bold flex items-center justify-center">1</span>
         <span>Select OS & Type</span>
       </button>
       <span class="text-slate-400 text-xs">›</span>
-      <button type="button" onclick="window.goToStep(2)" id="stepBtn2" class="flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-medium transition text-slate-600 hover:text-slate-900 cursor-pointer">
+      <button type="button" onclick="goToStep(2)" id="stepBtn2" class="flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-medium transition text-slate-600 hover:text-slate-900 cursor-pointer">
         <span class="w-5 h-5 rounded-full bg-slate-300/80 text-slate-700 text-[11px] font-bold flex items-center justify-center">2</span>
         <span>Choose Policies</span>
       </button>
       <span class="text-slate-400 text-xs">›</span>
-      <button type="button" onclick="window.goToStep(3)" id="stepBtn3" class="flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-medium transition text-slate-600 hover:text-slate-900 cursor-pointer">
+      <button type="button" onclick="goToStep(3)" id="stepBtn3" class="flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-medium transition text-slate-600 hover:text-slate-900 cursor-pointer">
         <span class="w-5 h-5 rounded-full bg-slate-300/80 text-slate-700 text-[11px] font-bold flex items-center justify-center">3</span>
         <span>Profile Details & Export</span>
       </button>
@@ -295,13 +189,13 @@
 
     <!-- Utility Actions -->
     <div class="flex items-center gap-2">
-      <button type="button" onclick="window.resetWorkspace()" class="px-3 py-1.5 text-xs font-semibold rounded-xl border border-rose-300/70 bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 flex items-center gap-1.5 transition cursor-pointer">
+      <button type="button" onclick="resetWorkspace()" class="px-3 py-1.5 text-xs font-semibold rounded-xl border border-rose-300/70 bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 flex items-center gap-1.5 transition cursor-pointer">
         <span>↺ New / Reset</span>
       </button>
-      <button type="button" onclick="window.openRepoModal()" class="px-3 py-1.5 text-xs font-semibold rounded-xl border border-white/80 bg-white/60 hover:bg-white/90 text-slate-700 flex items-center gap-1.5 shadow-2xs transition cursor-pointer">
+      <button type="button" onclick="openRepoModal()" class="px-3 py-1.5 text-xs font-semibold rounded-xl border border-white/80 bg-white/60 hover:bg-white/90 text-slate-700 flex items-center gap-1.5 shadow-2xs transition cursor-pointer">
         <span>+ Custom Schema</span>
       </button>
-      <button type="button" onclick="window.openImportModal()" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-900/90 hover:bg-slate-900 text-white border border-white/20 flex items-center gap-1.5 shadow-sm transition cursor-pointer">
+      <button type="button" onclick="openImportModal()" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-900/90 hover:bg-slate-900 text-white border border-white/20 flex items-center gap-1.5 shadow-sm transition cursor-pointer">
         <span>↑ Import</span>
       </button>
     </div>
@@ -322,7 +216,7 @@
 
       <!-- Format Selector Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <button type="button" onclick="window.selectWizardProtocol('mdm')" id="wizProtoMdm"
+        <button type="button" onclick="selectWizardProtocol('mdm')" id="wizProtoMdm"
           class="liquid-card-selected p-5 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer">
           <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 font-bold text-xs shadow-sm border border-white/40">
             XML
@@ -338,7 +232,7 @@
           </div>
         </button>
 
-        <button type="button" onclick="window.selectWizardProtocol('ddm')" id="wizProtoDdm"
+        <button type="button" onclick="selectWizardProtocol('ddm')" id="wizProtoDdm"
           class="liquid-card p-5 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer">
           <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 text-indigo-700 border border-indigo-300/50 flex items-center justify-center shrink-0 font-bold text-xs">
             DDM
@@ -359,7 +253,7 @@
       <div>
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 text-center">Choose Target Operating System</h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5" id="stage1OsGrid">
-          <button type="button" data-os="All" onclick="window.chooseTargetOSAndProceed('All')"
+          <button type="button" data-os="All" onclick="chooseTargetOSAndProceed('All')"
             class="os-card liquid-card-selected p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer">
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center mb-2.5 text-lg shadow-xs border border-white/40 transition">
               🗂️
@@ -368,7 +262,7 @@
             <div class="text-[11px] text-slate-500 mt-0.5">Full Catalog</div>
           </button>
 
-          <button type="button" data-os="iOS" onclick="window.chooseTargetOSAndProceed('iOS')"
+          <button type="button" data-os="iOS" onclick="chooseTargetOSAndProceed('iOS')"
             class="os-card liquid-card p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer">
             <div class="w-11 h-11 rounded-2xl bg-white/80 text-slate-700 border border-white group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg shadow-2xs transition">
               📱
@@ -377,7 +271,7 @@
             <div class="text-[11px] text-slate-500 mt-0.5">iPhone & iPad</div>
           </button>
 
-          <button type="button" data-os="macOS" onclick="window.chooseTargetOSAndProceed('macOS')"
+          <button type="button" data-os="macOS" onclick="chooseTargetOSAndProceed('macOS')"
             class="os-card liquid-card p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer">
             <div class="w-11 h-11 rounded-2xl bg-white/80 text-slate-700 border border-white group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg shadow-2xs transition">
               💻
@@ -386,7 +280,7 @@
             <div class="text-[11px] text-slate-500 mt-0.5">MacBook & Desktop</div>
           </button>
 
-          <button type="button" data-os="tvOS" onclick="window.chooseTargetOSAndProceed('tvOS')"
+          <button type="button" data-os="tvOS" onclick="chooseTargetOSAndProceed('tvOS')"
             class="os-card liquid-card p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer">
             <div class="w-11 h-11 rounded-2xl bg-white/80 text-slate-700 border border-white group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg shadow-2xs transition">
               📺
@@ -395,7 +289,7 @@
             <div class="text-[11px] text-slate-500 mt-0.5">Apple TV</div>
           </button>
 
-          <button type="button" data-os="visionOS" onclick="window.chooseTargetOSAndProceed('visionOS')"
+          <button type="button" data-os="visionOS" onclick="chooseTargetOSAndProceed('visionOS')"
             class="os-card liquid-card p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer">
             <div class="w-11 h-11 rounded-2xl bg-white/80 text-slate-700 border border-white group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg shadow-2xs transition">
               🥽
@@ -404,7 +298,7 @@
             <div class="text-[11px] text-slate-500 mt-0.5">Apple Vision Pro</div>
           </button>
 
-          <button type="button" data-os="watchOS" onclick="window.chooseTargetOSAndProceed('watchOS')"
+          <button type="button" data-os="watchOS" onclick="chooseTargetOSAndProceed('watchOS')"
             class="os-card liquid-card p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer">
             <div class="w-11 h-11 rounded-2xl bg-white/80 text-slate-700 border border-white group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg shadow-2xs transition">
               ⌚
@@ -419,10 +313,10 @@
       <div class="liquid-well rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
         <span class="text-xs font-medium text-slate-600">Or jump straight in with a pre-built template:</span>
         <div class="flex flex-wrap gap-2">
-          <button type="button" onclick="window.loadStarterEssentials()" class="px-3.5 py-1.5 rounded-xl bg-white/80 hover:bg-white border border-white text-xs font-semibold text-slate-800 shadow-2xs flex items-center gap-1.5 transition cursor-pointer">
+          <button type="button" onclick="loadStarterEssentials()" class="px-3.5 py-1.5 rounded-xl bg-white/80 hover:bg-white border border-white text-xs font-semibold text-slate-800 shadow-2xs flex items-center gap-1.5 transition cursor-pointer">
             <span>📶 Wi-Fi + Passcode Starter</span>
           </button>
-          <button type="button" onclick="window.loadEnterpriseAppsPreset()" class="px-3.5 py-1.5 rounded-xl bg-white/80 hover:bg-white border border-white text-xs font-semibold text-slate-800 shadow-2xs flex items-center gap-1.5 transition cursor-pointer">
+          <button type="button" onclick="loadEnterpriseAppsPreset()" class="px-3.5 py-1.5 rounded-xl bg-white/80 hover:bg-white border border-white text-xs font-semibold text-slate-800 shadow-2xs flex items-center gap-1.5 transition cursor-pointer">
             <span>🖥️ macOS Enterprise Apps Suite</span>
           </button>
         </div>
@@ -445,13 +339,14 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
+        <!-- Live OS Switcher inside Step 2 -->
         <div class="flex items-center liquid-well p-1 rounded-xl" id="stage2OsSwitcher"></div>
 
         <div class="relative w-60">
-          <input id="stage2SearchInput" type="text" oninput="window.renderStage2Catalog()" placeholder="Search VPN, Wi-Fi, Chrome, TCC..."
+          <input id="stage2SearchInput" type="text" oninput="renderStage2Catalog()" placeholder="Search VPN, Wi-Fi, Chrome, TCC..."
             class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl" />
         </div>
-        <button type="button" onclick="window.goToStep(3)" class="liquid-btn-primary px-4 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+        <button type="button" onclick="goToStep(3)" class="liquid-btn-primary px-4 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer">
           <span>Next: Profile Details →</span>
         </button>
       </div>
@@ -472,10 +367,10 @@
         <div id="selectedPillsTray" class="flex items-center gap-1.5 overflow-x-auto"></div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
-        <button type="button" onclick="window.goToStep(1)" class="px-3.5 py-1.5 rounded-xl border border-white bg-white/70 hover:bg-white text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
+        <button type="button" onclick="goToStep(1)" class="px-3.5 py-1.5 rounded-xl border border-white bg-white/70 hover:bg-white text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
           ← Change OS / Type
         </button>
-        <button type="button" onclick="window.goToStep(3)" class="liquid-btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+        <button type="button" onclick="goToStep(3)" class="liquid-btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer">
           <span>Continue to Profile Details →</span>
         </button>
       </div>
@@ -497,13 +392,13 @@
               <h2 class="text-sm font-bold text-slate-900" id="metaHeaderLabel">Profile Details & Policy Settings</h2>
             </div>
             <div class="flex items-center gap-3">
-              <button type="button" onclick="window.goToStep(2)" class="text-xs font-bold text-sky-700 hover:text-sky-900 cursor-pointer">
+              <button type="button" onclick="goToStep(2)" class="text-xs font-bold text-sky-700 hover:text-sky-900 cursor-pointer">
                 + Add / Remove Policies
               </button>
-              <button type="button" id="toggleAdvancedTopLevelBtn" onclick="window.toggleAdvancedTopLevel()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">
+              <button type="button" id="toggleAdvancedTopLevelBtn" onclick="toggleAdvancedTopLevel()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">
                 Advanced Options
               </button>
-              <button type="button" onclick="window.regenerateAllUUIDs()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 cursor-pointer">
+              <button type="button" onclick="regenerateAllUUIDs()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 cursor-pointer">
                 New UUIDs
               </button>
             </div>
@@ -512,22 +407,22 @@
           <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-1" id="metaNameLabel">Profile Name (Shown on Device)</label>
-              <input id="metaDisplayName" type="text" value="Corporate Device Profile" oninput="window.refreshOutput()"
+              <input id="metaDisplayName" type="text" value="Corporate Device Profile" oninput="refreshOutput()"
                 class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl" />
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-1" id="metaIdentLabel">Unique Identifier (Reverse-DNS)</label>
-              <input id="metaIdentifier" type="text" value="com.rgm.mdm.profile" oninput="window.refreshOutput()"
+              <input id="metaIdentifier" type="text" value="com.rgm.mdm.profile" oninput="refreshOutput()"
                 class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl" />
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-1">Organization Name</label>
-              <input id="metaOrg" type="text" value="RGM IT" oninput="window.refreshOutput()"
+              <input id="metaOrg" type="text" value="RGM IT" oninput="refreshOutput()"
                 class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl" />
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-700 mb-1" id="metaExtraLabel">Install Scope (System / User)</label>
-              <input id="metaScopeOrActivation" type="text" value="System" oninput="window.refreshOutput()"
+              <input id="metaScopeOrActivation" type="text" value="System" oninput="refreshOutput()"
                 class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl" />
             </div>
           </div>
@@ -536,7 +431,7 @@
           <div id="advancedTopLevelPanel" class="hidden mt-3 pt-3 border-t border-white/70 grid grid-cols-1 md:grid-cols-4 gap-3">
             <div>
               <label class="block text-[11px] font-bold text-slate-600 mb-1">Target Device Platform</label>
-              <select id="metaTargetDeviceType" onchange="window.refreshOutput()" class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl">
+              <select id="metaTargetDeviceType" onchange="refreshOutput()" class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl">
                 <option value="0">0 — Any Apple Device</option>
                 <option value="1">1 — iPhone / iPad</option>
                 <option value="2">2 — Apple Watch</option>
@@ -548,24 +443,24 @@
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-600 mb-1">Profile Description</label>
-              <input id="metaDescription" type="text" value="Created with RGM Profile Editor" oninput="window.refreshOutput()"
+              <input id="metaDescription" type="text" value="Created with RGM Profile Editor" oninput="refreshOutput()"
                 class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl" />
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-600 mb-1">Auto-Removal Date (ISO-8601)</label>
-              <input id="metaRemovalDate" type="text" placeholder="e.g. 2027-12-31T23:59:59Z" oninput="window.refreshOutput()"
+              <input id="metaRemovalDate" type="text" placeholder="e.g. 2027-12-31T23:59:59Z" oninput="refreshOutput()"
                 class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl" />
             </div>
             <div class="flex flex-col justify-between">
               <label class="block text-[11px] font-bold text-slate-600 mb-1">Removal Protection</label>
               <label class="inline-flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
-                <input id="metaRemovalDisallowed" type="checkbox" onchange="window.refreshOutput()" class="rounded border-slate-300 text-sky-600" />
+                <input id="metaRemovalDisallowed" type="checkbox" onchange="refreshOutput()" class="rounded border-slate-300 text-sky-600" />
                 <span>Prevent User Removal (Supervised)</span>
               </label>
             </div>
             <div class="md:col-span-4">
               <label class="block text-[11px] font-bold text-slate-600 mb-1">User Consent Agreement Message (Optional)</label>
-              <input id="metaConsentText" type="text" placeholder="Shown to the user before installing the profile..." oninput="window.refreshOutput()"
+              <input id="metaConsentText" type="text" placeholder="Shown to the user before installing the profile..." oninput="refreshOutput()"
                 class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl" />
             </div>
           </div>
@@ -576,7 +471,7 @@
           <div id="emptyStage3Notice" class="hidden liquid-card rounded-3xl p-8 text-center max-w-md mx-auto">
             <h3 class="text-sm font-bold text-slate-800 mb-1">No Policies Added Yet</h3>
             <p class="text-xs text-slate-600 mb-4">Go back to Step 2 to pick at least one setting to configure.</p>
-            <button type="button" onclick="window.goToStep(2)" class="liquid-btn-primary px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">
+            <button type="button" onclick="goToStep(2)" class="liquid-btn-primary px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">
               ← Back to Policy Selection
             </button>
           </div>
@@ -588,21 +483,21 @@
       <aside class="w-[450px] liquid-dark-glass text-slate-100 flex flex-col shrink-0">
         <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between gap-2">
           <div class="flex items-center gap-1" id="outputFormatTabs">
-            <button type="button" onclick="window.setOutputFormat('primary')" id="outTabPrimary"
+            <button type="button" onclick="setOutputFormat('primary')" id="outTabPrimary"
               class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/15 text-sky-300 border border-white/15 cursor-pointer">
               .mobileconfig XML
             </button>
-            <button type="button" onclick="window.setOutputFormat('ddm_mobileconfig')" id="outTabDdmMobileconfig"
+            <button type="button" onclick="setOutputFormat('ddm_mobileconfig')" id="outTabDdmMobileconfig"
               class="px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hidden cursor-pointer">
               .mobileconfig (DDM)
             </button>
           </div>
 
           <div class="flex items-center gap-1.5">
-            <button type="button" onclick="window.copyOutput()" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-slate-100 flex items-center gap-1 transition cursor-pointer">
+            <button type="button" onclick="copyOutput()" class="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-slate-100 flex items-center gap-1 transition cursor-pointer">
               <span id="copyBtnText">Copy</span>
             </button>
-            <button type="button" onclick="window.downloadOutput()" class="liquid-btn-primary px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer">
+            <button type="button" onclick="downloadOutput()" class="liquid-btn-primary px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer">
               <span id="downloadBtnText">Download .mobileconfig</span>
             </button>
           </div>
@@ -611,7 +506,7 @@
         <!-- Secondary Quick-Download Bar for Declarative DDM Mode -->
         <div id="ddmMobileconfigBanner" class="hidden px-4 py-2 bg-indigo-500/20 border-b border-indigo-400/20 flex items-center justify-between gap-2">
           <span class="text-[11px] text-indigo-200">Install DDM profile directly on device:</span>
-          <button type="button" onclick="window.downloadDdmAsMobileconfig()" class="px-2.5 py-1 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-[11px] font-bold text-white border border-white/25 shrink-0 transition cursor-pointer">
+          <button type="button" onclick="downloadDdmAsMobileconfig()" class="px-2.5 py-1 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-[11px] font-bold text-white border border-white/25 shrink-0 transition cursor-pointer">
             Download .mobileconfig
           </button>
         </div>
@@ -631,19 +526,19 @@
     <div class="liquid-modal rounded-3xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[85vh]">
       <div class="px-5 py-3.5 border-b border-white/70 flex items-center justify-between">
         <h3 class="text-sm font-bold text-slate-900">Add Custom Apple Schema or Application Policy</h3>
-        <button type="button" onclick="window.closeModal('repoModal')" class="text-slate-500 hover:text-slate-900 font-bold cursor-pointer">✕</button>
+        <button type="button" onclick="closeModal('repoModal')" class="text-slate-500 hover:text-slate-900 font-bold cursor-pointer">✕</button>
       </div>
 
       <div class="p-5 space-y-4 overflow-y-auto flex-1">
         <div class="flex gap-2">
-          <select id="repoFolderSelect" onchange="window.fetchGitHubDirectory()" class="liquid-input px-3 py-2 text-xs rounded-xl font-semibold">
+          <select id="repoFolderSelect" onchange="fetchGitHubDirectory()" class="liquid-input px-3 py-2 text-xs rounded-xl font-semibold">
             <option value="mdm/profiles">Standard MDM Payloads</option>
             <option value="declarative/declarations/configurations">Declarative DDM Configurations</option>
             <option value="declarative/declarations/assets">Declarative DDM Assets</option>
             <option value="declarative/declarations/activations">Declarative DDM Activations</option>
             <option value="declarative/declarations/management">Declarative DDM Management</option>
           </select>
-          <button type="button" onclick="window.fetchGitHubDirectory()" class="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-900 text-white hover:bg-slate-800 cursor-pointer">
+          <button type="button" onclick="fetchGitHubDirectory()" class="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-900 text-white hover:bg-slate-800 cursor-pointer">
             Browse Online Catalog
           </button>
         </div>
@@ -660,8 +555,8 @@
       </div>
 
       <div class="px-5 py-3 bg-white/50 border-t border-white/70 flex justify-end gap-2">
-        <button type="button" onclick="window.closeModal('repoModal')" class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">Cancel</button>
-        <button type="button" onclick="window.parsePastedYaml()" class="liquid-btn-primary px-4 py-1.5 text-xs font-bold rounded-xl cursor-pointer">
+        <button type="button" onclick="closeModal('repoModal')" class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">Cancel</button>
+        <button type="button" onclick="parsePastedYaml()" class="liquid-btn-primary px-4 py-1.5 text-xs font-bold rounded-xl cursor-pointer">
           Parse & Add to Builder
         </button>
       </div>
@@ -673,17 +568,17 @@
     <div class="liquid-modal rounded-3xl w-full max-w-xl overflow-hidden">
       <div class="px-5 py-3.5 border-b border-white/70 flex items-center justify-between">
         <h3 class="text-sm font-bold text-slate-900">Import Existing .mobileconfig or DDM JSON</h3>
-        <button type="button" onclick="window.closeModal('importModal')" class="text-slate-500 hover:text-slate-900 font-bold cursor-pointer">✕</button>
+        <button type="button" onclick="closeModal('importModal')" class="text-slate-500 hover:text-slate-900 font-bold cursor-pointer">✕</button>
       </div>
       <div class="p-5 space-y-3">
-        <input type="file" id="importFileInput" accept=".mobileconfig,.plist,.xml,.json" onchange="window.handleFileUpload(event)"
+        <input type="file" id="importFileInput" accept=".mobileconfig,.plist,.xml,.json" onchange="handleFileUpload(event)"
           class="block w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border file:border-white file:text-xs file:font-bold file:bg-sky-500/15 file:text-sky-800 hover:file:bg-sky-500/25" />
         <textarea id="importTextArea" rows="8" placeholder="Paste .mobileconfig XML plist or DDM declaration JSON..."
           class="liquid-input w-full p-3 text-xs rounded-2xl"></textarea>
       </div>
       <div class="px-5 py-3 bg-white/50 border-t border-white/70 flex justify-end gap-2">
-        <button type="button" onclick="window.closeModal('importModal')" class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 cursor-pointer">Cancel</button>
-        <button type="button" onclick="window.importFromText()" class="liquid-btn-primary px-4 py-1.5 text-xs font-bold rounded-xl cursor-pointer">Import Profile</button>
+        <button type="button" onclick="closeModal('importModal')" class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 cursor-pointer">Cancel</button>
+        <button type="button" onclick="importFromText()" class="liquid-btn-primary px-4 py-1.5 text-xs font-bold rounded-xl cursor-pointer">Import Profile</button>
       </div>
     </div>
   </div>
@@ -917,7 +812,9 @@
           { key: 'minLength', title: 'Minimum Passcode Length (0-16)', type: 'integer', default: 6 },
           { key: 'minComplexChars', title: 'Minimum Special Characters (0-4)', type: 'integer', default: 1 },
           { key: 'maxFailedAttempts', title: 'Max Failed Attempts Before Wipe/Lock (2-11)', type: 'integer', default: 10 },
-          { key: 'maxInactivity', title: 'Auto-Lock After Inactivity (Minutes)', type: 'integer', default: 5 }
+          { key: 'maxInactivity', title: 'Auto-Lock After Inactivity (Minutes)', type: 'integer', default: 5 },
+          { key: 'maxPINAgeInDays', title: 'Max Passcode Age (Days, 1-730)', type: 'integer' },
+          { key: 'pinHistory', title: 'Passcode Reuse History Count (1-50)', type: 'integer' }
         ]
       },
       {
@@ -937,7 +834,9 @@
           { key: 'allowUSBRestrictedMode', title: 'Block USB Accessories When Locked (Supervised)', type: 'boolean', default: true },
           { key: 'allowEraseContentAndSettings', title: 'Allow Erase All Content and Settings (Supervised)', type: 'boolean', default: true },
           { key: 'allowCloudBackup', title: 'Allow iCloud Backup (Supervised on iOS)', type: 'boolean', default: true },
+          { key: 'allowCloudDocumentSync', title: 'Allow iCloud Drive & Document Sync (Supervised on iOS)', type: 'boolean', default: true },
           { key: 'allowAppInstallation', title: 'Allow Installing Apps (Supervised on iOS)', type: 'boolean', default: true },
+          { key: 'allowAppRemoval', title: 'Allow Removing Apps (Supervised on iOS)', type: 'boolean', default: true },
           { key: 'allowSafari', title: 'Allow Safari Browser (Supervised on iOS)', type: 'boolean', default: true },
           { key: 'forceEncryptedBackup', title: 'Require Encrypted Backups', type: 'boolean', default: false }
         ]
@@ -2915,7 +2814,7 @@
     ];
 
     // =========================================================================
-    // 3. 3-STAGE WIZARD STATE & GLOBAL BINDINGS
+    // 3. 3-STAGE WIZARD STATE & NAVIGATION
     // =========================================================================
     const OS_TARGET_MAP = {
       'iOS': '1',
@@ -2928,7 +2827,7 @@
 
     const OS_PILL_OPTIONS = ['All', 'iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'];
 
-    const state = {
+    let state = {
       currentStep: 1,
       protocol: 'mdm',
       selectedOS: 'All',
@@ -2987,7 +2886,7 @@
       });
     }
 
-    window.goToStep = function(stepNum) {
+    function goToStep(stepNum) {
       state.currentStep = stepNum;
       [1, 2, 3].forEach(n => {
         const sec = document.getElementById(`wizardStage${n}`);
@@ -3014,14 +2913,14 @@
       }
 
       if (stepNum === 1) highlightStage1Cards();
-      if (stepNum === 2) window.renderStage2Catalog();
+      if (stepNum === 2) renderStage2Catalog();
       if (stepNum === 3) {
         renderActiveItems();
-        window.refreshOutput();
+        refreshOutput();
       }
-    };
+    }
 
-    window.selectWizardProtocol = function(mode) {
+    function selectWizardProtocol(mode) {
       state.protocol = mode;
       state.selectedCategory = 'All';
       state.outputFormat = 'primary';
@@ -3052,19 +2951,19 @@
       }
 
       highlightStage1Cards();
-    };
+    }
 
-    window.chooseTargetOSAndProceed = function(osId) {
+    function chooseTargetOSAndProceed(osId) {
       state.selectedOS = osId;
       state.selectedCategory = 'All';
       const targetVal = OS_TARGET_MAP[osId] || '0';
       const targetEl = document.getElementById('metaTargetDeviceType');
       if (targetEl) targetEl.value = targetVal;
       highlightStage1Cards();
-      window.goToStep(2);
-    };
+      goToStep(2);
+    }
 
-    window.switchStage2OS = function(osId) {
+    function switchStage2OS(osId) {
       state.selectedOS = osId;
       state.selectedCategory = 'All';
       const targetVal = OS_TARGET_MAP[osId] || '0';
@@ -3072,10 +2971,10 @@
       if (targetEl) targetEl.value = targetVal;
       const pill = document.getElementById('activeOsPill');
       if (pill) pill.textContent = `${osId === 'All' ? 'All OS' : osId} • ${state.protocol === 'mdm' ? '.mobileconfig' : 'DDM'}`;
-      window.renderStage2Catalog();
-    };
+      renderStage2Catalog();
+    }
 
-    window.resetWorkspace = function() {
+    function resetWorkspace() {
       if (state.activeItems.length > 0 && !confirm('Clear all added policies and start a fresh profile?')) {
         return;
       }
@@ -3092,32 +2991,32 @@
       document.getElementById('metaIdentifier').value = state.protocol === 'mdm' ? 'com.rgm.mdm.profile' : 'com.rgm.ddm.profile';
       document.getElementById('metaOrg').value = 'RGM IT';
       document.getElementById('metaScopeOrActivation').value = state.protocol === 'mdm' ? 'System' : 'com.rgm.activation.main';
-      window.goToStep(1);
-    };
+      goToStep(1);
+    }
 
-    window.toggleAdvancedTopLevel = function() {
+    function toggleAdvancedTopLevel() {
       document.getElementById('advancedTopLevelPanel').classList.toggle('hidden');
-    };
+    }
 
-    window.loadStarterEssentials = function() {
-      window.selectWizardProtocol('mdm');
+    function loadStarterEssentials() {
+      selectWizardProtocol('mdm');
       state.selectedOS = 'All';
       ['com.apple.wifi.managed', 'com.apple.mobiledevice.passwordpolicy'].forEach(pt => {
         const idx = state.schemas.findIndex(s => s.protocol === 'mdm' && s.payloadType === pt);
-        if (idx !== -1) window.addSchemaToBuilder(idx, true);
+        if (idx !== -1) addSchemaToBuilder(idx, true);
       });
-      window.goToStep(3);
-    };
+      goToStep(3);
+    }
 
-    window.loadEnterpriseAppsPreset = function() {
-      window.selectWizardProtocol('mdm');
+    function loadEnterpriseAppsPreset() {
+      selectWizardProtocol('mdm');
       state.selectedOS = 'macOS';
       ['com.google.Chrome', 'com.microsoft.Edge', 'org.mozilla.firefox', 'com.microsoft.Outlook', 'com.google.drivefs.settings', 'com.anthropic.claudefordesktop'].forEach(domain => {
         const idx = state.schemas.findIndex(s => s.protocol === 'mdm' && s.payloadType === domain);
-        if (idx !== -1) window.addSchemaToBuilder(idx, true);
+        if (idx !== -1) addSchemaToBuilder(idx, true);
       });
-      window.goToStep(3);
-    };
+      goToStep(3);
+    }
 
     // =========================================================================
     // 4. STAGE 2 POLICY SELECTION PANE
@@ -3141,7 +3040,7 @@
       return '';
     }
 
-    window.renderStage2Catalog = function() {
+    function renderStage2Catalog() {
       if (!Array.isArray(state.schemas) || state.schemas.length === 0) {
         state.schemas = [...BUILTIN_SCHEMAS];
       }
@@ -3150,7 +3049,7 @@
 
       document.getElementById('stage2OsSwitcher').innerHTML = OS_PILL_OPTIONS.map(os => {
         const active = state.selectedOS === os;
-        return `<button type="button" onclick="window.switchStage2OS('${os}')"
+        return `<button type="button" onclick="switchStage2OS('${os}')"
           class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${active ? 'bg-white/95 text-sky-700 shadow-2xs border border-white' : 'text-slate-600 hover:text-slate-900'}">
           ${os === 'All' ? 'All OS' : os}
         </button>`;
@@ -3170,7 +3069,7 @@
 
       document.getElementById('stage2CategoryBar').innerHTML = categories.map(cat => {
         const active = state.selectedCategory === cat;
-        return `<button type="button" onclick="state.selectedCategory='${cat}';window.renderStage2Catalog()"
+        return `<button type="button" onclick="state.selectedCategory='${cat}';renderStage2Catalog()"
           class="px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${active ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white/65 text-slate-700 border border-white/80 hover:bg-white'}">
           ${cat}
         </button>`;
@@ -3210,7 +3109,7 @@
                   ${renderSupervisionBadge(schema)}
                   ${platforms.map(p => `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-slate-700 border border-white">${p}</span>`).join('')}
                 </div>
-                <button type="button" onclick="window.addSchemaToBuilder(${globalIdx})"
+                <button type="button" onclick="addSchemaToBuilder(${globalIdx})"
                   class="px-3 py-1.5 rounded-xl bg-white/85 hover:bg-sky-600 text-sky-700 hover:text-white border border-white hover:border-sky-500 text-xs font-bold shadow-2xs flex items-center gap-1 shrink-0 transition cursor-pointer">
                   + Add Policy
                 </button>
@@ -3227,13 +3126,13 @@
         ? activeForProto.map(item => `
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-500/15 text-sky-900 border border-sky-300/60 text-[11px] font-bold whitespace-nowrap">
               ${escapeHtml(item.schema.title)}
-              <button type="button" onclick="window.removeActiveItem('${item.instanceId}')" class="text-sky-600 hover:text-rose-600 cursor-pointer">✕</button>
+              <button type="button" onclick="removeActiveItem('${item.instanceId}')" class="text-sky-600 hover:text-rose-600 cursor-pointer">✕</button>
             </span>
           `).join('')
         : `<span class="text-xs text-slate-500">None yet — click "+ Add Policy" on any card above.</span>`;
-    };
+    }
 
-    window.setOutputFormat = function(fmt) {
+    function setOutputFormat(fmt) {
       state.outputFormat = fmt;
       const p = document.getElementById('outTabPrimary');
       const m = document.getElementById('outTabDdmMobileconfig');
@@ -3244,8 +3143,8 @@
         m.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white/15 text-indigo-300 border border-white/15 cursor-pointer';
         p.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white cursor-pointer';
       }
-      window.refreshOutput();
-    };
+      refreshOutput();
+    }
 
     // =========================================================================
     // 5. ADDING & RENDERING DYNAMIC FORMS (STAGE 3)
@@ -3276,7 +3175,7 @@
       return obj;
     }
 
-    window.addSchemaToBuilder = function(schemaIdx, skipRender = false) {
+    function addSchemaToBuilder(schemaIdx, skipRender = false) {
       const schema = state.schemas[schemaIdx];
       if (!schema) return;
 
@@ -3294,36 +3193,36 @@
       });
 
       if (!skipRender) {
-        if (state.currentStep === 2) window.renderStage2Catalog();
+        if (state.currentStep === 2) renderStage2Catalog();
         if (state.currentStep === 3) {
           renderActiveItems();
-          window.refreshOutput();
+          refreshOutput();
         }
       }
-    };
+    }
 
-    window.toggleItemTechMeta = function(instanceId) {
+    function toggleItemTechMeta(instanceId) {
       const item = state.activeItems.find(i => i.instanceId === instanceId);
       if (item) {
         item.showTechMeta = !item.showTechMeta;
         renderActiveItems();
       }
-    };
+    }
 
-    window.removeActiveItem = function(instanceId) {
+    function removeActiveItem(instanceId) {
       state.activeItems = state.activeItems.filter(i => i.instanceId !== instanceId);
-      if (state.currentStep === 2) window.renderStage2Catalog();
+      if (state.currentStep === 2) renderStage2Catalog();
       if (state.currentStep === 3) {
         renderActiveItems();
-        window.refreshOutput();
+        refreshOutput();
       }
-    };
+    }
 
-    window.regenerateAllUUIDs = function() {
+    function regenerateAllUUIDs() {
       state.activeItems.forEach(item => { item.uuid = uuidv4(); });
       renderActiveItems();
-      window.refreshOutput();
-    };
+      refreshOutput();
+    }
 
     function getNestedValue(obj, path) {
       if (!path.length) return obj;
@@ -3343,7 +3242,7 @@
       else curr[last] = value;
     }
 
-    window.updateField = function(instanceId, pathJson, rawVal, fieldType) {
+    function updateField(instanceId, pathJson, rawVal, fieldType) {
       const item = state.activeItems.find(i => i.instanceId === instanceId);
       if (!item) return;
       const path = JSON.parse(pathJson);
@@ -3357,10 +3256,10 @@
       else if (fieldType === 'string') parsed = rawVal === '' ? undefined : String(rawVal);
 
       setNestedValue(item.values, path, parsed);
-      window.refreshOutput();
-    };
+      refreshOutput();
+    }
 
-    window.toggleOptionalDict = function(instanceId, pathJson, subkeysJson) {
+    function toggleOptionalDict(instanceId, pathJson, subkeysJson) {
       const item = state.activeItems.find(i => i.instanceId === instanceId);
       if (!item) return;
       const path = JSON.parse(pathJson);
@@ -3368,10 +3267,10 @@
       if (existing !== undefined) setNestedValue(item.values, path, undefined);
       else setNestedValue(item.values, path, buildDefaultValues(JSON.parse(subkeysJson)));
       renderActiveItems();
-      window.refreshOutput();
-    };
+      refreshOutput();
+    }
 
-    window.addArrayItem = function(instanceId, pathJson, itemType, subkeysJson) {
+    function addArrayItem(instanceId, pathJson, itemType, subkeysJson) {
       const item = state.activeItems.find(i => i.instanceId === instanceId);
       if (!item) return;
       const path = JSON.parse(pathJson);
@@ -3386,10 +3285,10 @@
       else if (itemType === 'data') arr.push({ __plistData: '' });
       else arr.push('');
       renderActiveItems();
-      window.refreshOutput();
-    };
+      refreshOutput();
+    }
 
-    window.removeArrayItem = function(instanceId, pathJson, index) {
+    function removeArrayItem(instanceId, pathJson, index) {
       const item = state.activeItems.find(i => i.instanceId === instanceId);
       if (!item) return;
       const path = JSON.parse(pathJson);
@@ -3399,10 +3298,10 @@
         if (arr.length === 0) setNestedValue(item.values, path, undefined);
       }
       renderActiveItems();
-      window.refreshOutput();
-    };
+      refreshOutput();
+    }
 
-    window.addDynamicDictEntry = function(instanceId, pathJson, mode, subkeysJson) {
+    function addDynamicDictEntry(instanceId, pathJson, mode, subkeysJson) {
       const item = state.activeItems.find(i => i.instanceId === instanceId);
       if (!item) return;
       const keyName = prompt(
@@ -3417,10 +3316,10 @@
       else if (mode === 'kv_array_map') setNestedValue(item.values, path, ['']);
       else setNestedValue(item.values, path, buildDefaultValues(JSON.parse(subkeysJson || '[]')));
       renderActiveItems();
-      window.refreshOutput();
-    };
+      refreshOutput();
+    }
 
-    window.removeDynamicDictEntry = function(instanceId, pathJson, entryKey) {
+    function removeDynamicDictEntry(instanceId, pathJson, entryKey) {
       const item = state.activeItems.find(i => i.instanceId === instanceId);
       if (!item) return;
       const parentPath = JSON.parse(pathJson);
@@ -3430,8 +3329,8 @@
         if (parentObj && Object.keys(parentObj).length === 0) setNestedValue(item.values, parentPath, undefined);
       }
       renderActiveItems();
-      window.refreshOutput();
-    };
+      refreshOutput();
+    }
 
     function renderRootKvMap(item) {
       const entries = Object.entries(item.values || {});
@@ -3442,7 +3341,7 @@
               <span class="text-xs font-bold text-slate-800">Custom Key / Value Settings</span>
               <span class="text-[10px] text-slate-500 ml-1.5">Dictionary</span>
             </div>
-            <button type="button" onclick="window.addDynamicDictEntry('${item.instanceId}', '[]', 'kv_map', '[]')"
+            <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '[]', 'kv_map', '[]')"
               class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
               + Add Setting Key
             </button>
@@ -3454,9 +3353,9 @@
               return `
                 <div class="flex items-center gap-2">
                   <span class="text-xs font-bold text-slate-700 bg-white/80 px-2.5 py-1 rounded-xl border border-white shrink-0">${escapeHtml(entryKey)}</span>
-                  <input type="text" value="${escapeHtml(entryVal ?? '')}" oninput="window.updateField('${item.instanceId}', '${entryPathStr}', this.value, 'string')"
+                  <input type="text" value="${escapeHtml(entryVal ?? '')}" oninput="updateField('${item.instanceId}', '${entryPathStr}', this.value, 'string')"
                     class="liquid-input flex-1 px-2.5 py-1 text-xs rounded-xl" placeholder="Value..." />
-                  <button type="button" onclick="window.removeDynamicDictEntry('${item.instanceId}', '[]', '${escapeHtml(entryKey)}')"
+                  <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '[]', '${escapeHtml(entryKey)}')"
                     class="text-slate-400 hover:text-rose-600 px-1 cursor-pointer">✕</button>
                 </div>
               `;
@@ -3482,7 +3381,7 @@
                   <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
                   <span class="text-[10px] text-slate-500 ml-1.5">${escapeHtml(k.key)}</span>
                 </div>
-                <button type="button" onclick="window.addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'kv_array_map', '[]')"
+                <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'kv_array_map', '[]')"
                   class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
                   + Add Team ID
                 </button>
@@ -3497,8 +3396,8 @@
                       <div class="flex items-center justify-between border-b border-slate-200/60 pb-1">
                         <span class="text-xs font-bold text-indigo-700">${escapeHtml(teamKey)}</span>
                         <div class="flex items-center gap-2">
-                          <button type="button" onclick="window.addArrayItem('${item.instanceId}', '${teamPathStr}', 'string', '[]')" class="text-[11px] font-bold text-sky-600 hover:underline cursor-pointer">+ Add Item</button>
-                          <button type="button" onclick="window.removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(teamKey)}')" class="text-[11px] text-rose-500 hover:underline cursor-pointer">Remove</button>
+                          <button type="button" onclick="addArrayItem('${item.instanceId}', '${teamPathStr}', 'string', '[]')" class="text-[11px] font-bold text-sky-600 hover:underline cursor-pointer">+ Add Item</button>
+                          <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(teamKey)}')" class="text-[11px] text-rose-500 hover:underline cursor-pointer">Remove</button>
                         </div>
                       </div>
                       <div class="space-y-1.5">
@@ -3506,9 +3405,9 @@
                           const sPathStr = escapeHtml(JSON.stringify([...teamPath, sIdx]));
                           return `
                             <div class="flex items-center gap-2">
-                              <input type="text" value="${escapeHtml(strVal ?? '')}" oninput="window.updateField('${item.instanceId}', '${sPathStr}', this.value, 'string')"
+                              <input type="text" value="${escapeHtml(strVal ?? '')}" oninput="updateField('${item.instanceId}', '${sPathStr}', this.value, 'string')"
                                 class="liquid-input flex-1 px-2.5 py-1 text-xs rounded-xl" placeholder="Enter value..." />
-                              <button type="button" onclick="window.removeArrayItem('${item.instanceId}', '${teamPathStr}', ${sIdx})" class="text-slate-400 hover:text-rose-600 px-1 cursor-pointer">✕</button>
+                              <button type="button" onclick="removeArrayItem('${item.instanceId}', '${teamPathStr}', ${sIdx})" class="text-slate-400 hover:text-rose-600 px-1 cursor-pointer">✕</button>
                             </div>
                           `;
                         }).join('')}
@@ -3532,7 +3431,7 @@
                   <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
                   <span class="text-[10px] text-slate-500 ml-1.5">${escapeHtml(k.key)}</span>
                 </div>
-                <button type="button" onclick="window.addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'dynamic_dict', '${subkeysStr}')"
+                <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'dynamic_dict', '${subkeysStr}')"
                   class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
                   + Add Domain / Entry
                 </button>
@@ -3543,4 +3442,796 @@
                   return `
                     <div class="p-2.5 bg-white/75 border border-white rounded-xl space-y-2">
                       <div class="flex items-center justify-between border-b border-slate-200/60 pb-1">
-                        <span class="text-xs font
+                        <span class="text-xs font-bold text-indigo-700">${escapeHtml(entryKey)}</span>
+                        <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(entryKey)}')"
+                          class="text-[11px] text-rose-500 hover:underline cursor-pointer">Remove</button>
+                      </div>
+                      ${renderKeyControls(item, k.subkeys, entryPath)}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (k.type === 'kv_map') {
+          const dictVal = (val && typeof val === 'object') ? val : {};
+          const entries = Object.entries(dictVal);
+          return `
+            <div class="liquid-well rounded-2xl p-3 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
+                  <span class="text-[10px] text-slate-500 ml-1.5">${escapeHtml(k.key)}</span>
+                </div>
+                <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'kv_map', '[]')"
+                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
+                  + Add Key/Value
+                </button>
+              </div>
+              <div class="space-y-1.5">
+                ${entries.map(([entryKey, entryVal]) => {
+                  const entryPathStr = escapeHtml(JSON.stringify([...currentPath, entryKey]));
+                  return `
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-slate-700 bg-white/80 px-2.5 py-1 rounded-xl border border-white shrink-0">${escapeHtml(entryKey)}</span>
+                      <input type="text" value="${escapeHtml(entryVal ?? '')}" oninput="updateField('${item.instanceId}', '${entryPathStr}', this.value, 'string')"
+                        class="liquid-input flex-1 px-2.5 py-1 text-xs rounded-xl" placeholder="Value..." />
+                      <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(entryKey)}')"
+                        class="text-slate-400 hover:text-rose-600 px-1 cursor-pointer">✕</button>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (k.type === 'dictionary' && k.subkeys) {
+          const isEnabled = val !== undefined;
+          const subkeysStr = escapeHtml(JSON.stringify(k.subkeys));
+          return `
+            <div class="liquid-well rounded-2xl p-3 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
+                  <span class="text-[10px] text-slate-500 ml-1.5">${escapeHtml(k.key)}</span>
+                  ${k.required ? '<span class="ml-1.5 text-[10px] font-bold text-rose-600">Required</span>' : ''}
+                </div>
+                ${!k.required ? `
+                  <button type="button" onclick="toggleOptionalDict('${item.instanceId}', '${pathStr}', '${subkeysStr}')"
+                    class="px-2.5 py-1 rounded-xl text-[11px] font-bold shadow-2xs cursor-pointer ${isEnabled ? 'bg-rose-500/15 text-rose-700 border border-rose-300/60' : 'bg-white/85 text-sky-700 border border-white'}">
+                    ${isEnabled ? 'Remove Section' : '+ Configure'}
+                  </button>
+                ` : ''}
+              </div>
+              ${isEnabled ? `<div class="pl-3 border-l-2 border-sky-400/50 space-y-2.5 pt-1">${renderKeyControls(item, k.subkeys, currentPath)}</div>` : ''}
+            </div>
+          `;
+        }
+
+        if (k.type === 'array') {
+          const arr = Array.isArray(val) ? val : [];
+          const subkeysStr = escapeHtml(JSON.stringify(k.subkeys || []));
+          return `
+            <div class="liquid-well rounded-2xl p-3 space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800">${escapeHtml(k.title || k.key)}</span>
+                  <span class="text-[10px] text-slate-500 ml-1.5">${escapeHtml(k.key)}[]</span>
+                  ${k.required ? '<span class="ml-1.5 text-[10px] font-bold text-rose-600">Required</span>' : ''}
+                </div>
+                <button type="button" onclick="addArrayItem('${item.instanceId}', '${pathStr}', '${k.itemType || 'string'}', '${subkeysStr}')"
+                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
+                  + Add Item
+                </button>
+              </div>
+              <div class="space-y-2">
+                ${arr.map((entry, idx) => {
+                  const elemPath = [...currentPath, idx];
+                  const elemPathStr = escapeHtml(JSON.stringify(elemPath));
+                  if (k.itemType === 'array' && k.subkeys) {
+                    const innerArr = Array.isArray(entry) ? entry : [];
+                    return `
+                      <div class="p-2.5 bg-white/75 border border-white rounded-xl space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-200/60 pb-1">
+                          <span class="text-[11px] font-bold text-slate-700">Group #${idx + 1}</span>
+                          <div class="flex items-center gap-2">
+                            <button type="button" onclick="addArrayItem('${item.instanceId}', '${elemPathStr}', 'dictionary', '${subkeysStr}')"
+                              class="text-[11px] font-bold text-sky-600 hover:underline cursor-pointer">+ Add Pair</button>
+                            <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-[11px] text-rose-500 hover:underline cursor-pointer">Remove</button>
+                          </div>
+                        </div>
+                        <div class="space-y-2 pl-2 border-l-2 border-slate-300/60">
+                          ${innerArr.map((_, innerIdx) => {
+                            const iconPath = [...elemPath, innerIdx];
+                            return `
+                              <div class="p-2 bg-white/70 rounded-xl border border-white space-y-1.5">
+                                <div class="flex justify-between items-center">
+                                  <span class="text-[10px] font-bold text-slate-500">Pair #${innerIdx + 1}</span>
+                                  <button type="button" onclick="removeArrayItem('${item.instanceId}', '${elemPathStr}', ${innerIdx})" class="text-[10px] text-rose-500 cursor-pointer">Remove</button>
+                                </div>
+                                ${renderKeyControls(item, k.subkeys, iconPath)}
+                              </div>
+                            `;
+                          }).join('')}
+                        </div>
+                      </div>
+                    `;
+                  } else if (k.itemType === 'dictionary' && k.subkeys) {
+                    return `
+                      <div class="p-2.5 bg-white/75 border border-white rounded-xl space-y-2">
+                        <div class="flex justify-between items-center border-b border-slate-200/60 pb-1">
+                          <span class="text-[11px] font-bold text-slate-600">Item #${idx + 1}</span>
+                          <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-[11px] text-rose-500 hover:underline cursor-pointer">Remove</button>
+                        </div>
+                        ${renderKeyControls(item, k.subkeys, elemPath)}
+                      </div>
+                    `;
+                  } else if (k.rangelist) {
+                    return `
+                      <div class="flex items-center gap-2">
+                        <select onchange="updateField('${item.instanceId}', '${elemPathStr}', this.value, '${k.itemType || 'string'}')"
+                          class="liquid-input flex-1 px-2.5 py-1.5 text-xs rounded-xl">
+                          ${k.rangelist.map(opt => `<option value="${escapeHtml(opt)}" ${String(entry) === String(opt) ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
+                        </select>
+                        <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-slate-400 hover:text-rose-600 px-1.5 cursor-pointer">✕</button>
+                      </div>
+                    `;
+                  } else {
+                    const elemInputType = k.itemType === 'integer' ? 'number' : 'text';
+                    const elemVal = (entry && typeof entry === 'object' && entry.__plistData !== undefined) ? entry.__plistData : (entry ?? '');
+                    return `
+                      <div class="flex items-center gap-2">
+                        <input type="${elemInputType}" value="${escapeHtml(elemVal)}" oninput="updateField('${item.instanceId}', '${elemPathStr}', this.value, '${k.itemType || 'string'}')"
+                          class="liquid-input flex-1 px-2.5 py-1.5 text-xs rounded-xl" placeholder="${k.itemType === 'data' ? 'Base64 encoded data...' : 'Enter value...'}" />
+                        <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-slate-400 hover:text-rose-600 px-1.5 cursor-pointer">✕</button>
+                      </div>
+                    `;
+                  }
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (k.type === 'boolean') {
+          const checked = val !== undefined ? Boolean(val) : (k.default !== undefined ? Boolean(k.default) : false);
+          return `
+            <div class="flex items-start justify-between gap-4 py-1.5 border-b border-white/60 last:border-0">
+              <div>
+                <div class="text-xs font-bold text-slate-800">
+                  ${escapeHtml(k.title || k.key)}
+                  <span class="text-[10px] text-slate-500 font-normal ml-1">${escapeHtml(k.key)}</span>
+                </div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
+                <input type="checkbox" ${checked ? 'checked' : ''}
+                  onchange="updateField('${item.instanceId}', '${pathStr}', this.checked, 'boolean')" class="sr-only peer">
+                <div class="w-9 h-5 bg-slate-300/80 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:shadow-xs after:transition-all peer-checked:bg-sky-600"></div>
+              </label>
+            </div>
+          `;
+        }
+
+        if (k.rangelist && k.rangelist.length) {
+          const current = val !== undefined ? val : (k.default !== undefined ? k.default : '');
+          return `
+            <div class="space-y-1">
+              <label class="block text-xs font-bold text-slate-800">
+                ${escapeHtml(k.title || k.key)}
+                <span class="text-[10px] text-slate-500 font-normal ml-1">${escapeHtml(k.key)}</span>
+                ${k.required ? '<span class="text-rose-500 ml-0.5">*</span>' : ''}
+              </label>
+              <select onchange="updateField('${item.instanceId}', '${pathStr}', this.value, '${k.type || 'string'}')"
+                class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl">
+                ${!k.required ? `<option value="">-- Default / Unset --</option>` : ''}
+                ${k.rangelist.map(opt => `<option value="${escapeHtml(opt)}" ${String(current) === String(opt) ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
+              </select>
+            </div>
+          `;
+        }
+
+        const inputType = (k.type === 'integer' || k.type === 'real') ? 'number' : 'text';
+        const displayVal = (val && typeof val === 'object' && val.__plistData !== undefined) ? val.__plistData :
+                           (val && typeof val === 'object' && val.__plistDate !== undefined) ? val.__plistDate :
+                           (val !== undefined ? val : '');
+        const tagHint = k.type === 'data' ? ' (<data> Base64)' : (k.type === 'date' ? ' (<date> ISO 8601)' : '');
+        return `
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-slate-800">
+              ${escapeHtml(k.title || k.key)}
+              <span class="text-[10px] text-slate-500 font-normal ml-1">${escapeHtml(k.key)}${tagHint}</span>
+              ${k.required ? '<span class="text-rose-500 ml-0.5">*</span>' : ''}
+            </label>
+            <input type="${inputType}" step="${k.type === 'real' ? 'any' : '1'}" value="${escapeHtml(displayVal)}"
+              placeholder="${k.default !== undefined && k.default !== '' ? 'Default: ' + escapeHtml(k.default) : 'Enter ' + escapeHtml(k.key)}"
+              oninput="updateField('${item.instanceId}', '${pathStr}', this.value, '${k.type || 'string'}')"
+              class="liquid-input w-full px-3 py-1.5 text-xs rounded-xl" />
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderActiveItems() {
+      const items = state.activeItems.filter(i => i.schema.protocol === state.protocol);
+      const emptyEl = document.getElementById('emptyStage3Notice');
+      const stackEl = document.getElementById('activeItemsStack');
+
+      if (!items.length) {
+        emptyEl.classList.remove('hidden');
+        stackEl.innerHTML = '';
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      stackEl.innerHTML = items.map(item => `
+        <div class="liquid-card rounded-3xl overflow-hidden">
+          <div class="px-5 py-3.5 bg-white/50 border-b border-white/70 flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="text-xs font-bold text-slate-900">${escapeHtml(item.schema.title)}</h3>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-white/80 text-slate-700 border border-white">${escapeHtml(item.schema.payloadType)}</span>
+                ${renderSupervisionBadge(item.schema)}
+              </div>
+              <div class="text-[11px] text-slate-600 mt-0.5">${escapeHtml(item.schema.supportedOS || '')}</div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="toggleItemTechMeta('${item.instanceId}')" class="px-2.5 py-1 rounded-xl text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-white/60 hover:bg-white border border-white transition cursor-pointer">
+                ${item.showTechMeta ? 'Hide IDs' : 'IDs'}
+              </button>
+              <button type="button" onclick="removeActiveItem('${item.instanceId}')" class="px-2.5 py-1 rounded-xl text-xs font-bold text-slate-500 hover:text-rose-600 bg-white/60 hover:bg-rose-50 border border-white transition cursor-pointer" title="Remove">
+                ✕
+              </button>
+            </div>
+          </div>
+
+          ${item.schema.supervisionNote ? `
+            <div class="px-5 py-2 bg-amber-500/10 border-b border-amber-300/40 flex items-center gap-2 text-[11px] text-amber-900 font-medium">
+              <span>ℹ️ ${escapeHtml(item.schema.supervisionNote)}</span>
+            </div>
+          ` : ''}
+
+          <div class="p-5 space-y-3">
+            ${item.showTechMeta ? `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3 border-b border-white/70 liquid-well p-3 rounded-2xl">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">${state.protocol === 'mdm' ? 'PayloadIdentifier' : 'Declaration Identifier'}</label>
+                  <input type="text" value="${escapeHtml(item.identifier)}"
+                    oninput="itemMetaUpdate('${item.instanceId}', 'identifier', this.value)"
+                    class="liquid-input w-full px-2.5 py-1 text-xs rounded-xl" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-700 mb-1">${state.protocol === 'mdm' ? 'PayloadUUID' : 'ServerToken Seed'}</label>
+                  <input type="text" value="${escapeHtml(item.uuid)}"
+                    oninput="itemMetaUpdate('${item.instanceId}', 'uuid', this.value)"
+                    class="liquid-input w-full px-2.5 py-1 text-xs rounded-xl" />
+                </div>
+              </div>
+            ` : ''}
+
+            <div class="space-y-3">
+              ${item.schema.rootKvMap ? renderRootKvMap(item) : renderKeyControls(item, item.schema.keys)}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function itemMetaUpdate(instanceId, field, value) {
+      const item = state.activeItems.find(i => i.instanceId === instanceId);
+      if (item) {
+        item[field] = value;
+        refreshOutput();
+      }
+    }
+
+    // =========================================================================
+    // 6. XML PLIST & DECLARATIVE DDM SERIALIZATION (.mobileconfig + JSON)
+    // =========================================================================
+    function cleanObject(obj) {
+      if (Array.isArray(obj)) return obj.map(cleanObject).filter(v => v !== undefined && v !== '');
+      if (obj && typeof obj === 'object') {
+        if (obj.__plistData !== undefined || obj.__plistDate !== undefined) return obj;
+        const res = {};
+        Object.entries(obj).forEach(([k, v]) => {
+          const cleaned = cleanObject(v);
+          if (cleaned !== undefined && !(Array.isArray(cleaned) && cleaned.length === 0)) res[k] = cleaned;
+        });
+        return res;
+      }
+      return obj;
+    }
+
+    function jsToPlistXml(val, indent = '  ') {
+      if (val === null || val === undefined) return '';
+      if (typeof val === 'boolean') return `${indent}<${val ? 'true' : 'false'}/>`;
+      if (typeof val === 'number') return Number.isInteger(val) ? `${indent}<integer>${val}</integer>` : `${indent}<real>${val}</real>`;
+      if (typeof val === 'string') return `${indent}<string>${escapeXml(val)}</string>`;
+      if (Array.isArray(val)) {
+        if (!val.length) return `${indent}<array/>`;
+        return `${indent}<array>\n${val.map(v => jsToPlistXml(v, indent + '  ')).join('\n')}\n${indent}</array>`;
+      }
+      if (typeof val === 'object') {
+        if (val.__plistData !== undefined) return `${indent}<data>${escapeXml(val.__plistData)}</data>`;
+        if (val.__plistDate !== undefined) return `${indent}<date>${escapeXml(val.__plistDate)}</date>`;
+        const entries = Object.entries(val);
+        if (!entries.length) return `${indent}<dict/>`;
+        const inner = entries.map(([k, v]) => `${indent}  <key>${escapeXml(k)}</key>\n${jsToPlistXml(v, indent + '  ')}`).join('\n');
+        return `${indent}<dict>\n${inner}\n${indent}</dict>`;
+      }
+      return '';
+    }
+
+    function buildClassicMobileconfigXml() {
+      const displayName = document.getElementById('metaDisplayName').value || 'Corporate Profile';
+      const identifier = document.getElementById('metaIdentifier').value || 'com.rgm.mdm.profile';
+      const org = document.getElementById('metaOrg').value || 'RGM IT';
+      const scope = document.getElementById('metaScopeOrActivation').value || 'System';
+      const description = document.getElementById('metaDescription').value || 'Created with RGM Profile Editor';
+      const targetDeviceType = parseInt(document.getElementById('metaTargetDeviceType').value || '0', 10);
+      const removalDisallowed = document.getElementById('metaRemovalDisallowed').checked;
+      const removalDateStr = document.getElementById('metaRemovalDate').value.trim();
+      const consentTextStr = document.getElementById('metaConsentText').value.trim();
+
+      const mdmItems = state.activeItems.filter(i => i.schema.protocol === 'mdm');
+      const payloadContent = mdmItems.map(item => ({
+        PayloadType: item.schema.payloadType,
+        PayloadVersion: 1,
+        PayloadIdentifier: item.identifier,
+        PayloadUUID: item.uuid,
+        PayloadEnabled: true,
+        PayloadDisplayName: item.schema.title,
+        ...cleanObject(item.values)
+      }));
+
+      const root = {
+        PayloadContent: payloadContent,
+        PayloadDescription: description,
+        PayloadDisplayName: displayName,
+        PayloadIdentifier: identifier,
+        PayloadOrganization: org,
+        PayloadRemovalDisallowed: removalDisallowed,
+        PayloadScope: scope,
+        PayloadType: 'Configuration',
+        PayloadUUID: uuidv4(),
+        PayloadVersion: 1
+      };
+
+      if (targetDeviceType > 0) root.TargetDeviceType = targetDeviceType;
+      if (removalDateStr) root.RemovalDate = { __plistDate: removalDateStr };
+      if (consentTextStr) root.ConsentText = { default: consentTextStr };
+
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n${jsToPlistXml(root, '')}\n</plist>`;
+    }
+
+    async function sha256Hex(message) {
+      const msgUint8 = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function buildDeclarativeBundle() {
+      const ddmItems = state.activeItems.filter(i => i.schema.protocol === 'ddm');
+      const activationId = document.getElementById('metaScopeOrActivation').value || 'com.rgm.activation.main';
+
+      const declarations = [];
+      const configIdentifiers = [];
+
+      for (const item of ddmItems) {
+        const payloadObj = cleanObject(item.values);
+        const tokenHash = await sha256Hex(JSON.stringify({ id: item.identifier, seed: item.uuid, payload: payloadObj }));
+        declarations.push({
+          Type: item.schema.payloadType,
+          Identifier: item.identifier,
+          ServerToken: tokenHash.slice(0, 32),
+          Payload: payloadObj
+        });
+        if (item.schema.payloadType.startsWith('com.apple.configuration.')) configIdentifiers.push(item.identifier);
+      }
+
+      if (configIdentifiers.length > 0) {
+        const actPayload = { StandardConfigurations: configIdentifiers };
+        const actHash = await sha256Hex(JSON.stringify({ activationId, actPayload }));
+        declarations.unshift({
+          Type: 'com.apple.activation.simple',
+          Identifier: activationId,
+          ServerToken: actHash.slice(0, 32),
+          Payload: actPayload
+        });
+      }
+
+      return {
+        BlueprintName: document.getElementById('metaDisplayName').value || 'RGM Declarative Profile',
+        Declarations: declarations
+      };
+    }
+
+    async function buildDdmMobileconfigXml() {
+      const bundle = await buildDeclarativeBundle();
+      const base64Declarations = bundle.Declarations.map(decl => ({
+        __plistData: utf8ToBase64(JSON.stringify(decl))
+      }));
+
+      const displayName = document.getElementById('metaDisplayName').value || 'RGM Declarative Profile';
+      const identifier = document.getElementById('metaIdentifier').value || 'com.rgm.ddm.profile';
+      const org = document.getElementById('metaOrg').value || 'RGM IT';
+      const targetDeviceType = parseInt(document.getElementById('metaTargetDeviceType').value || '0', 10);
+
+      const root = {
+        PayloadContent: [{
+          PayloadType: 'com.apple.declarations',
+          PayloadVersion: 1,
+          PayloadIdentifier: `${identifier}.declarations`,
+          PayloadUUID: uuidv4(),
+          PayloadDisplayName: 'Declarative Management',
+          Declarations: base64Declarations
+        }],
+        PayloadDescription: 'Created with RGM Profile Editor',
+        PayloadDisplayName: displayName,
+        PayloadIdentifier: identifier,
+        PayloadOrganization: org,
+        PayloadRemovalDisallowed: false,
+        PayloadType: 'Configuration',
+        PayloadUUID: uuidv4(),
+        PayloadVersion: 1
+      };
+
+      if (targetDeviceType > 0) root.TargetDeviceType = targetDeviceType;
+
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0">\n${jsToPlistXml(root, '')}\n</plist>`;
+    }
+
+    async function refreshOutput() {
+      const preview = document.getElementById('codePreview');
+      const tokenBadge = document.getElementById('serverTokenBadge');
+      const dlText = document.getElementById('downloadBtnText');
+
+      if (state.protocol === 'mdm') {
+        preview.textContent = buildClassicMobileconfigXml();
+        tokenBadge.textContent = `${state.activeItems.filter(i => i.schema.protocol === 'mdm').length} payload(s)`;
+        dlText.textContent = 'Download .mobileconfig';
+      } else {
+        const bundle = await buildDeclarativeBundle();
+        const jsonStr = JSON.stringify(bundle, null, 2);
+        const bundleHash = await sha256Hex(jsonStr);
+        tokenBadge.textContent = `Token: ${bundleHash.slice(0, 14)}…`;
+
+        if (state.outputFormat === 'primary') {
+          preview.textContent = jsonStr;
+          dlText.textContent = 'Download JSON';
+        } else {
+          preview.textContent = await buildDdmMobileconfigXml();
+          dlText.textContent = 'Download .mobileconfig';
+        }
+      }
+    }
+
+    // =========================================================================
+    // 7. SCHEMA REPOSITORY BROWSER, YAML PARSER & POLICY PLIST PARSER
+    // =========================================================================
+    async function fetchGitHubDirectory() {
+      const folder = document.getElementById('repoFolderSelect').value;
+      const listEl = document.getElementById('repoFileList');
+      listEl.innerHTML = `<div class="p-4 text-xs text-slate-600 text-center">Fetching schema directory...</div>`;
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/apple/device-management/contents/${folder}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const files = await res.json();
+        const yamlFiles = files.filter(f => f.name.endsWith('.yaml'));
+
+        listEl.innerHTML = yamlFiles.map(f => `
+          <div class="px-3.5 py-2 flex items-center justify-between hover:bg-white/70 transition">
+            <span class="text-xs text-slate-800">${escapeHtml(f.name)}</span>
+            <button type="button" onclick="fetchAndLoadRawYaml('${escapeHtml(f.download_url)}')"
+              class="px-2.5 py-1 rounded-lg bg-sky-500/15 text-sky-800 hover:bg-sky-600 hover:text-white text-[11px] font-bold transition cursor-pointer">
+              Load Schema
+            </button>
+          </div>
+        `).join('');
+      } catch (err) {
+        listEl.innerHTML = `<div class="p-4 text-xs text-rose-600">Could not reach remote catalog (${escapeHtml(err.message)}). You can paste any raw YAML or XML policy definition directly below.</div>`;
+      }
+    }
+
+    async function fetchAndLoadRawYaml(url) {
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        document.getElementById('rawYamlInput').value = text;
+        parsePastedYaml();
+      } catch (err) {
+        alert('Failed to download schema file: ' + err.message);
+      }
+    }
+
+    function normalizeYamlKeys(payloadkeys) {
+      return (payloadkeys || []).map(k => {
+        const rawType = (k.type || '<string>').replace(/[<>]/g, '').toLowerCase();
+        let itemType = 'string';
+        let subkeys = undefined;
+        let finalType = rawType;
+
+        if (rawType === 'dictionary' && k.subkeys) {
+          if (k.subkeys.length === 1 && k.subkeys[0].key === 'ANY') {
+            const anySub = k.subkeys[0];
+            const anyType = (anySub.type || '<string>').replace(/[<>]/g, '').toLowerCase();
+            if (anyType === 'dictionary' && anySub.subkeys) {
+              finalType = 'dynamic_dict';
+              subkeys = normalizeYamlKeys(anySub.subkeys);
+            } else if (anyType === 'array') {
+              finalType = 'kv_array_map';
+            } else {
+              finalType = 'kv_map';
+            }
+          } else {
+            subkeys = normalizeYamlKeys(k.subkeys);
+          }
+        } else if (rawType === 'array' && k.subkeys && k.subkeys.length) {
+          const firstSub = k.subkeys[0];
+          const subRawType = (firstSub.type || '<string>').replace(/[<>]/g, '').toLowerCase();
+          if (subRawType === 'dictionary' && firstSub.subkeys) {
+            itemType = 'dictionary';
+            subkeys = normalizeYamlKeys(firstSub.subkeys);
+          } else {
+            itemType = subRawType;
+          }
+        }
+
+        return {
+          key: k.key,
+          title: k.title || k.key,
+          type: finalType,
+          itemType,
+          required: k.presence === 'required',
+          default: k.default,
+          rangelist: k.rangelist || (k.subkeys && k.subkeys[0] && k.subkeys[0].rangelist ? k.subkeys[0].rangelist : undefined),
+          content: k.content || '',
+          subkeys
+        };
+      });
+    }
+
+    function normalizePfmSubkeys(pfmSubkeys) {
+      return (pfmSubkeys || []).filter(s => s.pfm_name && !s.pfm_imazing_omit).map(s => {
+        const hasSubs = Array.isArray(s.pfm_subkeys) && s.pfm_subkeys.length > 0;
+        let inferredType = 'string';
+        if (typeof s.pfm_default === 'boolean') inferredType = 'boolean';
+        else if (typeof s.pfm_default === 'number') inferredType = Number.isInteger(s.pfm_default) ? 'integer' : 'real';
+        else if (hasSubs) inferredType = 'dictionary';
+
+        return {
+          key: s.pfm_name,
+          title: s.pfm_title || s.pfm_name,
+          type: inferredType,
+          default: s.pfm_default,
+          rangelist: s.pfm_range_list || (s.pfm_imazing_pretty_range_list ? Object.keys(s.pfm_imazing_pretty_range_list) : undefined),
+          content: s.pfm_description || '',
+          subkeys: hasSubs ? normalizePfmSubkeys(s.pfm_subkeys) : undefined
+        };
+      });
+    }
+
+    function parsePastedYaml() {
+      const rawStr = document.getElementById('rawYamlInput').value.trim();
+      if (!rawStr) return;
+
+      try {
+        if (rawStr.startsWith('<')) {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(rawStr, 'text/xml');
+          const rootDict = xmlDoc.querySelector('plist > dict');
+          const manifest = parsePlistNode(rootDict);
+          const bundleIds = manifest.pfm_imazing_participating_bundle_ids || [];
+          const domain = bundleIds[0] || manifest.pfm_domain || prompt('Enter Application Bundle ID / PayloadType (e.g. org.mozilla.firefox):', 'com.example.app');
+          if (!domain) return;
+
+          const keys = normalizePfmSubkeys(manifest.pfm_subkeys);
+          const schema = {
+            protocol: 'mdm',
+            category: 'Enterprise Apps',
+            title: domain,
+            payloadType: domain,
+            platforms: ['macOS'],
+            supervision: 'none',
+            description: manifest.pfm_description || 'Custom application preference schema',
+            supportedOS: `macOS Application Policy (${domain})`,
+            rootKvMap: keys.length === 0,
+            keys
+          };
+          state.schemas.unshift(schema);
+          selectWizardProtocol('mdm');
+          addSchemaToBuilder(0, true);
+          closeModal('repoModal');
+          goToStep(3);
+          return;
+        }
+
+        const doc = jsyaml.load(rawStr);
+        const isDdm = Boolean(doc?.payload?.declarationtype);
+        const payloadType = doc?.payload?.declarationtype || doc?.payload?.payloadtype || 'com.apple.custom.payload';
+        const isRootKv = Array.isArray(doc.payloadkeys) && doc.payloadkeys.length === 1 && doc.payloadkeys[0].key === 'ANY';
+
+        const supOS = doc?.payload?.supportedOS || {};
+        const platforms = Object.keys(supOS).filter(os => supOS[os]?.introduced && supOS[os]?.introduced !== 'n/a');
+        const anySup = platforms.some(os => supOS[os]?.supervised === true);
+
+        const schema = {
+          protocol: isDdm ? 'ddm' : 'mdm',
+          category: 'Custom Schemas',
+          title: doc.title || payloadType,
+          payloadType,
+          platforms: platforms.length ? platforms : ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
+          supervision: anySup ? 'required' : 'none',
+          supervisionNote: anySup ? 'Requires a Supervised device on supported platforms.' : undefined,
+          description: doc.description || '',
+          supportedOS: 'Apple Device Management Schema',
+          rootKvMap: isRootKv,
+          keys: isRootKv ? [] : normalizeYamlKeys(doc.payloadkeys)
+        };
+
+        state.schemas.unshift(schema);
+        selectWizardProtocol(schema.protocol);
+        addSchemaToBuilder(0, true);
+        closeModal('repoModal');
+        goToStep(3);
+      } catch (err) {
+        alert('Parse Error: ' + err.message);
+      }
+    }
+
+    // =========================================================================
+    // 8. IMPORT & EXPORT
+    // =========================================================================
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => { document.getElementById('importTextArea').value = ev.target.result; };
+      reader.readAsText(file);
+    }
+
+    function importFromText() {
+      const raw = document.getElementById('importTextArea').value.trim();
+      if (!raw) return;
+
+      try {
+        if (raw.startsWith('{')) {
+          const json = JSON.parse(raw);
+          const decls = json.Declarations || [json];
+          selectWizardProtocol('ddm');
+          decls.forEach(d => {
+            if (d.Type === 'com.apple.activation.simple') return;
+            const matched = state.schemas.find(s => s.payloadType === d.Type) || {
+              protocol: 'ddm',
+              category: 'Custom Schemas',
+              title: d.Type,
+              payloadType: d.Type,
+              keys: Object.keys(d.Payload || {}).map(k => ({ key: k, title: k, type: typeof d.Payload[k] }))
+            };
+            state.activeItems.push({
+              instanceId: 'inst_' + Math.random().toString(36).slice(2, 9),
+              uuid: uuidv4(),
+              identifier: d.Identifier || d.Type,
+              displayName: matched.title,
+              showTechMeta: false,
+              schema: matched,
+              values: d.Payload || {}
+            });
+          });
+          closeModal('importModal');
+          goToStep(3);
+        } else {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(raw, 'text/xml');
+          const rootDict = xmlDoc.querySelector('plist > dict');
+          const parsed = parsePlistNode(rootDict);
+          selectWizardProtocol('mdm');
+          if (parsed.PayloadDisplayName) document.getElementById('metaDisplayName').value = parsed.PayloadDisplayName;
+          if (parsed.PayloadIdentifier) document.getElementById('metaIdentifier').value = parsed.PayloadIdentifier;
+          if (parsed.PayloadOrganization) document.getElementById('metaOrg').value = parsed.PayloadOrganization;
+          if (parsed.PayloadDescription) document.getElementById('metaDescription').value = parsed.PayloadDescription;
+          if (parsed.TargetDeviceType) document.getElementById('metaTargetDeviceType').value = String(parsed.TargetDeviceType);
+          if (parsed.PayloadRemovalDisallowed !== undefined) document.getElementById('metaRemovalDisallowed').checked = Boolean(parsed.PayloadRemovalDisallowed);
+
+          (parsed.PayloadContent || []).forEach(p => {
+            const { PayloadType, PayloadVersion, PayloadIdentifier, PayloadUUID, PayloadEnabled, PayloadDisplayName, ...rest } = p;
+            const matched = state.schemas.find(s => s.payloadType === PayloadType) || {
+              protocol: 'mdm',
+              category: 'Custom Schemas',
+              title: PayloadDisplayName || PayloadType,
+              payloadType: PayloadType,
+              rootKvMap: true,
+              keys: []
+            };
+            state.activeItems.push({
+              instanceId: 'inst_' + Math.random().toString(36).slice(2, 9),
+              uuid: PayloadUUID || uuidv4(),
+              identifier: PayloadIdentifier || PayloadType,
+              displayName: PayloadDisplayName || matched.title,
+              showTechMeta: false,
+              schema: matched,
+              values: rest
+            });
+          });
+          closeModal('importModal');
+          goToStep(3);
+        }
+      } catch (err) {
+        alert('Import failed: ' + err.message);
+      }
+    }
+
+    function parsePlistNode(node) {
+      if (!node) return null;
+      const tag = node.tagName;
+      if (tag === 'string') return node.textContent;
+      if (tag === 'integer') return parseInt(node.textContent, 10);
+      if (tag === 'real') return parseFloat(node.textContent);
+      if (tag === 'true') return true;
+      if (tag === 'false') return false;
+      if (tag === 'data') return { __plistData: node.textContent.trim() };
+      if (tag === 'date') return { __plistDate: node.textContent.trim() };
+      if (tag === 'array') return Array.from(node.children).map(parsePlistNode);
+      if (tag === 'dict') {
+        const obj = {};
+        const children = Array.from(node.children);
+        for (let i = 0; i < children.length; i += 2) {
+          if (children[i].tagName === 'key') obj[children[i].textContent] = parsePlistNode(children[i + 1]);
+        }
+        return obj;
+      }
+      return node.textContent;
+    }
+
+    function copyOutput() {
+      const text = document.getElementById('codePreview').textContent;
+      navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copyBtnText');
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+    }
+
+    function triggerFileDownload(content, filename, mime) {
+      const blob = new Blob([content], { type: mime });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    }
+
+    function downloadOutput() {
+      const text = document.getElementById('codePreview').textContent;
+      const isJson = state.protocol === 'ddm' && state.outputFormat === 'primary';
+      const safeSlug = (document.getElementById('metaDisplayName').value || 'rgm-profile')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'rgm-profile';
+      const filename = isJson ? `${safeSlug}-ddm.json` : `${safeSlug}.mobileconfig`;
+      const mime = isJson ? 'application/json' : 'application/x-apple-aspen-config';
+      triggerFileDownload(text, filename, mime);
+    }
+
+    async function downloadDdmAsMobileconfig() {
+      const xml = await buildDdmMobileconfigXml();
+      const safeSlug = (document.getElementById('metaDisplayName').value || 'rgm-ddm-profile')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'rgm-ddm-profile';
+      triggerFileDownload(xml, `${safeSlug}-ddm.mobileconfig`, 'application/x-apple-aspen-config');
+    }
+
+    function openRepoModal() { document.getElementById('repoModal').classList.replace('hidden', 'flex'); }
+    function openImportModal() { document.getElementById('importModal').classList.replace('hidden', 'flex'); }
+    function closeModal(id) { document.getElementById(id).classList.replace('flex', 'hidden'); }
+
+    function escapeHtml(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function escapeXml(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+    }
+
+    selectWizardProtocol('mdm');
+    goToStep(1);
+  </script>
+</body>
+</html>
