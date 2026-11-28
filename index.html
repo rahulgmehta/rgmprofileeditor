@@ -13,137 +13,116 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
+    /* Palette: Linen 60% (#faf6f0 / #f4ede2), Navy 30% (#122647 / #1e3a66), Amber 10% (#d97706 / #f59e0b) */
     body {
       background:
-        radial-gradient(circle at 12% 18%, rgba(56, 189, 248, 0.28) 0%, transparent 42%),
-        radial-gradient(circle at 86% 14%, rgba(129, 140, 248, 0.28) 0%, transparent 45%),
-        radial-gradient(circle at 52% 88%, rgba(14, 165, 233, 0.20) 0%, transparent 50%),
-        linear-gradient(135deg, #e8f0f9 0%, #f1f5fb 48%, #e4ecf7 100%);
-      color: #0f172a;
+        radial-gradient(circle at 14% 16%, rgba(217, 119, 6, 0.08) 0%, transparent 42%),
+        radial-gradient(circle at 86% 18%, rgba(18, 38, 71, 0.08) 0%, transparent 46%),
+        linear-gradient(160deg, #faf6f0 0%, #f5efe4 55%, #efe6d8 100%);
+      color: #122647;
     }
 
-    /* Apple Liquid Glass Surfaces */
+    /* Linen (60%) + Navy (30%) + Amber (10%) Surfaces */
     .liquid-bar {
-      background: rgba(255, 255, 255, 0.62);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.75);
-      box-shadow:
-        0 4px 24px -4px rgba(15, 23, 42, 0.06),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+      background: rgba(250, 246, 240, 0.88);
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      border-bottom: 1px solid rgba(18, 38, 71, 0.14);
+      box-shadow: 0 4px 20px -4px rgba(18, 38, 71, 0.08);
     }
 
     .liquid-footer-bar {
-      background: rgba(255, 255, 255, 0.68);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border-top: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow:
-        0 -6px 28px -6px rgba(15, 23, 42, 0.07),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.92);
+      background: rgba(245, 239, 228, 0.92);
+      backdrop-filter: blur(20px) saturate(150%);
+      -webkit-backdrop-filter: blur(20px) saturate(150%);
+      border-top: 1px solid rgba(18, 38, 71, 0.15);
+      box-shadow: 0 -6px 24px -6px rgba(18, 38, 71, 0.09);
     }
 
     .liquid-card {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.48) 100%);
-      backdrop-filter: blur(26px) saturate(185%);
-      -webkit-backdrop-filter: blur(26px) saturate(185%);
-      border: 1px solid rgba(255, 255, 255, 0.82);
+      background: linear-gradient(150deg, rgba(250, 246, 240, 0.94) 0%, rgba(243, 236, 224, 0.86) 100%);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid rgba(18, 38, 71, 0.18);
       box-shadow:
-        0 10px 30px -8px rgba(15, 23, 42, 0.08),
-        0 2px 6px -1px rgba(15, 23, 42, 0.04),
-        inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
-        inset 0 -1px 1px 0 rgba(148, 163, 184, 0.15);
+        0 8px 24px -8px rgba(18, 38, 71, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
       transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
 
     .liquid-card:hover {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.60) 100%);
-      border-color: rgba(255, 255, 255, 0.98);
+      background: linear-gradient(150deg, rgba(252, 249, 244, 0.98) 0%, rgba(247, 241, 231, 0.92) 100%);
+      border-color: rgba(217, 119, 6, 0.55);
       box-shadow:
-        0 16px 36px -8px rgba(2, 132, 199, 0.14),
-        0 4px 10px -2px rgba(15, 23, 42, 0.05),
-        inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1);
+        0 14px 30px -8px rgba(18, 38, 71, 0.14),
+        0 0 0 1px rgba(217, 119, 6, 0.20);
     }
 
     .liquid-card-selected {
-      background: linear-gradient(145deg, rgba(240, 249, 255, 0.88) 0%, rgba(224, 242, 254, 0.65) 100%) !important;
-      backdrop-filter: blur(28px) saturate(200%);
-      -webkit-backdrop-filter: blur(28px) saturate(200%);
-      border: 1.5px solid rgba(2, 132, 199, 0.65) !important;
+      background: linear-gradient(150deg, rgba(254, 249, 235, 0.98) 0%, rgba(253, 243, 215, 0.92) 100%) !important;
+      border: 1.5px solid #d97706 !important;
       box-shadow:
-        0 14px 32px -6px rgba(2, 132, 199, 0.20),
-        inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.98),
-        inset 0 0 16px rgba(56, 189, 248, 0.12) !important;
+        0 12px 28px -6px rgba(217, 119, 6, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
     }
 
     .liquid-card-selected-indigo {
-      background: linear-gradient(145deg, rgba(238, 242, 255, 0.88) 0%, rgba(224, 231, 255, 0.65) 100%) !important;
-      backdrop-filter: blur(28px) saturate(200%);
-      -webkit-backdrop-filter: blur(28px) saturate(200%);
-      border: 1.5px solid rgba(79, 70, 229, 0.65) !important;
+      background: linear-gradient(150deg, rgba(235, 240, 248, 0.98) 0%, rgba(221, 230, 244, 0.92) 100%) !important;
+      border: 1.5px solid #122647 !important;
       box-shadow:
-        0 14px 32px -6px rgba(79, 70, 229, 0.20),
-        inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.98),
-        inset 0 0 16px rgba(129, 140, 248, 0.14) !important;
+        0 12px 28px -6px rgba(18, 38, 71, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
     }
 
     .liquid-well {
-      background: rgba(255, 255, 255, 0.45);
-      backdrop-filter: blur(18px) saturate(165%);
-      -webkit-backdrop-filter: blur(18px) saturate(165%);
-      border: 1px solid rgba(255, 255, 255, 0.72);
-      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.8);
+      background: rgba(241, 234, 222, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(18, 38, 71, 0.14);
+      box-shadow: inset 0 1px 2px rgba(18, 38, 71, 0.05);
     }
 
     .liquid-input {
-      background: rgba(255, 255, 255, 0.72);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(203, 213, 225, 0.75);
-      box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.85);
+      background: #faf6f0;
+      border: 1px solid rgba(18, 38, 71, 0.24);
+      color: #122647;
+      box-shadow: inset 0 1px 2px rgba(18, 38, 71, 0.04);
       transition: all 0.18s ease;
     }
 
     .liquid-input:focus {
-      background: rgba(255, 255, 255, 0.94);
-      border-color: #0284c7;
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.16), inset 0 1px 1px rgba(255, 255, 255, 1);
+      background: #fffdf9;
+      border-color: #d97706;
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.18);
       outline: none;
     }
 
     .liquid-btn-primary {
-      background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
-      border: 1px solid rgba(255, 255, 255, 0.45);
+      background: linear-gradient(180deg, #1e3a66 0%, #122647 100%);
+      border: 1px solid rgba(245, 158, 11, 0.55);
       box-shadow:
-        0 6px 18px -4px rgba(2, 132, 199, 0.45),
-        inset 0 1px 0.5px rgba(255, 255, 255, 0.65);
-      color: #ffffff;
+        0 6px 16px -4px rgba(18, 38, 71, 0.40),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      color: #faf6f0;
       transition: all 0.18s ease;
     }
 
     .liquid-btn-primary:hover {
-      background: linear-gradient(180deg, #38bdf8 0%, #0369a1 100%);
-      box-shadow:
-        0 8px 22px -4px rgba(2, 132, 199, 0.55),
-        inset 0 1px 1px rgba(255, 255, 255, 0.8);
+      background: linear-gradient(180deg, #27497d 0%, #162f59 100%);
+      border-color: #f59e0b;
+      box-shadow: 0 8px 20px -4px rgba(217, 119, 6, 0.35);
     }
 
     .liquid-dark-glass {
-      background: rgba(15, 23, 42, 0.84);
-      backdrop-filter: blur(30px) saturate(180%);
-      -webkit-backdrop-filter: blur(30px) saturate(180%);
-      border-left: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.08);
+      background: #10203b;
+      border-left: 1px solid rgba(245, 158, 11, 0.28);
+      box-shadow: inset 1px 0 0 rgba(250, 246, 240, 0.06);
     }
 
     .liquid-modal {
-      background: rgba(255, 255, 255, 0.84);
-      backdrop-filter: blur(32px) saturate(195%);
-      -webkit-backdrop-filter: blur(32px) saturate(195%);
-      border: 1px solid rgba(255, 255, 255, 0.92);
-      box-shadow:
-        0 24px 56px -12px rgba(15, 23, 42, 0.25),
-        inset 0 1.5px 1px rgba(255, 255, 255, 1);
+      background: #faf6f0;
+      border: 1.5px solid rgba(18, 38, 71, 0.24);
+      box-shadow: 0 24px 56px -12px rgba(18, 38, 71, 0.30);
     }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -157,7 +136,7 @@
   <!-- Top Navigation & 3-Stage Stepper Bar -->
   <header class="liquid-bar px-5 py-2.5 flex items-center justify-between shrink-0 z-20">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-md border border-white/40 font-bold text-sm tracking-tight cursor-pointer" onclick="goToStep(1)">
+      <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#1e3a66] via-[#122647] to-[#0b182e] text-white flex items-center justify-center shadow-md border border-white/40 font-bold text-sm tracking-tight cursor-pointer" onclick="goToStep(1)">
         RGM
       </div>
       <div>
@@ -171,8 +150,8 @@
 
     <!-- Interactive 3-Step Progress Indicator -->
     <nav class="hidden md:flex items-center gap-2 liquid-well px-3 py-1.5 rounded-2xl">
-      <button type="button" onclick="goToStep(1)" id="stepBtn1" class="flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-bold transition bg-white/90 text-sky-700 shadow-xs border border-white cursor-pointer">
-        <span class="w-5 h-5 rounded-full bg-sky-600 text-white text-[11px] font-bold flex items-center justify-center">1</span>
+      <button type="button" onclick="goToStep(1)" id="stepBtn1" class="flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-bold transition bg-white/90 text-amber-700 shadow-xs border border-white cursor-pointer">
+        <span class="w-5 h-5 rounded-full bg-amber-600 text-[#faf6f0] text-[11px] font-bold flex items-center justify-center">1</span>
         <span>Select OS & Type</span>
       </button>
       <span class="text-slate-400 text-xs">›</span>
@@ -195,7 +174,7 @@
       <button type="button" onclick="openRepoModal()" class="px-3 py-1.5 text-xs font-semibold rounded-xl border border-white/80 bg-white/60 hover:bg-white/90 text-slate-700 flex items-center gap-1.5 shadow-2xs transition cursor-pointer">
         <span>+ Custom Schema</span>
       </button>
-      <button type="button" onclick="openImportModal()" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-slate-900/90 hover:bg-slate-900 text-white border border-white/20 flex items-center gap-1.5 shadow-sm transition cursor-pointer">
+      <button type="button" onclick="openImportModal()" class="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-[#122647] hover:bg-[#1b3663] text-[#faf6f0] border border-white/20 flex items-center gap-1.5 shadow-sm transition cursor-pointer">
         <span>↑ Import</span>
       </button>
     </div>
@@ -218,13 +197,13 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         <button type="button" onclick="selectWizardProtocol('mdm')" id="wizProtoMdm"
           class="liquid-card-selected p-4 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer">
-          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 font-bold text-xs shadow-sm border border-white/40">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#1e3a66] to-[#122647] text-white flex items-center justify-center shrink-0 font-bold text-xs shadow-sm border border-white/40">
             XML
           </div>
           <div>
             <div class="flex flex-wrap items-center gap-2">
               <span class="text-sm font-bold text-slate-900">Standard Configuration Profile (.mobileconfig)</span>
-              <span id="badgeProtoMdm" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-600 text-white shadow-2xs">Selected</span>
+              <span id="badgeProtoMdm" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-600 text-[#faf6f0] shadow-2xs">Selected</span>
             </div>
             <p class="text-xs text-slate-600 mt-1 leading-relaxed">
               Classic Apple XML profile for Wi-Fi, Passcode, Restrictions, VPN, Certificates, TCC Privacy, Dock, Login Window, FileVault, and Enterprise Apps.
@@ -287,7 +266,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5" id="stage1OsGrid">
           <button type="button" data-os="All" onclick="chooseTargetOSAndProceed('All')"
             class="os-card liquid-card-selected p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer">
-            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center mb-2.5 text-lg shadow-xs border border-white/40 transition">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#1e3a66] to-[#122647] text-white flex items-center justify-center mb-2.5 text-lg shadow-xs border border-white/40 transition">
               🗂️
             </div>
             <div class="text-xs font-bold text-slate-900">All Platforms</div>
@@ -430,7 +409,7 @@
               <h2 class="text-sm font-bold text-slate-900" id="metaHeaderLabel">Profile Details & Policy Settings</h2>
             </div>
             <div class="flex items-center gap-3">
-              <button type="button" onclick="goToStep(2)" class="text-xs font-bold text-sky-700 hover:text-sky-900 cursor-pointer">
+              <button type="button" onclick="goToStep(2)" class="text-xs font-bold text-amber-700 hover:text-sky-900 cursor-pointer">
                 + Add / Remove Policies
               </button>
               <button type="button" id="toggleAdvancedTopLevelBtn" onclick="toggleAdvancedTopLevel()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer">
@@ -492,7 +471,7 @@
             <div class="flex flex-col justify-between">
               <label class="block text-[11px] font-bold text-slate-600 mb-1">Removal Protection</label>
               <label class="inline-flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
-                <input id="metaRemovalDisallowed" type="checkbox" onchange="refreshOutput()" class="rounded border-slate-300 text-sky-600" />
+                <input id="metaRemovalDisallowed" type="checkbox" onchange="refreshOutput()" class="rounded border-slate-300 text-amber-600" />
                 <span>Prevent User Removal (Supervised)</span>
               </label>
             </div>
@@ -522,7 +501,7 @@
         <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between gap-2">
           <div class="flex items-center gap-1" id="outputFormatTabs">
             <button type="button" onclick="setOutputFormat('primary')" id="outTabPrimary"
-              class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/15 text-sky-300 border border-white/15 cursor-pointer">
+              class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white/15 text-amber-300 border border-white/15 cursor-pointer">
               .mobileconfig XML
             </button>
             <button type="button" onclick="setOutputFormat('ddm_mobileconfig')" id="outTabDdmMobileconfig"
@@ -564,7 +543,7 @@
           </button>
         </div>
 
-        <pre id="codePreview" class="flex-1 overflow-auto p-4 text-xs leading-relaxed text-sky-100 select-all"></pre>
+        <pre id="codePreview" class="flex-1 overflow-auto p-4 text-xs leading-relaxed text-[#faf6f0] select-all"></pre>
       </aside>
     </div>
   </section>
@@ -586,7 +565,7 @@
             <option value="declarative/declarations/activations">Declarative DDM Activations</option>
             <option value="declarative/declarations/management">Declarative DDM Management</option>
           </select>
-          <button type="button" onclick="fetchGitHubDirectory()" class="px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-900 text-white hover:bg-slate-800 cursor-pointer">
+          <button type="button" onclick="fetchGitHubDirectory()" class="px-3.5 py-2 text-xs font-bold rounded-xl bg-[#122647] text-amber-300 hover:bg-slate-800 cursor-pointer">
             Browse Online Catalog
           </button>
         </div>
@@ -2688,7 +2667,7 @@
 
     function highlightStage1Cards() {
       const cards = [
-        { id: 'wizProtoMdm', badge: 'badgeProtoMdm', mode: 'mdm', defaultLabel: 'Classic XML', defaultCls: 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-800 border border-sky-200/60', activeCard: 'liquid-card-selected', activeBadge: 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-600 text-white shadow-2xs' },
+        { id: 'wizProtoMdm', badge: 'badgeProtoMdm', mode: 'mdm', defaultLabel: 'Classic XML', defaultCls: 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-800 border border-sky-200/60', activeCard: 'liquid-card-selected', activeBadge: 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-600 text-[#faf6f0] shadow-2xs' },
         { id: 'wizProtoDdm', badge: 'badgeProtoDdm', mode: 'ddm', defaultLabel: 'JSON & .mobileconfig', defaultCls: 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-800 border border-indigo-200/60', activeCard: 'liquid-card-selected-indigo', activeBadge: 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-600 text-white shadow-2xs' },
         { id: 'wizProtoCis1', badge: 'badgeProtoCis1', mode: 'cis_lvl1', defaultLabel: '97 Controls + Audit .sh', defaultCls: 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-800 border border-emerald-300/60', activeCard: 'liquid-card-selected', activeBadge: 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-2xs' },
         { id: 'wizProtoCis2', badge: 'badgeProtoCis2', mode: 'cis_lvl2', defaultLabel: '115 Controls + Audit .sh', defaultCls: 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-800 border border-purple-300/60', activeCard: 'liquid-card-selected-indigo', activeBadge: 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-600 text-white shadow-2xs' }
@@ -2721,7 +2700,7 @@
         const iconBox = btn.querySelector('div:first-child');
         if (isSelected) {
           btn.className = 'os-card liquid-card-selected p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer';
-          if (iconBox) iconBox.className = 'w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center mb-2.5 text-lg shadow-xs border border-white/40 transition';
+          if (iconBox) iconBox.className = 'w-11 h-11 rounded-2xl bg-gradient-to-br from-[#1e3a66] to-[#122647] text-white flex items-center justify-center mb-2.5 text-lg shadow-xs border border-white/40 transition';
         } else {
           btn.className = 'os-card liquid-card p-4 rounded-3xl flex flex-col items-center text-center group cursor-pointer';
           if (iconBox) iconBox.className = 'w-11 h-11 rounded-2xl bg-white/80 text-slate-700 border border-white group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg shadow-2xs transition';
@@ -2744,8 +2723,8 @@
         if (n === stepNum) {
           sec.classList.remove('hidden');
           if (n === 2 || n === 3) sec.classList.add('flex');
-          btn.className = 'flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-bold transition bg-white/90 text-sky-700 shadow-xs border border-white cursor-pointer';
-          btn.querySelector('span:first-child').className = 'w-5 h-5 rounded-full bg-sky-600 text-white text-[11px] font-bold flex items-center justify-center';
+          btn.className = 'flex items-center gap-2 px-3 py-1 rounded-xl text-xs font-bold transition bg-white/90 text-amber-700 shadow-xs border border-white cursor-pointer';
+          btn.querySelector('span:first-child').className = 'w-5 h-5 rounded-full bg-amber-600 text-[#faf6f0] text-[11px] font-bold flex items-center justify-center';
         } else {
           sec.classList.add('hidden');
           sec.classList.remove('flex');
@@ -3249,7 +3228,7 @@ fi
       document.getElementById('stage2OsSwitcher').innerHTML = OS_PILL_OPTIONS.map(os => {
         const active = state.selectedOS === os;
         return `<button type="button" onclick="switchStage2OS('${os}')"
-          class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${active ? 'bg-white/95 text-sky-700 shadow-2xs border border-white' : 'text-slate-600 hover:text-slate-900'}">
+          class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${active ? 'bg-white/95 text-amber-700 shadow-2xs border border-white' : 'text-slate-600 hover:text-slate-900'}">
           ${os === 'All' ? 'All OS' : os}
         </button>`;
       }).join('');
@@ -3269,7 +3248,7 @@ fi
       document.getElementById('stage2CategoryBar').innerHTML = categories.map(cat => {
         const active = state.selectedCategory === cat;
         return `<button type="button" onclick="state.selectedCategory='${cat}';renderStage2Catalog()"
-          class="px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${active ? 'bg-slate-900 text-white shadow-2xs' : 'bg-white/65 text-slate-700 border border-white/80 hover:bg-white'}">
+          class="px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${active ? 'bg-[#122647] text-amber-300 shadow-2xs' : 'bg-white/65 text-slate-700 border border-white/80 hover:bg-white'}">
           ${cat}
         </button>`;
       }).join('');
@@ -3298,7 +3277,7 @@ fi
                     <div class="text-xs font-bold text-slate-900">${escapeHtml(schema.title)}</div>
                     <div class="text-[10px] text-slate-500 mt-0.5">${escapeHtml(schema.payloadType)}</div>
                   </div>
-                  ${countAdded ? `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-600 text-white shadow-2xs shrink-0">${countAdded} Added</span>` : ''}
+                  ${countAdded ? `<span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-600 text-[#faf6f0] shadow-2xs shrink-0">${countAdded} Added</span>` : ''}
                 </div>
                 <p class="text-[11px] text-slate-600 mt-2 leading-relaxed">${escapeHtml(schema.description || '')}</p>
               </div>
@@ -3309,7 +3288,7 @@ fi
                   ${platforms.map(p => `<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-white/70 text-slate-700 border border-white">${p}</span>`).join('')}
                 </div>
                 <button type="button" onclick="addSchemaToBuilder(${globalIdx})"
-                  class="px-3 py-1.5 rounded-xl bg-white/85 hover:bg-sky-600 text-sky-700 hover:text-white border border-white hover:border-sky-500 text-xs font-bold shadow-2xs flex items-center gap-1 shrink-0 transition cursor-pointer">
+                  class="px-3 py-1.5 rounded-xl bg-white/85 hover:bg-sky-600 text-amber-700 hover:text-white border border-white hover:border-sky-500 text-xs font-bold shadow-2xs flex items-center gap-1 shrink-0 transition cursor-pointer">
                   + Add Policy
                 </button>
               </div>
@@ -3325,7 +3304,7 @@ fi
         ? activeForProto.map(item => `
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-500/15 text-sky-900 border border-sky-300/60 text-[11px] font-bold whitespace-nowrap">
               ${escapeHtml(item.schema.title)}
-              <button type="button" onclick="removeActiveItem('${item.instanceId}')" class="text-sky-600 hover:text-rose-600 cursor-pointer">✕</button>
+              <button type="button" onclick="removeActiveItem('${item.instanceId}')" class="text-amber-600 hover:text-rose-600 cursor-pointer">✕</button>
             </span>
           `).join('')
         : `<span class="text-xs text-slate-500">None yet — click "+ Add Policy" on any card above.</span>`;
@@ -3336,7 +3315,7 @@ fi
       const p = document.getElementById('outTabPrimary');
       const m = document.getElementById('outTabDdmMobileconfig');
       if (fmt === 'primary') {
-        p.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white/15 text-sky-300 border border-white/15 cursor-pointer';
+        p.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white/15 text-amber-300 border border-white/15 cursor-pointer';
         m.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white cursor-pointer';
       } else {
         m.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-white/15 text-indigo-300 border border-white/15 cursor-pointer';
@@ -3541,7 +3520,7 @@ fi
               <span class="text-[10px] text-slate-500 ml-1.5">Dictionary</span>
             </div>
             <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '[]', 'kv_map', '[]')"
-              class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
+              class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-amber-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
               + Add Setting Key
             </button>
           </div>
@@ -3581,7 +3560,7 @@ fi
                   <span class="text-[10px] text-slate-500 ml-1.5">${escapeHtml(k.key)}</span>
                 </div>
                 <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'kv_array_map', '[]')"
-                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
+                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-amber-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
                   + Add Team ID
                 </button>
               </div>
@@ -3595,7 +3574,7 @@ fi
                       <div class="flex items-center justify-between border-b border-slate-200/60 pb-1">
                         <span class="text-xs font-bold text-indigo-700">${escapeHtml(teamKey)}</span>
                         <div class="flex items-center gap-2">
-                          <button type="button" onclick="addArrayItem('${item.instanceId}', '${teamPathStr}', 'string', '[]')" class="text-[11px] font-bold text-sky-600 hover:underline cursor-pointer">+ Add Item</button>
+                          <button type="button" onclick="addArrayItem('${item.instanceId}', '${teamPathStr}', 'string', '[]')" class="text-[11px] font-bold text-amber-600 hover:underline cursor-pointer">+ Add Item</button>
                           <button type="button" onclick="removeDynamicDictEntry('${item.instanceId}', '${pathStr}', '${escapeHtml(teamKey)}')" class="text-[11px] text-rose-500 hover:underline cursor-pointer">Remove</button>
                         </div>
                       </div>
@@ -3631,7 +3610,7 @@ fi
                   <span class="text-[10px] text-slate-500 ml-1.5">${escapeHtml(k.key)}</span>
                 </div>
                 <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'dynamic_dict', '${subkeysStr}')"
-                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
+                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-amber-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
                   + Add Domain / Entry
                 </button>
               </div>
@@ -3665,7 +3644,7 @@ fi
                   <span class="text-[10px] text-slate-500 ml-1.5">${escapeHtml(k.key)}</span>
                 </div>
                 <button type="button" onclick="addDynamicDictEntry('${item.instanceId}', '${pathStr}', 'kv_map', '[]')"
-                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
+                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-amber-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
                   + Add Key/Value
                 </button>
               </div>
@@ -3700,7 +3679,7 @@ fi
                 </div>
                 ${!k.required ? `
                   <button type="button" onclick="toggleOptionalDict('${item.instanceId}', '${pathStr}', '${subkeysStr}')"
-                    class="px-2.5 py-1 rounded-xl text-[11px] font-bold shadow-2xs cursor-pointer ${isEnabled ? 'bg-rose-500/15 text-rose-700 border border-rose-300/60' : 'bg-white/85 text-sky-700 border border-white'}">
+                    class="px-2.5 py-1 rounded-xl text-[11px] font-bold shadow-2xs cursor-pointer ${isEnabled ? 'bg-rose-500/15 text-rose-700 border border-rose-300/60' : 'bg-white/85 text-amber-700 border border-white'}">
                     ${isEnabled ? 'Remove Section' : '+ Configure'}
                   </button>
                 ` : ''}
@@ -3722,7 +3701,7 @@ fi
                   ${k.required ? '<span class="ml-1.5 text-[10px] font-bold text-rose-600">Required</span>' : ''}
                 </div>
                 <button type="button" onclick="addArrayItem('${item.instanceId}', '${pathStr}', '${k.itemType || 'string'}', '${subkeysStr}')"
-                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-sky-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
+                  class="px-2.5 py-1 rounded-xl bg-white/85 hover:bg-white text-amber-700 border border-white text-[11px] font-bold shadow-2xs cursor-pointer">
                   + Add Item
                 </button>
               </div>
@@ -3738,7 +3717,7 @@ fi
                           <span class="text-[11px] font-bold text-slate-700">Group #${idx + 1}</span>
                           <div class="flex items-center gap-2">
                             <button type="button" onclick="addArrayItem('${item.instanceId}', '${elemPathStr}', 'dictionary', '${subkeysStr}')"
-                              class="text-[11px] font-bold text-sky-600 hover:underline cursor-pointer">+ Add Pair</button>
+                              class="text-[11px] font-bold text-amber-600 hover:underline cursor-pointer">+ Add Pair</button>
                             <button type="button" onclick="removeArrayItem('${item.instanceId}', '${pathStr}', ${idx})" class="text-[11px] text-rose-500 hover:underline cursor-pointer">Remove</button>
                           </div>
                         </div>
@@ -3808,7 +3787,7 @@ fi
               <label class="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5">
                 <input type="checkbox" ${checked ? 'checked' : ''}
                   onchange="updateField('${item.instanceId}', '${pathStr}', this.checked, 'boolean')" class="sr-only peer">
-                <div class="w-9 h-5 bg-slate-300/80 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:shadow-xs after:transition-all peer-checked:bg-sky-600"></div>
+                <div class="w-9 h-5 bg-slate-300/80 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:shadow-xs after:transition-all peer-checked:bg-amber-600"></div>
               </label>
             </div>
           `;
