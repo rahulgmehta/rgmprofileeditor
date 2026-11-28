@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RGM Profile Editor — Apple MDM & Declarative DDM Builder</title>
+  <title>RGM Profile Editor Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <style>
@@ -165,7 +165,7 @@
           <h1 class="text-sm font-bold tracking-tight text-slate-900">RGM Profile Editor</h1>
           <span id="activeOsPill" class="hidden text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-800 border border-sky-300/60"></span>
         </div>
-        <p class="text-[11px] text-slate-600">Apple MDM & Declarative DDM Profile Studio</p>
+        <p class="text-[11px] text-slate-600">Apple MDM, Declarative DDM & CIS Benchmark Builder</p>
       </div>
     </div>
 
@@ -214,10 +214,10 @@
         </p>
       </div>
 
-      <!-- Format Selector Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Format & Baseline Selector Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         <button type="button" onclick="selectWizardProtocol('mdm')" id="wizProtoMdm"
-          class="liquid-card-selected p-5 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer">
+          class="liquid-card-selected p-4 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer">
           <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 font-bold text-xs shadow-sm border border-white/40">
             XML
           </div>
@@ -226,14 +226,14 @@
               <span class="text-sm font-bold text-slate-900">Standard Configuration Profile (.mobileconfig)</span>
               <span id="badgeProtoMdm" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-600 text-white shadow-2xs">Selected</span>
             </div>
-            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
               Classic Apple XML profile for Wi-Fi, Passcode, Restrictions, VPN, Certificates, TCC Privacy, Dock, Login Window, FileVault, and Enterprise Apps.
             </p>
           </div>
         </button>
 
         <button type="button" onclick="selectWizardProtocol('ddm')" id="wizProtoDdm"
-          class="liquid-card p-5 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer">
+          class="liquid-card p-4 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer">
           <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 text-indigo-700 border border-indigo-300/50 flex items-center justify-center shrink-0 font-bold text-xs">
             DDM
           </div>
@@ -242,8 +242,40 @@
               <span class="text-sm font-bold text-slate-900">Declarative Device Management (DDM)</span>
               <span id="badgeProtoDdm" class="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-800 border border-indigo-200/60">JSON & .mobileconfig</span>
             </div>
-            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
               Modern autonomous declarations for iOS 17+ and macOS 14+. Export as raw <strong>JSON</strong> or wrapped inside a local <strong>.mobileconfig</strong> profile.
+            </p>
+          </div>
+        </button>
+
+        <button type="button" onclick="selectWizardProtocol('cis_lvl1')" id="wizProtoCis1"
+          class="liquid-card p-4 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-700 border border-emerald-300/60 flex items-center justify-center shrink-0 font-bold text-xs">
+            CIS L1
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-sm font-bold text-slate-900">CIS Level 1 Baseline (macOS 27.0)</span>
+              <span id="badgeProtoCis1" class="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-800 border border-emerald-300/60">97 Controls + Audit .sh</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              Essential security hardening (mSCP 27.0): enforces Gatekeeper, FileVault, Firewall, 15-char Passcode, Safari & Apple Intelligence restrictions, plus companion Zsh audit script.
+            </p>
+          </div>
+        </button>
+
+        <button type="button" onclick="selectWizardProtocol('cis_lvl2')" id="wizProtoCis2"
+          class="liquid-card p-4 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer">
+          <div class="w-11 h-11 rounded-2xl bg-purple-500/15 text-purple-700 border border-purple-300/60 flex items-center justify-center shrink-0 font-bold text-xs">
+            CIS L2
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-sm font-bold text-slate-900">CIS Level 2 Baseline (macOS 27.0)</span>
+              <span id="badgeProtoCis2" class="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-800 border border-purple-300/60">115 Controls + Audit .sh</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              Defense-in-depth profile (mSCP 27.0): includes all Level 1 controls plus iCloud Drive sync lock, Bonjour disable, MCX shift-lock, Time Machine backup, and full audit flags.
             </p>
           </div>
         </button>
@@ -309,17 +341,23 @@
         </div>
       </div>
 
-      <!-- Quick Start Shortcuts -->
+      <!-- Quick Start Shortcuts & Next Action -->
       <div class="liquid-well rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-        <span class="text-xs font-medium text-slate-600">Or jump straight in with a pre-built template:</span>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-medium text-slate-600">Quick-start presets:</span>
           <button type="button" onclick="loadStarterEssentials()" class="px-3.5 py-1.5 rounded-xl bg-white/80 hover:bg-white border border-white text-xs font-semibold text-slate-800 shadow-2xs flex items-center gap-1.5 transition cursor-pointer">
             <span>📶 Wi-Fi + Passcode Starter</span>
           </button>
           <button type="button" onclick="loadEnterpriseAppsPreset()" class="px-3.5 py-1.5 rounded-xl bg-white/80 hover:bg-white border border-white text-xs font-semibold text-slate-800 shadow-2xs flex items-center gap-1.5 transition cursor-pointer">
             <span>🖥️ macOS Enterprise Apps Suite</span>
           </button>
+          <button type="button" onclick="loadMergedMacOSBundle()" class="px-3.5 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-300/70 text-xs font-bold text-sky-950 shadow-2xs flex items-center gap-1.5 transition cursor-pointer">
+            <span>📦 Merged macOS Bundle (6 Policies)</span>
+          </button>
         </div>
+        <button type="button" onclick="goToStep(2)" class="liquid-btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+          <span id="stage1NextBtnText">Next: Choose Policies →</span>
+        </button>
       </div>
     </div>
   </section>
@@ -511,9 +549,19 @@
           </button>
         </div>
 
-        <div class="px-4 py-2 bg-black/25 border-b border-white/10 flex items-center justify-between text-[11px]">
-          <span class="text-emerald-400 font-semibold">✓ Ready to Export</span>
+        <div id="validationStatusBar" class="px-4 py-2 bg-black/25 border-b border-white/10 flex items-center justify-between text-[11px]">
+          <span id="validationStatusText" class="text-emerald-400 font-semibold">✓ Validated & Ready to Export</span>
           <span id="serverTokenBadge" class="text-slate-400 truncate max-w-[190px]"></span>
+        </div>
+        <div id="validationIssuesPanel" class="hidden px-4 py-2 bg-amber-950/85 border-b border-amber-500/40 text-[11px] text-amber-200 space-y-1 max-h-28 overflow-y-auto"></div>
+        <div id="companionScriptBanner" class="hidden px-4 py-2 bg-emerald-950/80 border-b border-emerald-500/35 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <div class="text-[11px] font-bold text-emerald-200 truncate" id="companionScriptLabel">Companion Audit & Remediation Script</div>
+            <div class="text-[10px] text-emerald-300/80 truncate" id="companionScriptSub">Includes non-profile OS checks (--check / --fix)</div>
+          </div>
+          <button type="button" onclick="downloadCompanionAuditScript()" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-[11px] font-bold text-white border border-white/25 shrink-0 transition cursor-pointer">
+            Download .sh
+          </button>
         </div>
 
         <pre id="codePreview" class="flex-1 overflow-auto p-4 text-xs leading-relaxed text-sky-100 select-all"></pre>
@@ -765,6 +813,174 @@
     // 2. COMPLETE BUILT-IN CATALOG (ALL 74 MDM, APPS, & DDM SCHEMAS)
     // =========================================================================
     const BUILTIN_SCHEMAS = [
+      // --- MACOS 27.0 CIS BENCHMARK & COMPLIANCE DOMAINS ---
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Software Update Policy (macOS)',
+        payloadType: 'com.apple.SoftwareUpdate',
+        platforms: ['macOS'],
+        supervision: 'none',
+        description: 'Enforces automatic background download of updates, App Store updates, and XProtect Remediator / Gatekeeper security data (CIS 1.2, 1.4, 1.5).',
+        supportedOS: 'macOS 10.11+',
+        keys: [
+          { key: 'AutomaticDownload', title: 'Automatically Download Updates (CIS 1.2)', type: 'boolean', default: true },
+          { key: 'AutomaticallyInstallAppUpdates', title: 'Automatically Install App Updates (CIS 1.4)', type: 'boolean', default: true },
+          { key: 'ConfigDataInstall', title: 'Install XProtect & Gatekeeper Data Updates Automatically (CIS 1.5)', type: 'boolean', default: true },
+          { key: 'CriticalUpdateInstall', title: 'Install Critical Security Updates Automatically', type: 'boolean', default: true },
+          { key: 'AutomaticallyInstallMacOSUpdates', title: 'Automatically Install macOS Updates', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Safari Security & Privacy (macOS)',
+        payloadType: 'com.apple.Safari',
+        platforms: ['macOS'],
+        supervision: 'none',
+        description: 'Enforces CIS Level 1 Safari hardening: blocks auto-opening safe downloads, warns on fraudulent sites, blocks cross-site tracking, shows full URL & status bar.',
+        supportedOS: 'macOS 10.12+',
+        keys: [
+          { key: 'AutoOpenSafeDownloads', title: 'Open "Safe" Files After Downloading (CIS 6.3.1 - False)', type: 'boolean', default: false },
+          { key: 'WarnAboutFraudulentWebsites', title: 'Warn When Visiting a Fraudulent Website (CIS 6.3.3)', type: 'boolean', default: true },
+          { key: 'WebKitPreferences.storageBlockingPolicy', title: 'WebKit Storage Blocking Policy (CIS 6.3.4 = 1)', type: 'integer', rangelist: [0, 1, 2], default: 1 },
+          { key: 'WebKitStorageBlockingPolicy', title: 'Legacy WebKit Storage Blocking Policy (= 1)', type: 'integer', rangelist: [0, 1, 2], default: 1 },
+          { key: 'BlockStoragePolicy', title: 'Block Storage Policy (= 2)', type: 'integer', rangelist: [0, 1, 2], default: 2 },
+          { key: 'WebKitPreferences.privateClickMeasurementEnabled', title: 'Advertising Privacy Protection (CIS 6.3.6)', type: 'boolean', default: true },
+          { key: 'ShowFullURLInSmartSearchField', title: 'Show Full Website Address in Smart Search Field (CIS 6.3.7)', type: 'boolean', default: true },
+          { key: 'ShowOverlayStatusBar', title: 'Show Safari Status Bar (CIS 6.3.10)', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Enterprise Apps',
+        title: 'Terminal Secure Keyboard Entry (macOS)',
+        payloadType: 'com.apple.Terminal',
+        platforms: ['macOS'],
+        supervision: 'none',
+        description: 'Enforces Secure Keyboard Entry in Terminal.app to prevent other processes from intercepting keystrokes (CIS 6.4.1).',
+        supportedOS: 'macOS 10.11+',
+        keys: [
+          { key: 'SecureKeyboardEntry', title: 'Enable Secure Keyboard Entry (CIS 6.4.1)', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Diagnostics & Telemetry Submission (macOS)',
+        payloadType: 'com.apple.SubmitDiagInfo',
+        platforms: ['macOS'],
+        supervision: 'none',
+        description: 'Disables automatic submission of diagnostic and usage reports to Apple (CIS 2.6.3.1).',
+        supportedOS: 'macOS 10.11+',
+        keys: [
+          { key: 'AutoSubmit', title: 'Auto-Submit Diagnostic Reports to Apple (CIS 2.6.3.1 - False)', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Siri & Search Data Sharing Privacy (macOS)',
+        payloadType: 'com.apple.assistant.support',
+        platforms: ['macOS'],
+        supervision: 'none',
+        description: 'Opts out of sharing Spotlight Search queries and Siri/Dictation audio recordings with Apple (CIS 2.6.3.2, 2.9.1: 2 = Opt-Out).',
+        supportedOS: 'macOS 10.15+',
+        keys: [
+          { key: 'Search Queries Data Sharing Status', title: 'Improve Search Data Sharing (CIS 2.9.1: 1=Opt-In, 2=Opt-Out)', type: 'integer', rangelist: [1, 2], default: 2 },
+          { key: 'Siri Data Sharing Opt-In Status', title: 'Improve Siri & Dictation Sharing (CIS 2.6.3.2: 1=Opt-In, 2=Opt-Out)', type: 'integer', rangelist: [1, 2], default: 2 }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title: 'Assistive Voice Audio Donation (macOS)',
+        payloadType: 'com.apple.Accessibility',
+        platforms: ['macOS'],
+        supervision: 'none',
+        description: 'Disables sending audio recordings and transcripts of Vocal Shortcuts and Voice Control to Apple (CIS 2.6.3.3).',
+        supportedOS: 'macOS 15.0+',
+        keys: [
+          { key: 'AXSAudioDonationSiriImprovementEnabled', title: 'Improve Assistive Voice Features (CIS 2.6.3.3 - False)', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'Network & VPN',
+        title: 'Bonjour Multicast Advertising (macOS)',
+        payloadType: 'com.apple.mDNSResponder',
+        platforms: ['macOS'],
+        supervision: 'none',
+        description: 'Disables Bonjour multicast service advertisements over local network interfaces (CIS 4.1 Level 2).',
+        supportedOS: 'macOS 10.11+',
+        keys: [
+          { key: 'NoMulticastAdvertisements', title: 'Disable Bonjour Multicast Advertisements (CIS 4.1 L2)', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'mdm',
+        category: 'System & Devices',
+        title: 'Time Machine Auto-Backup Policy (macOS)',
+        payloadType: 'com.apple.TimeMachine',
+        platforms: ['macOS'],
+        supervision: 'none',
+        description: 'Enforces automatic Time Machine backups when a backup volume is configured (CIS 2.3.4.1 Level 2).',
+        supportedOS: 'macOS 10.12+',
+        keys: [
+          { key: 'AutoBackup', title: 'Enable Automatic Time Machine Backups (CIS 2.3.4.1 L2)', type: 'boolean', default: true }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Software Updates',
+        title: 'Software Update: Automatic Actions & Settings',
+        payloadType: 'com.apple.configuration.softwareupdate.settings',
+        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS'],
+        supervision: 'required',
+        supervisionNote: 'Declarative Software Update settings require a Supervised device.',
+        description: 'Configures autonomous DDM software update download, OS installation, and rapid security response behavior (CIS 1.2, 1.3, 1.5).',
+        supportedOS: 'iOS 18.0+, macOS 15.0+, tvOS 18.4+, visionOS 26.0+ (Supervised)',
+        keys: [
+          {
+            key: 'AutomaticActions', title: 'Automatic Update Actions', type: 'dictionary', required: true,
+            subkeys: [
+              { key: 'Download', title: 'Automatic Download (CIS 1.2)', type: 'string', rangelist: ['Allowed', 'AlwaysOn', 'AlwaysOff'], default: 'AlwaysOn' },
+              { key: 'InstallOSUpdates', title: 'Install OS Updates (CIS 1.3)', type: 'string', rangelist: ['Allowed', 'AlwaysOn', 'AlwaysOff'], default: 'AlwaysOn' },
+              { key: 'InstallSecurityUpdate', title: 'Install Security & Rapid Response Updates (CIS 1.5)', type: 'string', rangelist: ['Allowed', 'AlwaysOn', 'AlwaysOff'], default: 'AlwaysOn' }
+            ]
+          }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Apple Intelligence',
+        title: 'External Intelligence Integrations (DDM)',
+        payloadType: 'com.apple.configuration.external-intelligence.settings',
+        platforms: ['iOS', 'macOS', 'visionOS'],
+        supervision: 'partial',
+        supervisionNote: 'Requires a Supervised device on iOS and visionOS.',
+        description: 'Controls third-party external AI/intelligence extensions (e.g., ChatGPT integration) and account sign-in (CIS 2.5.1.2).',
+        supportedOS: 'iOS 18.2+, macOS 15.2+, visionOS 2.4+',
+        keys: [
+          { key: 'Enabled', title: 'Allow External Intelligence Integrations (CIS 2.5.1.2 - False)', type: 'boolean', default: false },
+          { key: 'AllowSignIn', title: 'Allow External Intelligence Sign-In (CIS 2.5.1.2 - False)', type: 'boolean', default: false }
+        ]
+      },
+      {
+        protocol: 'ddm',
+        category: 'Apple Intelligence',
+        title: 'Siri Settings (DDM)',
+        payloadType: 'com.apple.configuration.siri.settings',
+        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS'],
+        supervision: 'partial',
+        supervisionNote: 'Requires a Supervised device on iOS, tvOS, and visionOS.',
+        description: 'Declaratively enables or disables Siri assistant capabilities (CIS 2.5.2.1).',
+        supportedOS: 'iOS 18.0+, macOS 15.0+, tvOS 18.0+, visionOS 2.0+',
+        keys: [
+          { key: 'Enabled', title: 'Enable Siri Assistant (CIS 2.5.2.1 - False)', type: 'boolean', default: false }
+        ]
+      },
+
       // --- ESSENTIALS ---
       {
         protocol: 'mdm',
@@ -838,7 +1054,23 @@
           { key: 'allowAppInstallation', title: 'Allow Installing Apps (Supervised on iOS)', type: 'boolean', default: true },
           { key: 'allowAppRemoval', title: 'Allow Removing Apps (Supervised on iOS)', type: 'boolean', default: true },
           { key: 'allowSafari', title: 'Allow Safari Browser (Supervised on iOS)', type: 'boolean', default: true },
-          { key: 'forceEncryptedBackup', title: 'Require Encrypted Backups', type: 'boolean', default: false }
+          { key: 'forceEncryptedBackup', title: 'Require Encrypted Backups', type: 'boolean', default: false },
+          { key: 'allowAirPlayIncomingRequests', title: 'Allow AirPlay Receiver Incoming Requests (CIS 2.3.1.2)', type: 'boolean', default: true },
+          { key: 'allowAssistant', title: 'Allow Siri Assistant (CIS 2.5.2.1)', type: 'boolean', default: true },
+          { key: 'allowDiagnosticSubmission', title: 'Allow Diagnostic Submission to Apple (CIS 2.6.3.4)', type: 'boolean', default: true },
+          { key: 'allowApplePersonalizedAdvertising', title: 'Allow Personalized Advertising (CIS 2.6.4)', type: 'boolean', default: true },
+          { key: 'allowWritingTools', title: 'Allow Apple Intelligence Writing Tools (CIS 2.5.1.3)', type: 'boolean', default: true },
+          { key: 'allowMailSummary', title: 'Allow Apple Intelligence Mail Summary (CIS 2.5.1.4)', type: 'boolean', default: true },
+          { key: 'allowMailSmartReplies', title: 'Allow Apple Intelligence Mail Smart Replies (CIS 2.5.1.7)', type: 'boolean', default: true },
+          { key: 'allowNotesTranscription', title: 'Allow Apple Intelligence Notes Transcription (CIS 2.5.1.5)', type: 'boolean', default: true },
+          { key: 'allowNotesTranscriptionSummary', title: 'Allow Apple Intelligence Notes Transcription Summary (CIS 2.5.1.5)', type: 'boolean', default: true },
+          { key: 'allowSafariSummary', title: 'Allow Apple Intelligence Safari Reader Summary (CIS 2.5.1.6)', type: 'boolean', default: true },
+          { key: 'forceOnDeviceOnlyDictation', title: 'Force On-Device Only Dictation (CIS 2.18.1)', type: 'boolean', default: false },
+          { key: 'allowExternalIntelligenceIntegrations', title: 'Allow External Intelligence Integrations (CIS 2.5.1.2)', type: 'boolean', default: true },
+          { key: 'allowExternalIntelligenceIntegrationsSignIn', title: 'Allow External Intelligence Sign-In (CIS 2.5.1.2)', type: 'boolean', default: true },
+          { key: 'allowCloudDesktopAndDocuments', title: 'Allow iCloud Desktop & Documents Sync (CIS 2.1.1.3 L2)', type: 'boolean', default: true },
+          { key: 'allowContentCaching', title: 'Allow Content Caching Service (CIS 2.3.3.8 L2)', type: 'boolean', default: true },
+          { key: 'allowMediaSharingModification', title: 'Allow Media Sharing Modification (CIS 2.3.3.9 L2)', type: 'boolean', default: true }
         ]
       },
       {
@@ -876,12 +1108,12 @@
       {
         protocol: 'mdm',
         category: 'Network & VPN',
-        title: 'App-Layer VPN (Per-App VPN)',
+        title: 'App-Layer VPN & App Mapping (Per-App VPN)',
         payloadType: 'com.apple.vpn.managed.applayer',
         platforms: ['iOS', 'macOS', 'visionOS', 'watchOS'],
         supervision: 'partial',
         supervisionNote: 'Required to be Supervised on watchOS 10.0+. Works unsupervised on iOS, macOS, and visionOS.',
-        description: 'Configures a Per-App VPN tunnel triggered by managed apps, Safari domains, Associated Domains, or SMB domains.',
+        description: 'Merged Per-App VPN tunnel settings (domains, OnDemand app matching, IKEv2/VPN/IPSec) and macOS app-to-VPN mappings.',
         supportedOS: 'iOS 7.0+, macOS 10.9+, visionOS 1.1+, watchOS 10.0+',
         keys: [
           { key: 'VPNUUID', title: 'Per-App VPN UUID (referenced by managed apps)', type: 'string', required: true, default: '11111111-2222-4333-8444-555555555555' },
@@ -889,43 +1121,31 @@
           { key: 'SafariDomains', title: 'Safari domains triggering VPN', type: 'array', itemType: 'string' },
           { key: 'AssociatedDomains', title: 'Associated domains triggering VPN', type: 'array', itemType: 'string' },
           { key: 'ExcludedDomains', title: 'Excluded domains', type: 'array', itemType: 'string' },
-          ...VPN_COMMON_SUBKEYS
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: 'App-to-App-Layer VPN Mapping (macOS)',
-        payloadType: 'com.apple.vpn.managed.appmapping',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Maps macOS applications and helper tools to a Per-App VPNUUID.',
-        supportedOS: 'macOS 10.9+',
-        keys: [
           {
-            key: 'AppLayerVPNMapping', title: 'App-to-VPN mappings', type: 'array', itemType: 'dictionary', required: true,
+            key: 'AppLayerVPNMapping', title: 'macOS App-to-VPN Mappings', type: 'array', itemType: 'dictionary',
             subkeys: [
               { key: 'Identifier', title: 'App bundle identifier', type: 'string', required: true, default: 'com.example.corpapp' },
               { key: 'VPNUUID', title: 'Target Per-App VPNUUID', type: 'string', required: true, default: '11111111-2222-4333-8444-555555555555' },
               { key: 'SigningIdentifier', title: 'Code signature signing identifier', type: 'string', required: true, default: 'com.example.corpapp' },
               { key: 'DesignatedRequirement', title: 'Designated Requirement', type: 'string', required: true, default: 'anchor apple generic' }
             ]
-          }
+          },
+          ...VPN_COMMON_SUBKEYS
         ]
       },
       {
         protocol: 'mdm',
         category: 'Network & VPN',
-        title: 'DNS Settings (Encrypted DoH / DoT)',
+        title: 'DNS Settings & DNS Proxy (DoH / DoT / Proxy)',
         payloadType: 'com.apple.dnsSettings.managed',
         platforms: ['iOS', 'macOS', 'visionOS'],
         supervision: 'partial',
         supervisionNote: 'ProhibitDisablement requires a Supervised device.',
-        description: 'Configures DNS-over-HTTPS (HTTPS) or DNS-over-TLS (TLS) with OnDemand rules.',
-        supportedOS: 'iOS 14.0+, macOS 11.0+, visionOS 1.0+',
+        description: 'Merged DNS-over-HTTPS / DNS-over-TLS settings, OnDemand rules, and Network Extension DNS Proxy configuration.',
+        supportedOS: 'iOS 11.0+, macOS 10.15+, visionOS 1.0+',
         keys: [
           {
-            key: 'DNSSettings', title: 'DNS Settings', type: 'dictionary', required: true,
+            key: 'DNSSettings', title: 'DNS Settings (DoH / DoT)', type: 'dictionary', required: true,
             subkeys: [
               { key: 'DNSProtocol', title: 'DNS Protocol', type: 'string', required: true, rangelist: ['HTTPS', 'TLS'], default: 'HTTPS' },
               { key: 'ServerURL', title: 'DoH Server URL (https://)', type: 'string', default: 'https://dns.quad9.net/dns-query' },
@@ -935,24 +1155,12 @@
             ]
           },
           { key: 'OnDemandRules', title: 'On Demand Rules', type: 'array', itemType: 'dictionary', subkeys: ON_DEMAND_RULES_SUBKEYS },
-          { key: 'ProhibitDisablement', title: 'Prohibit User from Disabling (Supervised Only)', type: 'boolean', default: false }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: 'DNS Proxy',
-        payloadType: 'com.apple.dnsProxy.managed',
-        platforms: ['iOS', 'macOS', 'visionOS'],
-        supervision: 'none',
-        description: 'Configures a Network Extension DNS proxy provider.',
-        supportedOS: 'iOS 11.0+, macOS 10.15+, visionOS 1.1+',
-        keys: [
-          { key: 'AppBundleIdentifier', title: 'App Bundle Identifier', type: 'string', required: true, default: 'com.example.dnsproxy' },
-          { key: 'ProviderBundleIdentifier', title: 'Provider Bundle Identifier', type: 'string' },
-          { key: 'ProviderDesignatedRequirement', title: 'Provider Designated Requirement (macOS)', type: 'string' },
+          { key: 'ProhibitDisablement', title: 'Prohibit User from Disabling (Supervised Only)', type: 'boolean', default: false },
+          { key: 'AppBundleIdentifier', title: 'DNS Proxy App Bundle Identifier', type: 'string' },
+          { key: 'ProviderBundleIdentifier', title: 'DNS Proxy Provider Bundle Identifier', type: 'string' },
+          { key: 'ProviderDesignatedRequirement', title: 'DNS Proxy Provider Designated Requirement (macOS)', type: 'string' },
           { key: 'DNSProxyUUID', title: 'DNS Proxy UUID (iOS 16+)', type: 'string' },
-          { key: 'ProviderConfiguration', title: 'Vendor Provider Configuration (key/value)', type: 'kv_map' }
+          { key: 'ProviderConfiguration', title: 'DNS Proxy Vendor Configuration (key/value)', type: 'kv_map' }
         ]
       },
       {
@@ -977,15 +1185,15 @@
       {
         protocol: 'mdm',
         category: 'Network & VPN',
-        title: 'Network Proxy Configuration (macOS)',
+        title: 'Network Proxy Configuration & MASQUE Relay',
         payloadType: 'com.apple.SystemConfiguration',
-        platforms: ['macOS'],
+        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS'],
         supervision: 'none',
-        description: 'Configures HTTP, HTTPS, FTP, SOCKS, or PAC network proxies and bypass lists on macOS.',
-        supportedOS: 'macOS 10.7+',
+        description: 'Merged macOS HTTP/HTTPS/PAC proxy settings and HTTP/2 & HTTP/3 MASQUE Network Relay configuration.',
+        supportedOS: 'iOS 17.0+, macOS 10.7+, tvOS 17.0+, visionOS 1.0+',
         keys: [
           {
-            key: 'Proxies', title: 'Proxy Settings', type: 'dictionary', required: true,
+            key: 'Proxies', title: 'Proxy Settings (macOS)', type: 'dictionary', required: true,
             subkeys: [
               { key: 'HTTPEnable', title: 'Enable HTTP Proxy (0 or 1)', type: 'integer', rangelist: [0, 1], default: 1 },
               { key: 'HTTPProxy', title: 'HTTP Proxy Host/IP', type: 'string', default: 'proxy.example.com' },
@@ -997,28 +1205,16 @@
               { key: 'ProxyAutoConfigURLString', title: 'PAC File URL', type: 'string' },
               { key: 'ExceptionsList', title: 'Bypass Proxy Hosts & Domains (e.g. *.local)', type: 'array', itemType: 'string' }
             ]
-          }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: 'Relay (MASQUE Network Relay)',
-        payloadType: 'com.apple.relay.managed',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS'],
-        supervision: 'none',
-        description: 'Configures HTTP/2 and HTTP/3 MASQUE Network Relays with domain routing.',
-        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.0+',
-        keys: [
+          },
           {
-            key: 'Relays', title: 'Relay Servers', type: 'array', itemType: 'dictionary', required: true,
+            key: 'Relays', title: 'MASQUE Relay Servers', type: 'array', itemType: 'dictionary',
             subkeys: [
               { key: 'HTTP3RelayURL', title: 'HTTP/3 Relay URL', type: 'string', default: 'https://relay.example.com/.well-known/masque/udp/{target_host}/{target_port}/' },
               { key: 'HTTP2RelayURL', title: 'HTTP/2 Relay URL', type: 'string' }
             ]
           },
-          { key: 'MatchDomains', title: 'Match Domains', type: 'array', itemType: 'string' },
-          { key: 'ExcludedDomains', title: 'Excluded Domains', type: 'array', itemType: 'string' }
+          { key: 'MatchDomains', title: 'Relay Match Domains', type: 'array', itemType: 'string' },
+          { key: 'ExcludedDomains', title: 'Relay Excluded Domains', type: 'array', itemType: 'string' }
         ]
       },
       {
@@ -1060,89 +1256,14 @@
       {
         protocol: 'mdm',
         category: 'Network & VPN',
-        title: '802.1X: Global Ethernet',
+        title: '802.1X: Ethernet (Global, First/Second/Third & Active)',
         payloadType: 'com.apple.globalethernet.managed',
         platforms: ['iOS', 'macOS', 'tvOS'],
         supervision: 'none',
-        description: 'Configures the default fallback global 802.1X Ethernet interface.',
-        supportedOS: 'iOS 17.0+, macOS 10.13+, tvOS 17.0+',
+        description: 'Merged 802.1X Ethernet profile: select interface target (GlobalEthernet, FirstActiveEthernet, SecondActiveEthernet, SecondEthernet, ThirdActiveEthernet, ThirdEthernet, or FirstEthernet), setup mode, and EAP configuration.',
+        supportedOS: 'iOS 17.0+, macOS 10.7–10.13+, tvOS 17.0+',
         keys: [
-          { key: 'Interface', title: 'Interface Type', type: 'string', rangelist: ['GlobalEthernet'], default: 'GlobalEthernet' },
-          { key: 'SetupModes', title: 'Setup Mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
-          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (key/value)', type: 'kv_map' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: '802.1X: First Active Ethernet',
-        payloadType: 'com.apple.firstactiveethernet.managed',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures 802.1X wired authentication for the first active Ethernet interface on macOS.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'Interface', title: 'Interface Type', type: 'string', rangelist: ['FirstActiveEthernet'], default: 'FirstActiveEthernet' },
-          { key: 'SetupModes', title: 'Setup Mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
-          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (key/value)', type: 'kv_map' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: '802.1X: Second Active Ethernet',
-        payloadType: 'com.apple.secondactiveethernet.managed',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures 802.1X wired authentication for the second active Ethernet interface on macOS.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'Interface', title: 'Interface Type', type: 'string', rangelist: ['SecondActiveEthernet'], default: 'SecondActiveEthernet' },
-          { key: 'SetupModes', title: 'Setup Mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
-          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (key/value)', type: 'kv_map' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: '802.1X: Second Ethernet',
-        payloadType: 'com.apple.secondethernet.managed',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures 802.1X wired authentication for the second Ethernet interface by service order on macOS.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'Interface', title: 'Interface Type', type: 'string', rangelist: ['SecondEthernet'], default: 'SecondEthernet' },
-          { key: 'SetupModes', title: 'Setup Mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
-          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (key/value)', type: 'kv_map' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: '802.1X: Third Active Ethernet',
-        payloadType: 'com.apple.thirdactiveethernet.managed',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures 802.1X wired authentication for the third active Ethernet interface on macOS.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'Interface', title: 'Interface Type', type: 'string', rangelist: ['ThirdActiveEthernet'], default: 'ThirdActiveEthernet' },
-          { key: 'SetupModes', title: 'Setup Mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
-          { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (key/value)', type: 'kv_map' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Network & VPN',
-        title: '802.1X: Third Ethernet',
-        payloadType: 'com.apple.thirdethernet.managed',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures 802.1X wired authentication for the third Ethernet interface by service order on macOS.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'Interface', title: 'Interface Type', type: 'string', rangelist: ['ThirdEthernet'], default: 'ThirdEthernet' },
+          { key: 'Interface', title: 'Ethernet Interface Target', type: 'string', required: true, rangelist: ['GlobalEthernet', 'FirstActiveEthernet', 'SecondActiveEthernet', 'SecondEthernet', 'ThirdActiveEthernet', 'ThirdEthernet', 'FirstEthernet'], default: 'GlobalEthernet' },
           { key: 'SetupModes', title: 'Setup Mode', type: 'string', rangelist: ['System', 'Loginwindow'], default: 'System' },
           { key: 'EAPClientConfiguration', title: 'EAP Client Configuration (key/value)', type: 'kv_map' }
         ]
@@ -1177,6 +1298,14 @@
           { key: 'EnterpriseProfileCreationKeepBrowsingData', title: 'Keep browsing data on enterprise profile creation', type: 'boolean', default: true },
           { key: 'NativeMessagingUserLevelHosts', title: 'Allow user-level native messaging hosts', type: 'boolean', default: true },
           { key: 'ShowCastIconInToolbar', title: 'Show Cast icon in toolbar', type: 'boolean', default: true },
+          { key: 'AdsSettingForIntrusiveAdsSites', title: 'Intrusive Ads Setting (1=Allow, 2=Block)', type: 'integer', rangelist: [1, 2], default: 2 },
+          { key: 'AllowOutdatedPlugins', title: 'Allow Outdated Plugins', type: 'boolean', default: false },
+          { key: 'AllowedDomainsForApps', title: 'Allowed Domains for Apps', type: 'string', default: 'demo.com' },
+          { key: 'BlockExternalExtensions', title: 'Block External Extensions', type: 'boolean', default: true },
+          { key: 'CloudPrintProxyEnabled', title: 'Enable Cloud Print Proxy', type: 'boolean', default: false },
+          { key: 'CloudPrintSubmitEnabled', title: 'Enable Cloud Print Submission', type: 'boolean', default: false },
+          { key: 'ExtensionInstallBlocklist', title: 'Blocked Extensions (use * to block all)', type: 'array', itemType: 'string', default: ['*'] },
+          { key: 'ExtensionInstallAllowlist', title: 'Allowed Extension IDs', type: 'array', itemType: 'string', default: [] },
           { key: 'ProxySettings', title: 'Chrome Proxy Settings', type: 'dictionary', subkeys: CHROMIUM_PROXY_SUBKEYS }
         ]
       },
@@ -1335,18 +1464,6 @@
         rootKvMap: true,
         keys: []
       },
-      {
-        protocol: 'mdm',
-        category: 'Enterprise Apps',
-        title: 'Root3 Support App (nl.root3.support)',
-        payloadType: 'nl.root3.support',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures managed preferences for the Root3 Support macOS menu bar app.',
-        supportedOS: 'macOS Application Policy (nl.root3.support)',
-        rootKvMap: true,
-        keys: []
-      },
 
       // --- SECURITY, PRIVACY & CERTIFICATES ---
       {
@@ -1366,12 +1483,12 @@
       {
         protocol: 'mdm',
         category: 'Security & Privacy',
-        title: 'FDE FileVault',
+        title: 'FileVault Encryption, Escrow & Recovery (FDE)',
         payloadType: 'com.apple.MCX.FileVault2',
         platforms: ['macOS'],
         supervision: 'partial',
         supervisionNote: 'Enabling FileVault requires Supervised / UAMDM on macOS 10.15+. ForceEnableInSetupAssistant requires ADE (DEP).',
-        description: 'Enables or disables FileVault 2 full-disk encryption on macOS.',
+        description: 'Merged macOS FileVault 2 policy, PKCS #1 Recovery Key Escrow settings, and legacy FDE Recovery Key Redirection.',
         supportedOS: 'macOS 10.9+ (Supervised / UAMDM)',
         keys: [
           { key: 'Enable', title: 'Enable or Disable FileVault', type: 'string', required: true, rangelist: ['On', 'Off'], default: 'On' },
@@ -1379,35 +1496,10 @@
           { key: 'UserEntersMissingInfo', title: 'Prompt User for Missing Username/Password', type: 'boolean', default: true },
           { key: 'UseRecoveryKey', title: 'Create Personal Recovery Key (PRK)', type: 'boolean', default: true },
           { key: 'ShowRecoveryKey', title: 'Show Personal Recovery Key to User', type: 'boolean', default: true },
-          { key: 'ForceEnableInSetupAssistant', title: 'Force Enable During Setup Assistant (ADE/DEP)', type: 'boolean', default: false }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'FDE Recovery Key Escrow',
-        payloadType: 'com.apple.security.FDERecoveryKeyEscrow',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Encrypts the FileVault Personal Recovery Key with an escrow certificate for MDM retrieval.',
-        supportedOS: 'macOS 10.13+',
-        keys: [
-          { key: 'Location', title: 'Escrow Location Description', type: 'string', required: true, default: 'RGM IT Security Vault' },
-          { key: 'EncryptCertPayloadUUID', title: 'PKCS #1 Encryption Certificate PayloadUUID', type: 'string', required: true, default: '00000000-0000-0000-0000-000000000000' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'FDE Recovery Key Redirection (Legacy)',
-        payloadType: 'com.apple.security.FDERecoveryRedirect',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Legacy FileVault recovery key redirection (macOS 10.9–10.12; ignored on 10.13+).',
-        supportedOS: 'macOS 10.9–10.12',
-        keys: [
-          { key: 'RedirectURL', title: 'HTTPS Escrow Server URL', type: 'string', required: true, default: 'https://escrow.example.com/fde' },
-          { key: 'EncryptCertPayloadUUID', title: 'PKCS #1 Encryption Certificate PayloadUUID', type: 'string', required: true }
+          { key: 'ForceEnableInSetupAssistant', title: 'Force Enable During Setup Assistant (ADE/DEP)', type: 'boolean', default: false },
+          { key: 'Location', title: 'Escrow Location Description', type: 'string', default: 'RGM IT Security Vault' },
+          { key: 'EncryptCertPayloadUUID', title: 'PKCS #1 Encryption Certificate PayloadUUID', type: 'string', default: '00000000-0000-0000-0000-000000000000' },
+          { key: 'RedirectURL', title: 'Legacy FDE Escrow Server URL (macOS 10.9–10.12)', type: 'string' }
         ]
       },
       {
@@ -1461,46 +1553,22 @@
       {
         protocol: 'mdm',
         category: 'Security & Privacy',
-        title: 'Gatekeeper (System Policy Control)',
+        title: 'Gatekeeper, Finder Override & spctl Rules',
         payloadType: 'com.apple.systempolicy.control',
         platforms: ['macOS'],
         supervision: 'none',
-        description: 'Configures macOS Gatekeeper app assessment policy.',
+        description: 'Merged Gatekeeper assessment policy, Finder Control-Click override lock, and spctl code-signing requirement rule settings.',
         supportedOS: 'macOS 10.8+',
         keys: [
           { key: 'EnableAssessment', title: 'Enable Gatekeeper Assessment', type: 'boolean', default: true },
-          { key: 'AllowIdentifiedDevelopers', title: 'Allow Identified Developers (in addition to App Store)', type: 'boolean', default: true }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'System Policy Managed (Finder Gatekeeper Override)',
-        payloadType: 'com.apple.systempolicy.managed',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Disables Finder contextual Control-Click menu option to bypass Gatekeeper.',
-        supportedOS: 'macOS 10.8+',
-        keys: [
-          { key: 'DisableOverride', title: 'Disable Finder Gatekeeper Override', type: 'boolean', default: true }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'System Policy Rule (spctl Gatekeeper Rule)',
-        payloadType: 'com.apple.systempolicy.rule',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Defines custom Gatekeeper spctl code-signing requirement rules on macOS.',
-        supportedOS: 'macOS 10.8+',
-        keys: [
-          { key: 'Requirement', title: 'Code Signing Requirement', type: 'string', default: 'anchor apple generic' },
-          { key: 'Comment', title: 'Rule Comment', type: 'string', default: 'Allow enterprise signed apps' },
-          { key: 'OperationType', title: 'Operation Type', type: 'string', rangelist: ['operation:execute', 'operation:install', 'operation:lsopen'], default: 'operation:execute' },
-          { key: 'Priority', title: 'Rule Priority', type: 'real', default: 100.0 },
-          { key: 'Expiration', title: 'Expiration Date (ISO-8601 UTC)', type: 'date' },
-          { key: 'LeafCertificate', title: 'App Leaf Certificate (Base64 <data>)', type: 'data' }
+          { key: 'AllowIdentifiedDevelopers', title: 'Allow Identified Developers (in addition to App Store)', type: 'boolean', default: true },
+          { key: 'DisableOverride', title: 'Disable Finder Gatekeeper Override', type: 'boolean', default: true },
+          { key: 'Requirement', title: 'spctl Code Signing Requirement', type: 'string', default: 'anchor apple generic' },
+          { key: 'Comment', title: 'spctl Rule Comment', type: 'string', default: 'Allow enterprise signed apps' },
+          { key: 'OperationType', title: 'spctl Operation Type', type: 'string', rangelist: ['operation:execute', 'operation:install', 'operation:lsopen'], default: 'operation:execute' },
+          { key: 'Priority', title: 'spctl Rule Priority', type: 'real', default: 100.0 },
+          { key: 'Expiration', title: 'spctl Rule Expiration Date (ISO-8601 UTC)', type: 'date' },
+          { key: 'LeafCertificate', title: 'spctl App Leaf Certificate (Base64 <data>)', type: 'data' }
         ]
       },
       {
@@ -1591,86 +1659,19 @@
       {
         protocol: 'mdm',
         category: 'Security & Privacy',
-        title: 'Certificate (Root CA)',
+        title: 'Certificates (Root CA, PEM, PKCS #1/12), Preferences & CT',
         payloadType: 'com.apple.security.root',
         platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
         supervision: 'none',
-        description: 'Installs a trusted Root CA certificate.',
+        description: 'Merged certificate installation (Root CA, PEM, PKCS #1, PKCS #12 identity), macOS certificate/identity preferences, and Certificate Transparency domain exceptions.',
         supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
         keys: [
-          { key: 'PayloadCertificateFileName', title: 'Certificate Filename', type: 'string', default: 'enterprise-root-ca.cer' },
-          { key: 'PayloadContent', title: 'Certificate Binary Data (Base64 <data>)', type: 'data', required: true }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'Certificate (PEM)',
-        payloadType: 'com.apple.security.pem',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'Installs a PEM-formatted certificate without private key.',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
-        keys: [
-          { key: 'PayloadCertificateFileName', title: 'Certificate Filename', type: 'string', default: 'intermediate-ca.pem' },
-          { key: 'PayloadContent', title: 'Certificate Binary Data (Base64 <data>)', type: 'data', required: true }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'Certificate (PKCS #1)',
-        payloadType: 'com.apple.security.pkcs1',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'Installs a DER-encoded PKCS #1 certificate without private key.',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
-        keys: [
-          { key: 'PayloadCertificateFileName', title: 'Certificate Filename', type: 'string', default: 'certificate.cer' },
-          { key: 'PayloadContent', title: 'Certificate Binary Data (Base64 <data>)', type: 'data', required: true }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'Certificate (PKCS #12 Identity)',
-        payloadType: 'com.apple.security.pkcs12',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'Installs a password-protected PKCS #12 client identity certificate (.p12 / .pfx).',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.0+, watchOS 3.0+',
-        keys: [
-          { key: 'PayloadCertificateFileName', title: 'Identity Filename', type: 'string', default: 'client-identity.p12' },
-          { key: 'PayloadContent', title: 'PKCS #12 Identity Data (Base64 <data>)', type: 'data', required: true },
-          { key: 'Password', title: 'PKCS #12 Passphrase', type: 'string' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'Certificate Preference (macOS User)',
-        payloadType: 'com.apple.security.certificatepreference',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Associates a user keychain certificate payload with an email address or service name.',
-        supportedOS: 'macOS 10.12+ (User Channel)',
-        keys: [
-          { key: 'Name', title: 'Email Address or Service Name', type: 'string', required: true, default: 'user@example.com' },
-          { key: 'PayloadCertificateUUID', title: 'Certificate PayloadUUID', type: 'string', required: true }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'Identity Preference (macOS User)',
-        payloadType: 'com.apple.security.identitypreference',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Associates a client identity certificate payload with a service URL or email address.',
-        supportedOS: 'macOS 10.12+ (User Channel)',
-        keys: [
-          { key: 'Name', title: 'Service URL or Email Address', type: 'string', required: true, default: 'https://portal.example.com' },
-          { key: 'PayloadCertificateUUID', title: 'Identity Certificate PayloadUUID', type: 'string', required: true }
+          { key: 'PayloadCertificateFileName', title: 'Certificate / Identity Filename', type: 'string', default: 'enterprise-root-ca.cer' },
+          { key: 'PayloadContent', title: 'Certificate / Identity Binary Data (Base64 <data>)', type: 'data', required: true },
+          { key: 'Password', title: 'PKCS #12 Identity Passphrase', type: 'string' },
+          { key: 'Name', title: 'User Certificate/Identity Target (Email / Service URL)', type: 'string' },
+          { key: 'PayloadCertificateUUID', title: 'Referenced Certificate/Identity PayloadUUID', type: 'string' },
+          { key: 'DisabledForDomains', title: 'Certificate Transparency Excluded Domains (leading . for subdomains)', type: 'array', itemType: 'string' }
         ]
       },
       {
@@ -1690,19 +1691,6 @@
               { key: 'Hash', title: 'SPKI SHA-256 Hash (Base64 <data>)', type: 'data', required: true }
             ]
           }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'Certificate Transparency Exceptions',
-        payloadType: 'com.apple.security.certificatetransparency',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'Disables Certificate Transparency enforcement for specific internal domains or CAs.',
-        supportedOS: 'iOS 12.1.1+, macOS 10.14.2+, tvOS 12.1.1+, visionOS 1.0+, watchOS 5.1.1+',
-        keys: [
-          { key: 'DisabledForDomains', title: 'Excluded Domains (leading . for subdomains)', type: 'array', itemType: 'string' }
         ]
       },
       {
@@ -1730,24 +1718,6 @@
       {
         protocol: 'mdm',
         category: 'Security & Privacy',
-        title: 'ACME Certificate Enrollment',
-        payloadType: 'com.apple.security.acme',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'Configures Automated Certificate Management Environment (ACME) enrollment with hardware-bound Secure Enclave keys.',
-        supportedOS: 'iOS 16.0+, macOS 13.1+, tvOS 16.0+, visionOS 1.0+, watchOS 9.0+',
-        keys: [
-          { key: 'DirectoryURL', title: 'ACME Directory URL (https://)', type: 'string', required: true, default: 'https://acme.example.com/directory' },
-          { key: 'ClientIdentifier', title: 'Client Identifier', type: 'string', required: true, default: 'device-acme-token-001' },
-          { key: 'KeyType', title: 'Key Pair Type', type: 'string', required: true, rangelist: ['ECSECPrimeRandom', 'RSA'], default: 'ECSECPrimeRandom' },
-          { key: 'KeySize', title: 'Key Size', type: 'integer', required: true, default: 384 },
-          { key: 'HardwareBound', title: 'Hardware-Bound Secure Enclave Key', type: 'boolean', required: true, default: true },
-          { key: 'Subject', title: 'X.500 Subject (RDN Pairs)', type: 'array', itemType: 'array', required: true, subkeys: X500_RDN_PAIR_SUBKEYS }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
         title: 'Profile Removal Password',
         payloadType: 'com.apple.profileRemovalPassword',
         platforms: ['iOS', 'macOS', 'tvOS'],
@@ -1757,25 +1727,6 @@
         supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+ (Supervised)',
         keys: [
           { key: 'RemovalPassword', title: 'Profile Removal Password', type: 'string', default: 'RemoveMe@2026' }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'Security & Privacy',
-        title: 'MDM Enrollment Payload',
-        payloadType: 'com.apple.mdm',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'partial',
-        supervisionNote: 'Requires a Supervised device on watchOS 10.0+.',
-        description: 'Configures the core Mobile Device Management (MDM) check-in URL, server URL, APNs topic, and identity certificate.',
-        supportedOS: 'iOS 4.0+, macOS 10.7+, tvOS 9.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [
-          { key: 'IdentityCertificateUUID', title: 'Identity Certificate / SCEP PayloadUUID', type: 'string', required: true, default: '00000000-0000-0000-0000-000000000000' },
-          { key: 'Topic', title: 'APNs Push Topic (com.apple.mgmt.*)', type: 'string', required: true, default: 'com.apple.mgmt.External.00000000-0000-0000-0000-000000000000' },
-          { key: 'ServerURL', title: 'MDM Server URL (https://)', type: 'string', required: true, default: 'https://mdm.example.com/mdm/connect' },
-          { key: 'CheckInURL', title: 'MDM Check-In URL (https://)', type: 'string', default: 'https://mdm.example.com/mdm/checkin' },
-          { key: 'SignMessage', title: 'Sign Device Messages', type: 'boolean', default: true },
-          { key: 'AccessRights', title: 'Access Rights Bitmask', type: 'integer', default: 8191 }
         ]
       },
 
@@ -1975,11 +1926,11 @@
       {
         protocol: 'mdm',
         category: 'System & Devices',
-        title: 'Login Window (macOS)',
+        title: 'Login Window, Shift-Key, Login Items & Scripts (macOS)',
         payloadType: 'com.apple.loginwindow',
         platforms: ['macOS'],
         supervision: 'none',
-        description: 'Configures macOS Login Window UI, user lists, login banner text, and power buttons.',
+        description: 'Merged macOS Login Window UI/banner/power controls, Shift-key login item suppression lock, managed login items, and login/logout scripts.',
         supportedOS: 'macOS 10.7+',
         keys: [
           { key: 'SHOWFULLNAME', title: 'Show Name & Password Fields Instead of User List', type: 'boolean', default: false },
@@ -1989,7 +1940,21 @@
           { key: 'ShutDownDisabled', title: 'Disable Shut Down Button', type: 'boolean', default: false },
           { key: 'RestartDisabled', title: 'Disable Restart Button', type: 'boolean', default: false },
           { key: 'SleepDisabled', title: 'Disable Sleep Button', type: 'boolean', default: false },
-          { key: 'DisableConsoleAccess', title: 'Disable >console Command-Line Login', type: 'boolean', default: false }
+          { key: 'DisableConsoleAccess', title: 'Disable >console Command-Line Login', type: 'boolean', default: false },
+          { key: 'DisableLoginItemsSuppression', title: 'Disable Shift-Key Login Items Suppression', type: 'boolean', default: true },
+          { key: 'com.apple.login.mcx.DisableAutoLoginClient', title: 'Disable Automatic Login (CIS 2.13.3)', type: 'boolean', default: false },
+          { key: 'RetriesUntilHint', title: 'Password Retries Until Hint (CIS 2.11.5: 0 = Disabled)', type: 'integer', default: 0 },
+          { key: 'screenUnlockMode', title: 'Screen Unlock Mode (CIS 5.7: 1 = Session Owner Only)', type: 'integer', rangelist: [0, 1], default: 1 },
+          { key: 'AdminMayDisableMCX', title: 'Allow Admin to Disable MCX with Shift Key (CIS 2.13.4 L2 - False)', type: 'boolean', default: false },
+          {
+            key: 'AutoLaunchedApplicationDictionary-managed', title: 'Managed Login Items', type: 'array', itemType: 'dictionary',
+            subkeys: [
+              { key: 'Path', title: 'Application Path or URL', type: 'string', required: true, default: '/Applications/CompanyPortal.app' },
+              { key: 'Hide', title: 'Hide in Login Items List', type: 'boolean', default: false }
+            ]
+          },
+          { key: 'loginscripts', title: 'Login Scripts', type: 'array', itemType: 'dictionary', subkeys: MCX_SCRIPT_ITEM_SUBKEYS },
+          { key: 'logoutscripts', title: 'Logout Scripts', type: 'array', itemType: 'dictionary', subkeys: MCX_SCRIPT_ITEM_SUBKEYS }
         ]
       },
       {
@@ -2011,39 +1976,6 @@
               { key: 'Comment', title: 'Rule Comment', type: 'string', default: 'Allow enterprise background agent' }
             ]
           }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'System & Devices',
-        title: 'Login Items (Legacy macOS)',
-        payloadType: 'com.apple.loginitems.managed',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures applications that automatically launch at user login on macOS.',
-        supportedOS: 'macOS 10.13+',
-        keys: [
-          {
-            key: 'AutoLaunchedApplicationDictionary-managed', title: 'Managed Login Items', type: 'array', itemType: 'dictionary', required: true,
-            subkeys: [
-              { key: 'Path', title: 'Application Path or URL', type: 'string', required: true, default: '/Applications/CompanyPortal.app' },
-              { key: 'Hide', title: 'Hide in Login Items List', type: 'boolean', default: false }
-            ]
-          }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'System & Devices',
-        title: 'Login Window: Scripts (macOS)',
-        payloadType: 'com.apple.mcxloginscripts',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures managed executable scripts to run at user login and logout.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'loginscripts', title: 'Login Scripts', type: 'array', itemType: 'dictionary', subkeys: MCX_SCRIPT_ITEM_SUBKEYS },
-          { key: 'logoutscripts', title: 'Logout Scripts', type: 'array', itemType: 'dictionary', subkeys: MCX_SCRIPT_ITEM_SUBKEYS }
         ]
       },
       {
@@ -2106,40 +2038,30 @@
         description: 'Configures the NTP time server and timezone on macOS.',
         supportedOS: 'macOS 10.12.4+',
         keys: [
-          { key: 'timeServer', title: 'NTP Time Server Hostname', type: 'string', default: 'time.apple.com' },
-          { key: 'timeZone', title: 'Time Zone (e.g. Asia/Kolkata, America/New_York)', type: 'string', default: 'Asia/Kolkata' }
+          { key: 'timeServer', title: 'NTP Time Server Hostname (CIS 2.3.2.1)', type: 'string', default: 'time.apple.com' },
+          { key: 'timeZone', title: 'Time Zone (e.g. Asia/Kolkata, America/New_York)', type: 'string', default: 'Asia/Kolkata' },
+          { key: 'dontAllowFDEDisable', title: 'Prevent Users from Disabling FileVault (CIS 2.6.6)', type: 'boolean', default: true },
+          { key: 'DisableGuestAccount', title: 'Disable Guest Account (CIS 2.13.1)', type: 'boolean', default: true },
+          { key: 'EnableGuestAccount', title: 'Enable Guest Account (CIS 2.13.1 - False)', type: 'boolean', default: false },
+          { key: 'forceInternetSharingOff', title: 'Force Internet Sharing Off (CIS 2.3.3.7)', type: 'boolean', default: true }
         ]
       },
       {
         protocol: 'mdm',
         category: 'System & Devices',
-        title: 'Screensaver & Lock Grace Period (macOS)',
+        title: 'Screensaver, Lock Grace Period & User Settings (macOS)',
         payloadType: 'com.apple.screensaver',
         platforms: ['macOS'],
         supervision: 'none',
-        description: 'Configures macOS screen saver module, idle activation time, and password lock grace period.',
+        description: 'Merged macOS screen saver module, user module path, idle activation timer, and password lock grace period.',
         supportedOS: 'macOS 10.11+',
         keys: [
           { key: 'moduleName', title: 'Screen Saver Module Name', type: 'string', required: true, default: 'Flurry' },
-          { key: 'loginWindowModulePath', title: 'Screen Saver Module Path', type: 'string', default: '/System/Library/Screen Savers/Flurry.saver' },
+          { key: 'loginWindowModulePath', title: 'Login Window Screen Saver Module Path', type: 'string', default: '/System/Library/Screen Savers/Flurry.saver' },
+          { key: 'modulePath', title: 'User Screen Saver Module Path', type: 'string', default: '/System/Library/Screen Savers/Flurry.saver' },
           { key: 'idleTime', title: 'Idle Time Before Activation (Seconds)', type: 'integer', default: 300 },
           { key: 'askForPassword', title: 'Require Password to Unlock Screen Saver', type: 'boolean', default: true },
           { key: 'askForPasswordDelay', title: 'Password Grace Period (Seconds, 0 = Immediate)', type: 'integer', default: 0 }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'System & Devices',
-        title: 'Screensaver User (macOS)',
-        payloadType: 'com.apple.screensaver.user',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures user-channel screen saver module and idle activation timer on macOS.',
-        supportedOS: 'macOS 10.11+ (User Channel)',
-        keys: [
-          { key: 'moduleName', title: 'Screen Saver Module Name', type: 'string', required: true, default: 'Flurry' },
-          { key: 'modulePath', title: 'Full Path to Screen Saver Module', type: 'string', default: '/System/Library/Screen Savers/Flurry.saver' },
-          { key: 'idleTime', title: 'Idle Time Before Activation (Seconds)', type: 'integer', default: 300 }
         ]
       },
       {
@@ -2244,20 +2166,8 @@
         supportedOS: 'macOS 10.7+',
         keys: [
           { key: 'MultipleSessionEnabled', title: 'Allow Fast User Switching', type: 'boolean', default: true },
-          { key: 'com.apple.autologout.AutoLogOutDelay', title: 'Auto-Logout Idle Delay (Seconds, 0 = Off)', type: 'real', default: 0 }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'System & Devices',
-        title: 'Login Window: Shift-Key Suppression (loginwindow)',
-        payloadType: 'loginwindow',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Prevents users from holding Shift during login to bypass managed login items.',
-        supportedOS: 'macOS 10.7+',
-        keys: [
-          { key: 'DisableLoginItemsSuppression', title: 'Disable Login Items Suppression', type: 'boolean', default: true }
+          { key: 'com.apple.autologout.AutoLogOutDelay', title: 'Auto-Logout Idle Delay (Seconds, 0 = Off)', type: 'real', default: 0 },
+          { key: 'ignore-devices', title: 'Disable iOS/iPadOS Devices Opening & Syncing in Finder (ignore-devices)', type: 'boolean', default: false }
         ]
       },
       {
@@ -2277,30 +2187,18 @@
       {
         protocol: 'mdm',
         category: 'System & Devices',
-        title: 'Xsan Client Configuration (macOS)',
+        title: 'Xsan Client & Volume Mount Preferences (macOS)',
         payloadType: 'com.apple.xsan',
         platforms: ['macOS'],
         supervision: 'none',
-        description: 'Configures Xsan or StorNext SAN client metadata controllers and shared secret.',
+        description: 'Merged Xsan / StorNext SAN client metadata configuration, authentication, and volume mount/DLC preferences.',
         supportedOS: 'macOS 10.10+',
         keys: [
           { key: 'sanName', title: 'SAN Name', type: 'string', required: true, default: 'MediaSAN' },
           { key: 'sanConfigURLs', title: 'Xsan MDC LDAP URLs', type: 'array', itemType: 'string' },
           { key: 'fsnameservers', title: 'StorNext File System Name Servers', type: 'array', itemType: 'string' },
           { key: 'sanAuthMethod', title: 'SAN Auth Method', type: 'string', rangelist: ['auth_secret'], default: 'auth_secret' },
-          { key: 'sharedSecret', title: 'SAN Shared Secret', type: 'string', required: true }
-        ]
-      },
-      {
-        protocol: 'mdm',
-        category: 'System & Devices',
-        title: 'Xsan Volume Mount Preferences (macOS)',
-        payloadType: 'com.apple.xsan.preferences',
-        platforms: ['macOS'],
-        supervision: 'none',
-        description: 'Configures which Xsan or StorNext volumes automatically mount at startup.',
-        supportedOS: 'macOS 10.11+',
-        keys: [
+          { key: 'sharedSecret', title: 'SAN Shared Secret', type: 'string', required: true },
           { key: 'onlyMount', title: 'Only Auto-Mount Volumes', type: 'array', itemType: 'string' },
           { key: 'denyMount', title: 'Deny Auto-Mount Volumes', type: 'array', itemType: 'string' },
           { key: 'preferDLC', title: 'Prefer Distributed LAN Client (DLC)', type: 'array', itemType: 'string' },
@@ -2484,7 +2382,10 @@
           { key: 'RequireAlphanumericPasscode', title: 'Require alphanumeric passcode', type: 'boolean', default: false },
           { key: 'MinimumComplexCharacters', title: 'Minimum complex characters (0-4)', type: 'integer', default: 0 },
           { key: 'MaximumFailedAttempts', title: 'Max failed attempts before wipe/lock (2-11)', type: 'integer', default: 11 },
-          { key: 'MaximumInactivityInMinutes', title: 'Auto-lock inactivity in minutes (0-15)', type: 'integer', default: 5 }
+          { key: 'MaximumInactivityInMinutes', title: 'Auto-lock inactivity in minutes (0-15)', type: 'integer', default: 5 },
+          { key: 'MaximumPasscodeAgeInDays', title: 'Maximum passcode age in days (CIS 5.2.7: 365)', type: 'integer', default: 365 },
+          { key: 'PasscodeReuseLimit', title: 'Passcode reuse history limit (CIS 5.2.8: 24)', type: 'integer', default: 24 },
+          { key: 'MaximumGracePeriodInMinutes', title: 'Maximum unlock grace period (CIS 2.11.2)', type: 'integer', default: 0 }
         ]
       },
       {
@@ -2687,130 +2588,58 @@
           { key: 'AllowGenmoji', title: 'Allow Genmoji', type: 'boolean', default: true },
           { key: 'AllowImagePlayground', title: 'Allow Image Playground', type: 'boolean', default: true },
           { key: 'AllowVisualIntelligence', title: 'Allow Visual Intelligence (27.0+)', type: 'boolean', default: true },
-          { key: 'AllowWritingTools', title: 'Allow Writing Tools', type: 'boolean', default: true }
+          { key: 'AllowWritingTools', title: 'Allow Writing Tools (CIS 2.5.1.3)', type: 'boolean', default: true },
+          { key: 'ForceOnDeviceOnlyDictation', title: 'Force On-Device Only Dictation (CIS 2.18.1)', type: 'boolean', default: false },
+          {
+            key: 'Apps', title: 'Per-App Apple Intelligence Settings (CIS 2.5.1.4–2.5.1.7)', type: 'dictionary',
+            subkeys: [
+              {
+                key: 'Mail', title: 'Mail Intelligence', type: 'dictionary',
+                subkeys: [
+                  { key: 'AllowSummary', title: 'Allow Mail Summary', type: 'boolean', default: false },
+                  { key: 'AllowSmartReplies', title: 'Allow Mail Smart Replies', type: 'boolean', default: false }
+                ]
+              },
+              {
+                key: 'Notes', title: 'Notes Intelligence', type: 'dictionary',
+                subkeys: [
+                  { key: 'AllowTranscription', title: 'Allow Notes Transcription', type: 'boolean', default: false },
+                  { key: 'AllowTranscriptionSummary', title: 'Allow Notes Transcription Summary', type: 'boolean', default: false }
+                ]
+              },
+              {
+                key: 'Safari', title: 'Safari Intelligence', type: 'dictionary',
+                subkeys: [
+                  { key: 'AllowSummary', title: 'Allow Safari Reader Summary', type: 'boolean', default: false }
+                ]
+              }
+            ]
+          }
         ]
       },
       {
         protocol: 'ddm',
-        category: 'Assets',
-        title: 'Asset: Credential ACME',
-        payloadType: 'com.apple.asset.credential.acme',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'A reference to an ACME identity JSON document.',
-        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/acme-identity.json', 'application/json'), ASSET_AUTH_DICT, ASSET_ACCESSIBLE_FIELD]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Assets',
-        title: 'Asset: Credential Certificate',
-        payloadType: 'com.apple.asset.credential.certificate',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'A reference to one PKCS #1 or PEM encoded certificate.',
-        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/root-ca.pem', 'application/pem', ['application/pem', 'application/pkcs1']), ASSET_AUTH_DICT]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Assets',
-        title: 'Asset: Credential Identity (PKCS #12)',
-        payloadType: 'com.apple.asset.credential.identity',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'A reference to a PKCS #12 password-protected identity JSON document.',
-        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/client-identity.json', 'application/json'), ASSET_AUTH_DICT, ASSET_ACCESSIBLE_FIELD]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Assets',
-        title: 'Asset: Credential SCEP',
-        payloadType: 'com.apple.asset.credential.scep',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'A reference to a SCEP identity JSON document.',
-        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/scep-identity.json', 'application/json'), ASSET_AUTH_DICT, ASSET_ACCESSIBLE_FIELD]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Assets',
-        title: 'Asset: Credential User Name and Password',
-        payloadType: 'com.apple.asset.credential.userpassword',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'A reference to JSON data describing a username and password credential.',
-        supportedOS: 'iOS 15.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/userpass.json', 'application/json'), ASSET_AUTH_DICT]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Assets',
-        title: 'Asset: Data',
-        payloadType: 'com.apple.asset.data',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'A reference to arbitrary data (zip archives, property lists, DER keys).',
-        supportedOS: 'iOS 17.0+, macOS 14.0+, tvOS 17.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [buildAssetReferenceDict('https://mdm.example.com/assets/service-config.zip', 'application/zip', ['application/zip', 'application/plist', 'application/x-plist', 'application/xml', 'application/octet-stream']), ASSET_AUTH_DICT]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Assets',
-        title: 'Asset: User Identity',
-        payloadType: 'com.apple.asset.useridentity',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'The user-identity data (FullName, EmailAddress) referenced by Account declarations.',
-        supportedOS: 'iOS 15.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [
-          { key: 'FullName', title: 'Full name', type: 'string', default: 'Jane Doe' },
-          { key: 'EmailAddress', title: 'Email address', type: 'string', default: 'jane.doe@example.com' }
-        ]
-      },
-      {
-        protocol: 'ddm',
-        category: 'Management',
-        title: 'Management: Organization Information',
+        category: 'Management & Assets',
+        title: 'DDM Management & Credentials/Assets Bundle',
         payloadType: 'com.apple.management.organization-info',
         platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
         supervision: 'none',
-        description: 'Configures the managing organization contact name, support email, URL, and verification IdentityToken.',
+        description: 'Merged DDM organization info, properties, server capabilities, and credential/data/user-identity asset references.',
         supportedOS: 'iOS 15.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
         keys: [
-          { key: 'Name', title: 'Organization name', type: 'string', required: true, default: 'RGM IT Operations' },
-          { key: 'Email', title: 'Organization email address', type: 'string', default: 'it-support@example.com' },
-          { key: 'URL', title: 'Organization support URL', type: 'string', default: 'https://support.example.com' }
+          { key: 'Name', title: 'Organization / Asset Name', type: 'string', required: true, default: 'RGM IT Operations' },
+          { key: 'Email', title: 'Organization Email Address', type: 'string', default: 'it-support@example.com' },
+          { key: 'URL', title: 'Organization Support URL', type: 'string', default: 'https://support.example.com' },
+          { key: 'FullName', title: 'User Identity Full Name', type: 'string', default: 'Jane Doe' },
+          { key: 'EmailAddress', title: 'User Identity Email Address', type: 'string', default: 'jane.doe@example.com' },
+          { key: 'Version', title: 'Server Capabilities Protocol Version', type: 'string', default: '1.0.0' },
+          { key: 'SupportedFeatures', title: 'Server Capabilities Supported Features (key/value)', type: 'kv_map' },
+          { key: 'Properties', title: 'Managed Properties (key/value)', type: 'kv_map' },
+          buildAssetReferenceDict('https://mdm.example.com/assets/credential-asset.json', 'application/json'),
+          ASSET_AUTH_DICT,
+          ASSET_ACCESSIBLE_FIELD
         ]
       },
-      {
-        protocol: 'ddm',
-        category: 'Management',
-        title: 'Management: Properties',
-        payloadType: 'com.apple.management.properties',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'Configures arbitrary server-managed properties (key/value pairs) on the device.',
-        supportedOS: 'iOS 16.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
-        rootKvMap: true,
-        keys: []
-      },
-      {
-        protocol: 'ddm',
-        category: 'Management',
-        title: 'Management: Server Capabilities',
-        payloadType: 'com.apple.management.server-capabilities',
-        platforms: ['iOS', 'macOS', 'tvOS', 'visionOS', 'watchOS'],
-        supervision: 'none',
-        description: 'Advertises the MDM server protocol version and supported optional DDM protocol features.',
-        supportedOS: 'iOS 15.0+, macOS 13.0+, tvOS 16.0+, visionOS 1.1+, watchOS 10.0+',
-        keys: [
-          { key: 'Version', title: 'Protocol version', type: 'string', required: true, default: '1.0.0' },
-          { key: 'SupportedFeatures', title: 'Supported features (e.g. com.apple.* feature keys)', type: 'kv_map', required: true }
-        ]
-      }
     ];
 
     // =========================================================================
@@ -2851,26 +2680,40 @@
       return btoa(bin);
     }
 
-    function highlightStage1Cards() {
-      const mdmCard = document.getElementById('wizProtoMdm');
-      const ddmCard = document.getElementById('wizProtoDdm');
-      const badgeMdm = document.getElementById('badgeProtoMdm');
-      const badgeDdm = document.getElementById('badgeProtoDdm');
+    let selectedBaselineMode = 'mdm'; // 'mdm' | 'ddm' | 'cis_lvl1' | 'cis_lvl2'
 
-      if (state.protocol === 'mdm') {
-        mdmCard.className = 'liquid-card-selected p-5 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer';
-        ddmCard.className = 'liquid-card p-5 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer';
-        badgeMdm.textContent = 'Selected';
-        badgeMdm.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-600 text-white shadow-2xs';
-        badgeDdm.textContent = 'JSON & .mobileconfig';
-        badgeDdm.className = 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-800 border border-indigo-200/60';
-      } else {
-        ddmCard.className = 'liquid-card-selected-indigo p-5 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer';
-        mdmCard.className = 'liquid-card p-5 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer';
-        badgeDdm.textContent = 'Selected';
-        badgeDdm.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-600 text-white shadow-2xs';
-        badgeMdm.textContent = 'Classic XML';
-        badgeMdm.className = 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-800 border border-sky-200/60';
+    // Compact mSCP macOS 27.0 CIS Level 1 & Level 2 Rule Definitions (All Automated Checks & Fixes)
+    const CIS_LVL1_RULES_COMPACT = [{"id": "audit_acls_files_configure", "check": "/bin/ls -le \"/var/audit\" | /usr/bin/awk '{print $1}' | /usr/bin/grep -c \":\"", "result": "0", "script": "/bin/chmod -RN /var/audit"}, {"id": "audit_acls_folders_configure", "check": "/bin/ls -lde /var/audit | /usr/bin/awk '{print $1}' | /usr/bin/grep -c \":\"", "result": "0", "script": "/bin/chmod -N /var/audit"}, {"id": "audit_auditd_enabled", "check": "LAUNCHD_RUNNING=$(/bin/launchctl print system | /usr/bin/grep -c -E '\\tcom.apple.auditd')\nAUDITD_RUNNING=$(/usr/sbin/audit -c | /usr/bin/grep -c \"AUC_AUDITING\")\nif [[ $LAUNCHD_RUNNING == 1 ]] && [[ -e /etc/security/audit_control ]] && [[ $AUDITD_RUNNING == 1 ]]; then\n  echo \"pass\"\nelse\n  echo \"fail\"\nfi", "result": "pass", "script": "if [[ ! -e /etc/security/audit_control ]] && [[ -e /etc/security/audit_control.example ]];then\n  /bin/cp /etc/security/audit_control.example /etc/security/audit_control\nfi\n\n/bin/launchctl enable system/com.apple.auditd\n/bin/launchctl bootstrap system /System/Library/LaunchDaemons/com.apple.auditd.plist\n/usr/sbin/audit -i"}, {"id": "audit_control_acls_configure", "check": "/bin/ls -le /etc/security/audit_control | /usr/bin/awk '{print $1}' | /usr/bin/grep -c \":\"", "result": "0", "script": "/bin/chmod -N /etc/security/audit_control"}, {"id": "audit_control_group_configure", "check": "/bin/ls -dn /etc/security/audit_control | /usr/bin/awk '{print $4}'", "result": "0", "script": "/usr/bin/chgrp wheel /etc/security/audit_control"}, {"id": "audit_control_mode_configure", "check": "/bin/ls -l /etc/security/audit_control | /usr/bin/awk '!/-r--[r-]-----|current|total/{print $1}' | /usr/bin/wc -l | /usr/bin/xargs", "result": "0", "script": "/bin/chmod 440 /etc/security/audit_control"}, {"id": "audit_control_owner_configure", "check": "/bin/ls -dn /etc/security/audit_control | /usr/bin/awk '{print $3}'", "result": "0", "script": "/usr/sbin/chown root /etc/security/audit_control"}, {"id": "audit_files_group_configure", "check": "/bin/ls -n \"/var/audit\" | /usr/bin/awk '{s+=$4} END {print s}'", "result": "0", "script": "/usr/bin/chgrp -R wheel /var/audit/*"}, {"id": "audit_files_mode_configure", "check": "/bin/ls -l $(/usr/bin/grep '^dir' /etc/security/audit_control | /usr/bin/awk -F: '{print $2}') | /usr/bin/awk '!/-r--r-----|current|total/{print $1}' | /usr/bin/wc -l | /usr/bin/tr -d ' '", "result": "0", "script": "/bin/chmod 440 /var/audit/*"}, {"id": "audit_files_owner_configure", "check": "/bin/ls -n \"/var/audit\" | /usr/bin/awk '{s+=$3} END {print s}'", "result": "0", "script": "/usr/sbin/chown -R root /var/audit/*"}, {"id": "audit_folder_group_configure", "check": "/bin/ls -dn \"/var/audit\" | /usr/bin/awk '{print $4}'", "result": "0", "script": "/usr/bin/chgrp wheel /var/audit"}, {"id": "audit_folder_owner_configure", "check": "/bin/ls -dn \"/var/audit\" | /usr/bin/awk '{print $3}'", "result": "0", "script": "/usr/sbin/chown root /var/audit"}, {"id": "audit_folders_mode_configure", "check": "/usr/bin/stat -f %A \"/var/audit\"", "result": "700", "script": "/bin/chmod 700 /var/audit"}, {"id": "audit_retention_configure", "check": "/usr/bin/awk -F: '/expire-after/{print $2}' /etc/security/audit_control", "result": "60d OR 5G", "script": "/usr/bin/sed -i.bak 's/^expire-after.*/expire-after:60d OR 5G/' /etc/security/audit_control; /usr/sbin/audit -s"}, {"id": "os_airdrop_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowAirDrop\")) == false && s.objectIsForcedForKey(\"allowAirDrop\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_anti_virus_installed", "check": "/usr/bin/xprotect status | /usr/bin/grep -cE \"(launch scans: enabled|background scans: enabled)\"", "result": "2", "script": "/bin/launchctl load -w /Library/Apple/System/Library/LaunchDaemons/com.apple.XProtect.daemon.scan.plist\n/bin/launchctl load -w /Library/Apple/System/Library/LaunchDaemons/com.apple.XprotectFramework.PluginService.plist"}, {"id": "os_authenticated_root_enable", "check": "/sbin/mount | /usr/bin/grep ' / ' | /usr/bin/grep -o 'sealed'", "result": "sealed", "script": "/usr/bin/csrutil authenticated-root enable"}, {"id": "os_config_data_install_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.SoftwareUpdate')\\\n.objectForKey('ConfigDataInstall').js\nEOS", "result": "true", "script": ""}, {"id": "os_external_apfs_hfs_volumes_encrypted", "check": "/usr/sbin/diskutil list external | /usr/bin/grep -E \"APFS Volume|Apple_HFS|Logical Volume\" | /usr/bin/awk '{print $NF}' | /usr/bin/xargs -n1 /usr/sbin/diskutil info 2>/dev/null | /usr/bin/awk '/Volume Name:/{ volume_name=$0; sub(/^[ \\t]*Volume Name:[ \\t]*/,\"\",volume_name); is_disk_image=\"\"; is_vol_readonly=0; is_media_readonly=0 } /Protocol:/{ is_disk_image=($0 ~ /Disk Image/) } /Volume Read-Only:/{ is_vol_readonly=($0 ~ /Yes/) } /Media Read-Only:/{ is_media_readonly=($0 ~ /Yes/) } /FileVault:/{ if(is_disk_image && is_vol_readonly && is_media_readonly) next; encryption_status=($2==\"Yes\") ? \"Encrypted\" : \"NOT ENCRYPTED\"; printf \"%-40s %s\\n\", volume_name, encryption_status }'", "result": "Yes", "script": ""}, {"id": "os_gatekeeper_enable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.systempolicy.control\"); (ObjC.unwrap(s.objectForKey(\"EnableAssessment\")) == true && s.objectIsForcedForKey(\"EnableAssessment\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_guest_folder_removed", "check": "/bin/ls /Users/ | /usr/bin/grep -c \"Guest\"", "result": "0", "script": "/bin/rm -Rf /Users/Guest"}, {"id": "os_home_folders_secure", "check": "/usr/bin/find /System/Volumes/Data/Users -mindepth 1 -maxdepth 1 -type d ! \\( -perm 700 -o -perm 711 \\) | /usr/bin/grep -v \"Shared\" | /usr/bin/grep -v \"Guest\" | /usr/bin/wc -l | /usr/bin/xargs", "result": "0", "script": "IFS=$'\\n'\nfor userDirs in $( /usr/bin/find /System/Volumes/Data/Users -mindepth 1 -maxdepth 1 -type d ! \\( -perm 700 -o -perm 711 \\) | /usr/bin/grep -v \"Shared\" | /usr/bin/grep -v \"Guest\" ); do\n  /bin/chmod og-rwx \"$userDirs\"\ndone\nunset IFS"}, {"id": "os_httpd_disable", "check": "result=\"FAIL\"\nenabled=$(/bin/launchctl print-disabled system | /usr/bin/grep '\"org.apache.httpd\" => enabled')\nrunning=$(/bin/launchctl print system/org.apache.httpd 2>/dev/null)\n\nif [[ -z \"$running\" ]] && [[ -z \"$enabled\" ]]; then\n  result=\"PASS\"\nelif [[ -n \"$running\" ]]; then\n  result=\"${result}  RUNNING\"\nelif [[ -n \"$enabled\" ]]; then\n  result=\"${result}  ENABLED\"\nfi\necho $result", "result": "PASS", "script": "/usr/sbin/apachectl stop 2>/dev/null\n/bin/launchctl disable system/org.apache.httpd"}, {"id": "os_install_log_retention_configure", "check": "/usr/sbin/aslmanager -dd 2>&1 | /usr/bin/awk '/\\/var\\/log\\/install.log$/ {count++} /Processing module com.apple.install/,/Finished/ { for (i=1;i<=NR;i++) { if ($i == \"TTL\" && $(i+2) >= 365) { ttl=\"True\" }; if ($i == \"MAX\") {max=\"True\"}}} END{if (count > 1) { print \"Multiple config files for /var/log/install, manually remove the extra files\"} else if (max == \"True\") { print \"all_max setting is configured, must be removed\" } if (ttl != \"True\") { print \"TTL not configured\" } else { print \"Yes\" }}'", "result": "Yes", "script": "/usr/bin/sed -i '' \"s/\\* file \\/var\\/log\\/install.log.*/\\* file \\/var\\/log\\/install.log format='\\$\\(\\(Time\\)\\(JZ\\)\\) \\$Host \\$\\(Sender\\)\\[\\$\\(PID\\\\)\\]: \\$Message' rotate=utc compress file_max=50M size_only ttl=365/g\" /etc/asl/com.apple.install"}, {"id": "os_internal_apfs_volumes_encrypted", "check": "fail=$(/usr/sbin/diskutil list internal | /usr/bin/grep \"APFS Volume\" | /usr/bin/awk '{print $NF}' | /usr/bin/xargs -n1 /usr/sbin/diskutil info 2>/dev/null | /usr/bin/awk '\n  /Volume Name:/{name=$0; sub(/^[ \\t]*Volume Name:[ \\t]*/,\"\",name)}\n  /FileVault:/{\n    if ($2==\"No\" && name !~ /^(Preboot|Recovery|VM)$/) {\n      if (list==\"\") list=name; else list=list \", \" name\n    }\n  }\n  END{print list}')\nif [ -z \"$fail\" ]; then\n  /bin/echo \"Yes\"\nelse\n  /bin/echo \"Unencrypted internal user APFS volumes: $fail\"\nfi", "result": "Yes", "script": ""}, {"id": "os_mail_smart_reply_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowMailSmartReplies\")) == false && s.objectIsForcedForKey(\"allowMailSmartReplies\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_mail_summary_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowMailSummary\")) == false && s.objectIsForcedForKey(\"allowMailSummary\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_mobile_file_integrity_enable", "check": "/usr/sbin/nvram -p | /usr/bin/grep -c \"amfi_get_out_of_my_way=1\"", "result": "0", "script": "/usr/sbin/nvram boot-args=\"\""}, {"id": "os_nfsd_disable", "check": "isDisabled=$(/sbin/nfsd status | /usr/bin/awk '/nfsd service/ {print $NF}')\nif [[ \"$isDisabled\" == \"disabled\" ]] && [[ -z $(/usr/bin/pgrep nfsd) ]]; then\n  echo \"pass\"\nelse\n  echo \"fail\"\nfi", "result": "pass", "script": "/bin/launchctl disable system/com.apple.nfsd\n/bin/rm -rf /etc/exports"}, {"id": "os_notes_transcription_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowNotesTranscription\")) == false && s.objectIsForcedForKey(\"allowNotesTranscription\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_notes_transcription_summary_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowNotesTranscriptionSummary\")) == false && s.objectIsForcedForKey(\"allowNotesTranscriptionSummary\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_on_device_dictation_enforce", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"forceOnDeviceOnlyDictation\")) == true && s.objectIsForcedForKey(\"forceOnDeviceOnlyDictation\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_password_hint_remove", "check": "HINT=$(/usr/bin/dscl . -list /Users hint | /usr/bin/awk '{ print $2 }')\n\nif [ -z \"$HINT\" ]; then\n  echo \"PASS\"\nelse\n  echo \"FAIL\"\nfi", "result": "PASS", "script": "for u in $(/usr/bin/dscl . -list /Users UniqueID | /usr/bin/awk '$2 > 500 {print $1}'); do\n  /usr/bin/dscl . -delete /Users/$u hint\ndone"}, {"id": "os_root_disable", "check": "/usr/bin/dscl '/Local/Default' read '/Users/root' AuthenticationAuthority 2>/dev/null | /usr/bin/grep -c 'AuthenticationAuthority'", "result": "0", "script": "/usr/bin/fdesetup remove -user root\n/usr/bin/dscl '/Local/Default' delete '/Users/root' AuthenticationAuthority"}, {"id": "os_safari_advertising_privacy_protection_enable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c '\"WebKitPreferences.privateClickMeasurementEnabled\" = 1' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_open_safe_downloads_disable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c 'AutoOpenSafeDownloads = 0' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_prevent_cross-site_tracking_enable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -cE '\"WebKitPreferences.storageBlockingPolicy\" = 1|\"WebKitStorageBlockingPolicy\" = 1|\"BlockStoragePolicy\" =2' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_reader_summary_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowSafariSummary\")) == false && s.objectIsForcedForKey(\"allowSafariSummary\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_safari_show_full_website_address_enable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c 'ShowFullURLInSmartSearchField = 1' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_show_status_bar_enabled", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c 'ShowOverlayStatusBar = 1' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_warn_fraudulent_website_enable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c 'WarnAboutFraudulentWebsites = 1' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_sip_enable", "check": "/usr/bin/csrutil status | /usr/bin/grep -c 'System Integrity Protection status: enabled.'", "result": "1", "script": "/usr/bin/csrutil enable"}, {"id": "os_software_update_deferral", "check": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\n  let timeout = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.applicationaccess')\\\n.objectForKey('enforcedSoftwareUpdateDelay')) || 0\n  if ( timeout <= 30 ) {\n    return(\"true\")\n  } else {\n    return(\"false\")\n  }\n}\nEOS", "result": "true", "script": ""}, {"id": "os_sudo_log_enforce", "check": "/usr/bin/sudo /usr/bin/sudo -V | /usr/bin/grep -c \"Log when a command is allowed by sudoers\"", "result": "1", "script": "/usr/bin/find /etc/sudoers* -type f -exec sed -i '' '/^Defaults[[:blank:]]*\\!log_allowed/s/^/# /' '{}' \\;\n/bin/echo \"Defaults log_allowed\" >> /etc/sudoers.d/mscp"}, {"id": "os_sudo_timeout_configure", "check": "/usr/bin/sudo /usr/bin/sudo -V | /usr/bin/grep -c \"Authentication timestamp timeout: 0.0 minutes\"", "result": "1", "script": "/usr/bin/find /etc/sudoers* -type f -exec sed -i '' '/timestamp_timeout/d' '{}' \\;\n/bin/echo \"Defaults timestamp_timeout=0\" >> /etc/sudoers.d/mscp"}, {"id": "os_sudoers_timestamp_type_configure", "check": "/usr/bin/sudo /usr/bin/sudo -V | /usr/bin/awk -F\": \" '/Type of authentication timestamp record/{print $2}'", "result": "tty", "script": "/usr/bin/find /etc/sudoers* -type f -exec sed -i '' '/timestamp_type/d; /!tty_tickets/d' '{}' \\;"}, {"id": "os_system_wide_applications_configure", "check": "/usr/bin/find /Applications -iname \"*\\.app\" -type d -perm -2 -ls | /usr/bin/wc -l | /usr/bin/xargs", "result": "0", "script": "IFS=$'\\n'\nfor apps in $( /usr/bin/find /Applications -iname \"*\\.app\" -type d -perm -2 ); do\n  /bin/chmod -R o-w \"$apps\"\ndone"}, {"id": "os_terminal_secure_keyboard_enable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.Terminal')\\\n.objectForKey('SecureKeyboardEntry').js\nEOS", "result": "true", "script": ""}, {"id": "os_time_server_enabled", "check": "/bin/launchctl print system | /usr/bin/grep -c -E '\\tcom.apple.timed'", "result": "1", "script": "/bin/launchctl load -w /System/Library/LaunchDaemons/com.apple.timed.plist"}, {"id": "os_unlock_active_user_session_disable", "check": "RESULT=\"FAIL\"\nSS_RULE=$(/usr/bin/security -q authorizationdb read system.login.screensaver  2>&1 | /usr/bin/xmllint --xpath \"//dict/key[.='rule']/following-sibling::array[1]/string/text()\" -)\n\nif [[ \"${SS_RULE}\" == \"authenticate-session-owner\" ]]; then\n    RESULT=\"PASS\"\nelse\n    PSSO_CHECK=$(/usr/bin/security -q authorizationdb read \"$SS_RULE\"  2>&1 | /usr/bin/xmllint --xpath '//key[.=\"rule\"]/following-sibling::array[1]/string/text()' -)\n    if /usr/bin/grep -Fxq \"authenticate-session-owner\" <<<\"$PSSO_CHECK\"; then\n        RESULT=\"PASS\"\n    fi\nfi\n\necho $RESULT", "result": "PASS", "script": "SS_RULE=$(/usr/bin/security -q authorizationdb read system.login.screensaver 2>&1 | /usr/bin/xmllint --xpath \"//dict/key[.='rule']/following-sibling::array[1]/string/text()\" -)\nif [[ \"$SS_RULE\" == *psso* ]]; then\n    tmpdir=$(/usr/bin/mktemp -d) || return 1\n    /bin/chmod 700 \"$tmpdir\"\n    /usr/bin/security -q authorizationdb read psso-screensaver > \"$tmpdir/psso-screensaver-mscp.plist\"\n    /usr/bin/sed -i'' 's/<string>authenticate-session-owner-or-admin<\\/string>/<string>authenticate-session-owner<\\/string>/' \"$tmpdir/psso-screensaver-mscp.plist\"\n    /usr/bin/security -q authorizationdb write psso-screensaver-mscp < \"$tmpdir/psso-screensaver-mscp.plist\"\n    /usr/bin/security -q authorizationdb write system.login.screensaver psso-screensaver-mscp 2>&1\n    /bin/rm -rf \"$tmpdir\"\nelse\n    /usr/bin/security -q authorizationdb write system.login.screensaver \"authenticate-session-owner\" 2>&1\nfi"}, {"id": "os_world_writable_system_folder_configure", "check": "/usr/bin/find /System/Volumes/Data/System -type d -perm -2 -ls | /usr/bin/grep -vE \"downloadDir|locks\" | /usr/bin/wc -l | /usr/bin/xargs", "result": "0", "script": "IFS=$'\\n'\nfor sysPermissions in $( /usr/bin/find /System/Volumes/Data/System -type d -perm -2 | /usr/bin/grep -vE \"downloadDir|locks\" ); do\n  /bin/chmod -R o-w \"$sysPermissions\"\ndone"}, {"id": "os_writing_tools_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowWritingTools\")) == false && s.objectIsForcedForKey(\"allowWritingTools\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "pwpolicy_account_lockout_enforce", "check": "/usr/bin/pwpolicy -getaccountpolicies 2> /dev/null | /usr/bin/tail +2 | /usr/bin/xmllint --xpath '//dict/key[text()=\"policyAttributeMaximumFailedAuthentications\"]/following-sibling::integer[1]/text()' - | /usr/bin/awk '{ if ($1 <= 5) {print \"pass\"} else {print \"fail\"}}' | /usr/bin/uniq", "result": "pass", "script": ""}, {"id": "pwpolicy_history_enforce", "check": "/usr/bin/pwpolicy -getaccountpolicies 2> /dev/null | /usr/bin/tail +2 | /usr/bin/xmllint --xpath '//dict/key[text()=\"policyAttributePasswordHistoryDepth\"]/following-sibling::*[1]/text()' - | /usr/bin/awk '{ if ($1 >= 24 ) {print \"pass\"} else {print \"fail\"}}' | /usr/bin/uniq", "result": "pass", "script": ""}, {"id": "pwpolicy_max_lifetime_enforce", "check": "/usr/bin/pwpolicy -getaccountpolicies 2> /dev/null | /usr/bin/tail +2 | /usr/bin/xmllint --xpath '//dict/key[text()=\"policyAttributeExpiresEveryNDays\"]/following-sibling::*[1]/text()' - | /usr/bin/awk '{ if ($1 <= 365 ) {print \"pass\"} else {print \"fail\"}}' | /usr/bin/uniq", "result": "pass", "script": ""}, {"id": "pwpolicy_minimum_length_enforce", "check": "/usr/bin/pwpolicy -getaccountpolicies 2>/dev/null | tail +2 | grep -oE \"policyAttributePassword matches '.\\{[0-9]+,\" | awk -F'[{,]' -v ODV=15 '{if ($2 > max) max=$2} END {print (max >= ODV) ? \"pass\" : \"fail\"}'", "result": "pass", "script": ""}, {"id": "system_settings_airplay_receiver_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowAirPlayIncomingRequests\")) == false && s.objectIsForcedForKey(\"allowAirPlayIncomingRequests\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_automatic_login_disable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.loginwindow')\\\n.objectForKey('com.apple.login.mcx.DisableAutoLoginClient').js\nEOS", "result": "true", "script": ""}, {"id": "system_settings_bluetooth_sharing_disable", "check": "/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults -currentHost read com.apple.Bluetooth PrefKeyServicesEnabled", "result": "0", "script": "/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults -currentHost write com.apple.Bluetooth PrefKeyServicesEnabled -bool false"}, {"id": "system_settings_critical_update_install_enforce", "check": "/usr/bin/plutil -convert json /var/db/softwareupdate/SoftwareUpdateDDMStatePersistence.plist -o - | /usr/bin/jq --raw-output .'SUCorePersistedStatePolicyFields.SUCoreDDMDeclarationGlobalSettings.automaticallyInstallSystemAndSecurityUpdates'", "result": "1", "script": ""}, {"id": "system_settings_diagnostics_reports_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s1 = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.SubmitDiagInfo\"); var s2 = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); var v1 = ObjC.unwrap(s1.objectForKey(\"AutoSubmit\")); var v2 = ObjC.unwrap(s2.objectForKey(\"allowDiagnosticSubmission\")); var f1 = s1.objectIsForcedForKey(\"AutoSubmit\"); var f2 = s2.objectIsForcedForKey(\"allowDiagnosticSubmission\"); (v1 == false && v2 == false && f1 && f2) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_external_intelligence_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowExternalIntelligenceIntegrations\")) == false && s.objectIsForcedForKey(\"allowExternalIntelligenceIntegrations\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_external_intelligence_sign_in_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowExternalIntelligenceIntegrationsSignIn\")) == false && s.objectIsForcedForKey(\"allowExternalIntelligenceIntegrationsSignIn\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_filevault_enforce", "check": "dontAllowDisable=$(/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.MCX')\\\n.objectForKey('dontAllowFDEDisable').js\nEOS\n)\nfileVault=$(/usr/bin/fdesetup status | /usr/bin/grep -c \"FileVault is On.\")\nif [[ \"$dontAllowDisable\" == \"true\" ]] && [[ \"$fileVault\" == 1 ]]; then\n  echo \"1\"\nelse\n  echo \"0\"\nfi", "result": "1", "script": ""}, {"id": "system_settings_firewall_enable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.security.firewall')\\\n.objectForKey('EnableFirewall').js\nEOS", "result": "true", "script": "/usr/bin/defaults write /Library/Preferences/com.apple.alf globalstate -int 1"}, {"id": "system_settings_firewall_stealth_mode_enable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.security.firewall')\\\n.objectForKey('EnableStealthMode').js\nEOS", "result": "true", "script": "/usr/bin/defaults write /Library/Preferences/com.apple.alf stealthenabled -int 1"}, {"id": "system_settings_guest_access_smb_disable", "check": "/usr/sbin/sysadminctl -smbGuestAccess status 2>&1 | /usr/bin/grep -c \"SMB guest access disabled\"", "result": "1", "script": "/usr/sbin/sysadminctl -smbGuestAccess off"}, {"id": "system_settings_guest_account_disable", "check": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\n  let pref1 = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.MCX')\\\n.objectForKey('DisableGuestAccount'))\n  let pref2 = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.MCX')\\\n.objectForKey('EnableGuestAccount'))\n  if ( pref1 == true && pref2 == false ) {\n    return(\"true\")\n  } else {\n    return(\"false\")\n  }\n}\nEOS", "result": "true", "script": ""}, {"id": "system_settings_hot_corners_secure", "check": "bl_corner=\"$(/usr/bin/defaults read /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-bl-corner 2>/dev/null)\"\ntl_corner=\"$(/usr/bin/defaults read /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-tl-corner 2>/dev/null)\"\ntr_corner=\"$(/usr/bin/defaults read /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-tr-corner 2>/dev/null)\"\nbr_corner=\"$(/usr/bin/defaults read /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-br-corner 2>/dev/null)\"\n\nif [[ \"$bl_corner\" != \"6\" ]] && [[ \"$tl_corner\" != \"6\" ]] && [[ \"$tr_corner\" != \"6\" ]] && [[ \"$br_corner\" != \"6\" ]]; then\n  echo \"0\"\nfi", "result": "0", "script": "/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults delete /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-bl-corner 2>/dev/null\n/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults delete /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-tl-corner 2>/dev/null\n/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults delete /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-tr-corner 2>/dev/null\n/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults delete /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-br-corner 2>/dev/null"}, {"id": "system_settings_improve_assistive_voice_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.Accessibility\"); (ObjC.unwrap(s.objectForKey(\"AXSAudioDonationSiriImprovementEnabled\")) == false && s.objectIsForcedForKey(\"AXSAudioDonationSiriImprovementEnabled\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_improve_search_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.assistant.support\"); var v = ObjC.unwrap(s.objectForKey(\"Search Queries Data Sharing Status\")); (v == 2 && s.objectIsForcedForKey(\"Search Queries Data Sharing Status\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_improve_siri_dictation_disable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.assistant.support')\\\n.objectForKey('Siri Data Sharing Opt-In Status').js\nEOS", "result": "2", "script": ""}, {"id": "system_settings_install_macos_updates_enforce", "check": "/usr/bin/plutil -convert json /var/db/softwareupdate/SoftwareUpdateDDMStatePersistence.plist -o - | /usr/bin/jq --raw-output .'SUCorePersistedStatePolicyFields.SUCoreDDMDeclarationGlobalSettings.automaticallyInstallOSUpdates'", "result": "1", "script": ""}, {"id": "system_settings_internet_sharing_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.MCX\"); (ObjC.unwrap(s.objectForKey(\"forceInternetSharingOff\")) == true && s.objectIsForcedForKey(\"forceInternetSharingOff\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_loginwindow_loginwindowtext_enable", "check": "/usr/bin/osascript -l JavaScript << EOS | /usr/bin/base64\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.loginwindow')\\\n.objectForKey('LoginwindowText').js\nEOS", "result": "Q2VudGVyIGZvciBJbnRlcm5ldCBTZWN1cml0eSBUZXN0IE1lc3NhZ2U=", "script": ""}, {"id": "system_settings_loginwindow_prompt_username_password_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.loginwindow')\\\n.objectForKey('SHOWFULLNAME').js\nEOS", "result": "true", "script": ""}, {"id": "system_settings_password_hints_disable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.loginwindow')\\\n.objectForKey('RetriesUntilHint').js\nEOS", "result": "0", "script": ""}, {"id": "system_settings_personalized_advertising_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowApplePersonalizedAdvertising\")) == false && s.objectIsForcedForKey(\"allowApplePersonalizedAdvertising\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_printer_sharing_disable", "check": "/usr/sbin/cupsctl | /usr/bin/grep -c \"_share_printers=0\"", "result": "1", "script": "/usr/sbin/cupsctl --no-share-printers\n/usr/bin/lpstat -p | awk '{print $2}'| /usr/bin/xargs -I{} lpadmin -p {} -o printer-is-shared=false"}, {"id": "system_settings_rae_disable", "check": "/bin/launchctl print-disabled system | /usr/bin/grep -c '\"com.apple.AEServer\" => disabled'", "result": "1", "script": "/usr/sbin/systemsetup -setremoteappleevents off\n/bin/launchctl disable system/com.apple.AEServer"}, {"id": "system_settings_remote_management_disable", "check": "/usr/libexec/mdmclient QuerySecurityInfo 2>/dev/null | /usr/bin/grep -c \"RemoteDesktopEnabled = 0\"", "result": "1", "script": "/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -stop"}, {"id": "system_settings_screen_sharing_disable", "check": "result=\"FAIL\"\nenabled=$(/bin/launchctl print-disabled system | /usr/bin/grep '\"com.apple.screensharing\" => enabled')\nrunning=$(/bin/launchctl print system/com.apple.screensharing 2>/dev/null)\n\nif [[ -z \"$running\" ]] && [[ -z \"$enabled\" ]]; then\n  result=\"PASS\"\nelif [[ -n \"$running\" ]]; then\n  result=\"${result}  RUNNING\"\nelif [[ -n \"$enabled\" ]]; then\n  result=\"${result}  ENABLED\"\nfi\necho $result", "result": "PASS", "script": "/bin/launchctl disable system/com.apple.screensharing"}, {"id": "system_settings_screensaver_ask_for_password_delay_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\n  let delay = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.screensaver')\\\n.objectForKey('askForPasswordDelay'))\n  if ( delay <= 5 ) {\n    return(\"true\")\n  } else {\n    return(\"false\")\n  }\n}\nEOS", "result": "true", "script": ""}, {"id": "system_settings_screensaver_password_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.screensaver')\\\n.objectForKey('askForPassword').js\nEOS", "result": "true", "script": ""}, {"id": "system_settings_screensaver_timeout_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\n  let timeout = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.screensaver')\\\n.objectForKey('idleTime'))\n  if ( timeout <= 900 ) {\n    return(\"true\")\n  } else {\n    return(\"false\")\n  }\n}\nEOS", "result": "true", "script": ""}, {"id": "system_settings_siri_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.ironwood.support\"); (ObjC.unwrap(s.objectForKey(\"Assistant Allowed\")) == false && s.objectIsForcedForKey(\"Assistant Allowed\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_smbd_disable", "check": "/bin/launchctl print-disabled system | /usr/bin/grep -c '\"com.apple.smbd\" => disabled'", "result": "1", "script": "/bin/launchctl disable system/com.apple.smbd"}, {"id": "system_settings_software_update_app_update_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.SoftwareUpdate')\\\n.objectForKey('AutomaticallyInstallAppUpdates').js\nEOS", "result": "true", "script": ""}, {"id": "system_settings_software_update_download_enforce", "check": "/usr/bin/plutil -convert json /var/db/softwareupdate/SoftwareUpdateDDMStatePersistence.plist -o - | /usr/bin/jq --raw-output .'SUCorePersistedStatePolicyFields.SUCoreDDMDeclarationGlobalSettings.automaticallyDownload'", "result": "1", "script": ""}, {"id": "system_settings_softwareupdate_current", "check": "softwareupdate_date_epoch=$(/bin/date -j -f \"%Y-%m-%d\" \"$(/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist LastFullSuccessfulDate | /usr/bin/awk '{print $1}')\" \"+%s\")\nthirty_days_epoch=$(/bin/date -v -30d \"+%s\")\nif [[ $softwareupdate_date_epoch -lt $thirty_days_epoch ]]; then\n  /bin/echo \"0\"\nelse\n  /bin/echo \"1\"\nfi", "result": "1", "script": "/usr/sbin/softwareupdate -i -a"}, {"id": "system_settings_ssh_disable", "check": "result=\"FAIL\"\nenabled=$(/bin/launchctl print-disabled system | /usr/bin/grep '\"com.openssh.sshd\" => enabled')\nrunning=$(/bin/launchctl print system/com.openssh.sshd 2>/dev/null)\n\nif [[ -z \"$running\" ]] && [[ -z \"$enabled\" ]]; then\n  result=\"PASS\"\nelif [[ -n \"$running\" ]]; then\n  result=\"${result}  RUNNING\"\nelif [[ -n \"$enabled\" ]]; then\n  result=\"${result}  ENABLED\"\nfi\necho $result", "result": "PASS", "script": "/usr/sbin/systemsetup -f -setremotelogin off >/dev/null\n/bin/launchctl disable system/com.openssh.sshd"}, {"id": "system_settings_system_wide_preferences_configure", "check": "authDBs=(\"system.preferences\" \"system.preferences.energysaver\" \"system.preferences.network\" \"system.preferences.printing\" \"system.preferences.sharing\" \"system.preferences.softwareupdate\" \"system.preferences.startupdisk\" \"system.preferences.timemachine\")\nresult=\"1\"\nfor section in ${authDBs[@]}; do\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"shared\")]/following-sibling::*[1])' -) != \"false\" ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath '//*[contains(text(), \"group\")]/following-sibling::*[1]/text()' - ) != \"admin\" ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"authenticate-user\")]/following-sibling::*[1])' -) != \"true\" ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"session-owner\")]/following-sibling::*[1])' -) != \"false\" ]]; then\n    result=\"0\"\n  fi\ndone\necho $result", "result": "1", "script": "authDBs=(\"system.preferences\" \"system.preferences.energysaver\" \"system.preferences.network\" \"system.preferences.printing\" \"system.preferences.sharing\" \"system.preferences.softwareupdate\" \"system.preferences.startupdisk\" \"system.preferences.timemachine\")\ntmpdir=$(/usr/bin/mktemp -d) || return 1\n/bin/chmod 700 \"$tmpdir\"\nfor section in ${authDBs[@]}; do\n  /usr/bin/security -q authorizationdb read \"$section\" > \"$tmpdir/$section.plist\"\n\n  class_key_value=$(/usr/libexec/PlistBuddy -c \"Print :class\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$class_key_value\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :class string user\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :class user\" \"$tmpdir/$section.plist\"\n  fi\n\n  key_value=$(/usr/libexec/PlistBuddy -c \"Print :shared\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$key_value\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :shared bool false\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :shared false\" \"$tmpdir/$section.plist\"\n  fi\n\n  auth_user_key=$(/usr/libexec/PlistBuddy -c \"Print :authenticate-user\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$auth_user_key\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :authenticate-user bool true\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :authenticate-user true\" \"$tmpdir/$section.plist\"\n  fi\n\n  session_owner_key=$(/usr/libexec/PlistBuddy -c \"Print :session-owner\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$session_owner_key\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :session-owner bool false\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :session-owner false\" \"$tmpdir/$section.plist\"\n  fi\n\n  group_key=$(/usr/libexec/PlistBuddy -c \"Print :group\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$group_key\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :group string admin\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :group admin\" \"$tmpdir/$section.plist\"\n  fi\n\n  /usr/bin/security -q authorizationdb write \"$section\" < \"$tmpdir/$section.plist\"\ndone\n/bin/rm -rf \"$tmpdir\""}, {"id": "system_settings_time_machine_encrypted_configure", "check": "/usr/bin/defaults read /Library/Preferences/com.apple.TimeMachine.plist | /usr/bin/grep -c NotEncrypted", "result": "0", "script": ""}, {"id": "system_settings_time_server_configure", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.MCX')\\\n.objectForKey('timeServer').js\nEOS", "result": "time.apple.com", "script": ""}, {"id": "system_settings_time_server_enforce", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.timed\"); (ObjC.unwrap(s.objectForKey(\"TMAutomaticTimeOnlyEnabled\")) == true && s.objectIsForcedForKey(\"TMAutomaticTimeOnlyEnabled\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_wake_network_access_disable", "check": "/usr/bin/pmset -g custom | /usr/bin/awk '/womp/ { sum+=$2 } END {print sum}'", "result": "0", "script": "/usr/bin/pmset -a womp 0"}];
+    const CIS_LVL2_RULES_COMPACT = [{"id": "audit_acls_files_configure", "check": "/bin/ls -le \"/var/audit\" | /usr/bin/awk '{print $1}' | /usr/bin/grep -c \":\"", "result": "0", "script": "/bin/chmod -RN /var/audit"}, {"id": "audit_acls_folders_configure", "check": "/bin/ls -lde /var/audit | /usr/bin/awk '{print $1}' | /usr/bin/grep -c \":\"", "result": "0", "script": "/bin/chmod -N /var/audit"}, {"id": "audit_auditd_enabled", "check": "LAUNCHD_RUNNING=$(/bin/launchctl print system | /usr/bin/grep -c -E '\\tcom.apple.auditd')\nAUDITD_RUNNING=$(/usr/sbin/audit -c | /usr/bin/grep -c \"AUC_AUDITING\")\nif [[ $LAUNCHD_RUNNING == 1 ]] && [[ -e /etc/security/audit_control ]] && [[ $AUDITD_RUNNING == 1 ]]; then\n  echo \"pass\"\nelse\n  echo \"fail\"\nfi", "result": "pass", "script": "if [[ ! -e /etc/security/audit_control ]] && [[ -e /etc/security/audit_control.example ]];then\n  /bin/cp /etc/security/audit_control.example /etc/security/audit_control\nfi\n\n/bin/launchctl enable system/com.apple.auditd\n/bin/launchctl bootstrap system /System/Library/LaunchDaemons/com.apple.auditd.plist\n/usr/sbin/audit -i"}, {"id": "audit_control_acls_configure", "check": "/bin/ls -le /etc/security/audit_control | /usr/bin/awk '{print $1}' | /usr/bin/grep -c \":\"", "result": "0", "script": "/bin/chmod -N /etc/security/audit_control"}, {"id": "audit_control_group_configure", "check": "/bin/ls -dn /etc/security/audit_control | /usr/bin/awk '{print $4}'", "result": "0", "script": "/usr/bin/chgrp wheel /etc/security/audit_control"}, {"id": "audit_control_mode_configure", "check": "/bin/ls -l /etc/security/audit_control | /usr/bin/awk '!/-r--[r-]-----|current|total/{print $1}' | /usr/bin/wc -l | /usr/bin/xargs", "result": "0", "script": "/bin/chmod 440 /etc/security/audit_control"}, {"id": "audit_control_owner_configure", "check": "/bin/ls -dn /etc/security/audit_control | /usr/bin/awk '{print $3}'", "result": "0", "script": "/usr/sbin/chown root /etc/security/audit_control"}, {"id": "audit_files_group_configure", "check": "/bin/ls -n \"/var/audit\" | /usr/bin/awk '{s+=$4} END {print s}'", "result": "0", "script": "/usr/bin/chgrp -R wheel /var/audit/*"}, {"id": "audit_files_mode_configure", "check": "/bin/ls -l $(/usr/bin/grep '^dir' /etc/security/audit_control | /usr/bin/awk -F: '{print $2}') | /usr/bin/awk '!/-r--r-----|current|total/{print $1}' | /usr/bin/wc -l | /usr/bin/tr -d ' '", "result": "0", "script": "/bin/chmod 440 /var/audit/*"}, {"id": "audit_files_owner_configure", "check": "/bin/ls -n \"/var/audit\" | /usr/bin/awk '{s+=$3} END {print s}'", "result": "0", "script": "/usr/sbin/chown -R root /var/audit/*"}, {"id": "audit_flags_aa_configure", "check": "/usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\\n' | /usr/bin/grep -Ec 'aa'", "result": "1", "script": "/usr/bin/grep -qE \"^flags.*[^-]aa\" /etc/security/audit_control || /usr/bin/sed -i.bak '/^flags/ s/$/,aa/' /etc/security/audit_control; /usr/sbin/audit -s"}, {"id": "audit_flags_ad_configure", "check": "/usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\\n' | /usr/bin/grep -Ec 'ad'", "result": "1", "script": "/usr/bin/grep -qE \"^flags.*[^-]ad\" /etc/security/audit_control || /usr/bin/sed -i.bak '/^flags/ s/$/,ad/' /etc/security/audit_control; /usr/sbin/audit -s"}, {"id": "audit_flags_ex_configure", "check": "/usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\\n' | /usr/bin/grep -Ec '\\-ex'", "result": "1", "script": "/usr/bin/grep -qE \"^flags.*-ex\" /etc/security/audit_control || /usr/bin/sed -i.bak '/^flags/ s/$/,-ex/' /etc/security/audit_control; /usr/sbin/audit -s"}, {"id": "audit_flags_fm_failed_configure", "check": "/usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\\n' | /usr/bin/grep -Ec '\\-fm'", "result": "1", "script": "/usr/bin/grep -qE \"^flags.*-fm\" /etc/security/audit_control || /usr/bin/sed -i.bak '/^flags/ s/$/,-fm/' /etc/security/audit_control;/usr/sbin/audit -s"}, {"id": "audit_flags_fr_configure", "check": "/usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\\n' | /usr/bin/grep -Ec '\\-fr'", "result": "1", "script": "/usr/bin/grep -qE \"^flags.*-fr\" /etc/security/audit_control || /usr/bin/sed -i.bak '/^flags/ s/$/,-fr/' /etc/security/audit_control;/usr/sbin/audit -s"}, {"id": "audit_flags_fw_configure", "check": "/usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\\n' | /usr/bin/grep -Ec '\\-fw'", "result": "1", "script": "/usr/bin/grep -qE \"^flags.*-fw\" /etc/security/audit_control || /usr/bin/sed -i.bak '/^flags/ s/$/,-fw/' /etc/security/audit_control;/usr/sbin/audit -s"}, {"id": "audit_flags_lo_configure", "check": "/usr/bin/awk -F':' '/^flags/ { print $NF }' /etc/security/audit_control | /usr/bin/tr ',' '\\n' | /usr/bin/grep -Ec '^lo'", "result": "1", "script": "/usr/bin/grep -qE \"^flags.*[^-]lo\" /etc/security/audit_control || /usr/bin/sed -i.bak '/^flags/ s/$/,lo/' /etc/security/audit_control; /usr/sbin/audit -s"}, {"id": "audit_folder_group_configure", "check": "/bin/ls -dn \"/var/audit\" | /usr/bin/awk '{print $4}'", "result": "0", "script": "/usr/bin/chgrp wheel /var/audit"}, {"id": "audit_folder_owner_configure", "check": "/bin/ls -dn \"/var/audit\" | /usr/bin/awk '{print $3}'", "result": "0", "script": "/usr/sbin/chown root /var/audit"}, {"id": "audit_folders_mode_configure", "check": "/usr/bin/stat -f %A \"/var/audit\"", "result": "700", "script": "/bin/chmod 700 /var/audit"}, {"id": "audit_retention_configure", "check": "/usr/bin/awk -F: '/expire-after/{print $2}' /etc/security/audit_control", "result": "60d OR 5G", "script": "/usr/bin/sed -i.bak 's/^expire-after.*/expire-after:60d OR 5G/' /etc/security/audit_control; /usr/sbin/audit -s"}, {"id": "icloud_sync_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowCloudDesktopAndDocuments\")) == false && s.objectIsForcedForKey(\"allowCloudDesktopAndDocuments\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_airdrop_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowAirDrop\")) == false && s.objectIsForcedForKey(\"allowAirDrop\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_anti_virus_installed", "check": "/usr/bin/xprotect status | /usr/bin/grep -cE \"(launch scans: enabled|background scans: enabled)\"", "result": "2", "script": "/bin/launchctl load -w /Library/Apple/System/Library/LaunchDaemons/com.apple.XProtect.daemon.scan.plist\n/bin/launchctl load -w /Library/Apple/System/Library/LaunchDaemons/com.apple.XprotectFramework.PluginService.plist"}, {"id": "os_authenticated_root_enable", "check": "/sbin/mount | /usr/bin/grep ' / ' | /usr/bin/grep -o 'sealed'", "result": "sealed", "script": "/usr/bin/csrutil authenticated-root enable"}, {"id": "os_bonjour_disable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.mDNSResponder')\\\n.objectForKey('NoMulticastAdvertisements').js\nEOS", "result": "true", "script": ""}, {"id": "os_config_data_install_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.SoftwareUpdate')\\\n.objectForKey('ConfigDataInstall').js\nEOS", "result": "true", "script": ""}, {"id": "os_external_apfs_hfs_volumes_encrypted", "check": "/usr/sbin/diskutil list external | /usr/bin/grep -E \"APFS Volume|Apple_HFS|Logical Volume\" | /usr/bin/awk '{print $NF}' | /usr/bin/xargs -n1 /usr/sbin/diskutil info 2>/dev/null | /usr/bin/awk '/Volume Name:/{ volume_name=$0; sub(/^[ \\t]*Volume Name:[ \\t]*/,\"\",volume_name); is_disk_image=\"\"; is_vol_readonly=0; is_media_readonly=0 } /Protocol:/{ is_disk_image=($0 ~ /Disk Image/) } /Volume Read-Only:/{ is_vol_readonly=($0 ~ /Yes/) } /Media Read-Only:/{ is_media_readonly=($0 ~ /Yes/) } /FileVault:/{ if(is_disk_image && is_vol_readonly && is_media_readonly) next; encryption_status=($2==\"Yes\") ? \"Encrypted\" : \"NOT ENCRYPTED\"; printf \"%-40s %s\\n\", volume_name, encryption_status }'", "result": "Yes", "script": ""}, {"id": "os_gatekeeper_enable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.systempolicy.control\"); (ObjC.unwrap(s.objectForKey(\"EnableAssessment\")) == true && s.objectIsForcedForKey(\"EnableAssessment\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_guest_folder_removed", "check": "/bin/ls /Users/ | /usr/bin/grep -c \"Guest\"", "result": "0", "script": "/bin/rm -Rf /Users/Guest"}, {"id": "os_home_folders_secure", "check": "/usr/bin/find /System/Volumes/Data/Users -mindepth 1 -maxdepth 1 -type d ! \\( -perm 700 -o -perm 711 \\) | /usr/bin/grep -v \"Shared\" | /usr/bin/grep -v \"Guest\" | /usr/bin/wc -l | /usr/bin/xargs", "result": "0", "script": "IFS=$'\\n'\nfor userDirs in $( /usr/bin/find /System/Volumes/Data/Users -mindepth 1 -maxdepth 1 -type d ! \\( -perm 700 -o -perm 711 \\) | /usr/bin/grep -v \"Shared\" | /usr/bin/grep -v \"Guest\" ); do\n  /bin/chmod og-rwx \"$userDirs\"\ndone\nunset IFS"}, {"id": "os_httpd_disable", "check": "result=\"FAIL\"\nenabled=$(/bin/launchctl print-disabled system | /usr/bin/grep '\"org.apache.httpd\" => enabled')\nrunning=$(/bin/launchctl print system/org.apache.httpd 2>/dev/null)\n\nif [[ -z \"$running\" ]] && [[ -z \"$enabled\" ]]; then\n  result=\"PASS\"\nelif [[ -n \"$running\" ]]; then\n  result=\"${result}  RUNNING\"\nelif [[ -n \"$enabled\" ]]; then\n  result=\"${result}  ENABLED\"\nfi\necho $result", "result": "PASS", "script": "/usr/sbin/apachectl stop 2>/dev/null\n/bin/launchctl disable system/org.apache.httpd"}, {"id": "os_install_log_retention_configure", "check": "/usr/sbin/aslmanager -dd 2>&1 | /usr/bin/awk '/\\/var\\/log\\/install.log$/ {count++} /Processing module com.apple.install/,/Finished/ { for (i=1;i<=NR;i++) { if ($i == \"TTL\" && $(i+2) >= 365) { ttl=\"True\" }; if ($i == \"MAX\") {max=\"True\"}}} END{if (count > 1) { print \"Multiple config files for /var/log/install, manually remove the extra files\"} else if (max == \"True\") { print \"all_max setting is configured, must be removed\" } if (ttl != \"True\") { print \"TTL not configured\" } else { print \"Yes\" }}'", "result": "Yes", "script": "/usr/bin/sed -i '' \"s/\\* file \\/var\\/log\\/install.log.*/\\* file \\/var\\/log\\/install.log format='\\$\\(\\(Time\\)\\(JZ\\)\\) \\$Host \\$\\(Sender\\)\\[\\$\\(PID\\\\)\\]: \\$Message' rotate=utc compress file_max=50M size_only ttl=365/g\" /etc/asl/com.apple.install"}, {"id": "os_internal_apfs_volumes_encrypted", "check": "fail=$(/usr/sbin/diskutil list internal | /usr/bin/grep \"APFS Volume\" | /usr/bin/awk '{print $NF}' | /usr/bin/xargs -n1 /usr/sbin/diskutil info 2>/dev/null | /usr/bin/awk '\n  /Volume Name:/{name=$0; sub(/^[ \\t]*Volume Name:[ \\t]*/,\"\",name)}\n  /FileVault:/{\n    if ($2==\"No\" && name !~ /^(Preboot|Recovery|VM)$/) {\n      if (list==\"\") list=name; else list=list \", \" name\n    }\n  }\n  END{print list}')\nif [ -z \"$fail\" ]; then\n  /bin/echo \"Yes\"\nelse\n  /bin/echo \"Unencrypted internal user APFS volumes: $fail\"\nfi", "result": "Yes", "script": ""}, {"id": "os_mail_smart_reply_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowMailSmartReplies\")) == false && s.objectIsForcedForKey(\"allowMailSmartReplies\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_mail_summary_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowMailSummary\")) == false && s.objectIsForcedForKey(\"allowMailSummary\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_mcx_disable_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.loginwindow\"); (ObjC.unwrap(s.objectForKey(\"AdminMayDisableMCX\")) == false && s.objectIsForcedForKey(\"AdminMayDisableMCX\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_mobile_file_integrity_enable", "check": "/usr/sbin/nvram -p | /usr/bin/grep -c \"amfi_get_out_of_my_way=1\"", "result": "0", "script": "/usr/sbin/nvram boot-args=\"\""}, {"id": "os_nfsd_disable", "check": "isDisabled=$(/sbin/nfsd status | /usr/bin/awk '/nfsd service/ {print $NF}')\nif [[ \"$isDisabled\" == \"disabled\" ]] && [[ -z $(/usr/bin/pgrep nfsd) ]]; then\n  echo \"pass\"\nelse\n  echo \"fail\"\nfi", "result": "pass", "script": "/bin/launchctl disable system/com.apple.nfsd\n/bin/rm -rf /etc/exports"}, {"id": "os_notes_transcription_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowNotesTranscription\")) == false && s.objectIsForcedForKey(\"allowNotesTranscription\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_notes_transcription_summary_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowNotesTranscriptionSummary\")) == false && s.objectIsForcedForKey(\"allowNotesTranscriptionSummary\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_on_device_dictation_enforce", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"forceOnDeviceOnlyDictation\")) == true && s.objectIsForcedForKey(\"forceOnDeviceOnlyDictation\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_password_hint_remove", "check": "HINT=$(/usr/bin/dscl . -list /Users hint | /usr/bin/awk '{ print $2 }')\n\nif [ -z \"$HINT\" ]; then\n  echo \"PASS\"\nelse\n  echo \"FAIL\"\nfi", "result": "PASS", "script": "for u in $(/usr/bin/dscl . -list /Users UniqueID | /usr/bin/awk '$2 > 500 {print $1}'); do\n  /usr/bin/dscl . -delete /Users/$u hint\ndone"}, {"id": "os_policy_banner_loginwindow_enforce", "check": "/bin/ls -ld /Library/Security/PolicyBanner.rtf* | /usr/bin/wc -l | /usr/bin/tr -d ' '", "result": "1", "script": "bannerText=\"Center for Internet Security Test Message\"\n/bin/mkdir /Library/Security/PolicyBanner.rtfd\n/usr/bin/textutil -convert rtf -output /Library/Security/PolicyBanner.rtfd/TXT.rtf -stdin <<EOF\n$bannerText\nEOF"}, {"id": "os_root_disable", "check": "/usr/bin/dscl '/Local/Default' read '/Users/root' AuthenticationAuthority 2>/dev/null | /usr/bin/grep -c 'AuthenticationAuthority'", "result": "0", "script": "/usr/bin/fdesetup remove -user root\n/usr/bin/dscl '/Local/Default' delete '/Users/root' AuthenticationAuthority"}, {"id": "os_safari_advertising_privacy_protection_enable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c '\"WebKitPreferences.privateClickMeasurementEnabled\" = 1' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_open_safe_downloads_disable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c 'AutoOpenSafeDownloads = 0' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_prevent_cross-site_tracking_enable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -cE '\"WebKitPreferences.storageBlockingPolicy\" = 1|\"WebKitStorageBlockingPolicy\" = 1|\"BlockStoragePolicy\" =2' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_reader_summary_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowSafariSummary\")) == false && s.objectIsForcedForKey(\"allowSafariSummary\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "os_safari_show_full_website_address_enable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c 'ShowFullURLInSmartSearchField = 1' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_show_status_bar_enabled", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c 'ShowOverlayStatusBar = 1' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_safari_warn_fraudulent_website_enable", "check": "/usr/bin/profiles -P -o stdout | /usr/bin/grep -c 'WarnAboutFraudulentWebsites = 1' | /usr/bin/awk '{ if ($1 >= 1) {print \"1\"} else {print \"0\"}}'", "result": "1", "script": ""}, {"id": "os_sip_enable", "check": "/usr/bin/csrutil status | /usr/bin/grep -c 'System Integrity Protection status: enabled.'", "result": "1", "script": "/usr/bin/csrutil enable"}, {"id": "os_sleep_and_display_sleep_apple_silicon_enable", "check": "error_count=0\nif /usr/sbin/system_profiler SPHardwareDataType 2>/dev/null  | /usr/bin/grep -Ei \"MacBook|Mac[0-9]\" > /dev/null ; then\n  cpuType=$(/usr/sbin/sysctl -n machdep.cpu.brand_string)\n  if echo \"$cpuType\" | grep -q \"Apple\"; then\n    sleepMode=$(/usr/bin/pmset -b -g | /usr/bin/grep '^\\s*sleep' 2>&1 | /usr/bin/awk '{print $2}')\n    displaysleepMode=$(/usr/bin/pmset -b -g | /usr/bin/grep displaysleep 2>&1 | /usr/bin/awk '{print $2}')\n    if [[ \"$sleepMode\" == \"\" ]] || [[ \"$sleepMode\" -gt 15 ]]; then\n      ((error_count++))\n    fi\n    if [[ \"$displaysleepMode\" == \"\" ]] || [[ \"$displaysleepMode\" -gt 10 ]] || [[ \"$displaysleepMode\" -gt \"$sleepMode\" ]]; then\n      ((error_count++))\n    fi\n  fi\nfi\necho \"$error_count\"", "result": "0", "script": "/usr/bin/pmset -a sleep 15\n/usr/bin/pmset -a displaysleep 10"}, {"id": "os_software_update_deferral", "check": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\n  let timeout = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.applicationaccess')\\\n.objectForKey('enforcedSoftwareUpdateDelay')) || 0\n  if ( timeout <= 30 ) {\n    return(\"true\")\n  } else {\n    return(\"false\")\n  }\n}\nEOS", "result": "true", "script": ""}, {"id": "os_sudo_log_enforce", "check": "/usr/bin/sudo /usr/bin/sudo -V | /usr/bin/grep -c \"Log when a command is allowed by sudoers\"", "result": "1", "script": "/usr/bin/find /etc/sudoers* -type f -exec sed -i '' '/^Defaults[[:blank:]]*\\!log_allowed/s/^/# /' '{}' \\;\n/bin/echo \"Defaults log_allowed\" >> /etc/sudoers.d/mscp"}, {"id": "os_sudo_timeout_configure", "check": "/usr/bin/sudo /usr/bin/sudo -V | /usr/bin/grep -c \"Authentication timestamp timeout: 0.0 minutes\"", "result": "1", "script": "/usr/bin/find /etc/sudoers* -type f -exec sed -i '' '/timestamp_timeout/d' '{}' \\;\n/bin/echo \"Defaults timestamp_timeout=0\" >> /etc/sudoers.d/mscp"}, {"id": "os_sudoers_timestamp_type_configure", "check": "/usr/bin/sudo /usr/bin/sudo -V | /usr/bin/awk -F\": \" '/Type of authentication timestamp record/{print $2}'", "result": "tty", "script": "/usr/bin/find /etc/sudoers* -type f -exec sed -i '' '/timestamp_type/d; /!tty_tickets/d' '{}' \\;"}, {"id": "os_system_wide_applications_configure", "check": "/usr/bin/find /Applications -iname \"*\\.app\" -type d -perm -2 -ls | /usr/bin/wc -l | /usr/bin/xargs", "result": "0", "script": "IFS=$'\\n'\nfor apps in $( /usr/bin/find /Applications -iname \"*\\.app\" -type d -perm -2 ); do\n  /bin/chmod -R o-w \"$apps\"\ndone"}, {"id": "os_terminal_secure_keyboard_enable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.Terminal')\\\n.objectForKey('SecureKeyboardEntry').js\nEOS", "result": "true", "script": ""}, {"id": "os_time_server_enabled", "check": "/bin/launchctl print system | /usr/bin/grep -c -E '\\tcom.apple.timed'", "result": "1", "script": "/bin/launchctl load -w /System/Library/LaunchDaemons/com.apple.timed.plist"}, {"id": "os_unlock_active_user_session_disable", "check": "RESULT=\"FAIL\"\nSS_RULE=$(/usr/bin/security -q authorizationdb read system.login.screensaver  2>&1 | /usr/bin/xmllint --xpath \"//dict/key[.='rule']/following-sibling::array[1]/string/text()\" -)\n\nif [[ \"${SS_RULE}\" == \"authenticate-session-owner\" ]]; then\n    RESULT=\"PASS\"\nelse\n    PSSO_CHECK=$(/usr/bin/security -q authorizationdb read \"$SS_RULE\"  2>&1 | /usr/bin/xmllint --xpath '//key[.=\"rule\"]/following-sibling::array[1]/string/text()' -)\n    if /usr/bin/grep -Fxq \"authenticate-session-owner\" <<<\"$PSSO_CHECK\"; then\n        RESULT=\"PASS\"\n    fi\nfi\n\necho $RESULT", "result": "PASS", "script": "SS_RULE=$(/usr/bin/security -q authorizationdb read system.login.screensaver 2>&1 | /usr/bin/xmllint --xpath \"//dict/key[.='rule']/following-sibling::array[1]/string/text()\" -)\nif [[ \"$SS_RULE\" == *psso* ]]; then\n    tmpdir=$(/usr/bin/mktemp -d) || return 1\n    /bin/chmod 700 \"$tmpdir\"\n    /usr/bin/security -q authorizationdb read psso-screensaver > \"$tmpdir/psso-screensaver-mscp.plist\"\n    /usr/bin/sed -i'' 's/<string>authenticate-session-owner-or-admin<\\/string>/<string>authenticate-session-owner<\\/string>/' \"$tmpdir/psso-screensaver-mscp.plist\"\n    /usr/bin/security -q authorizationdb write psso-screensaver-mscp < \"$tmpdir/psso-screensaver-mscp.plist\"\n    /usr/bin/security -q authorizationdb write system.login.screensaver psso-screensaver-mscp 2>&1\n    /bin/rm -rf \"$tmpdir\"\nelse\n    /usr/bin/security -q authorizationdb write system.login.screensaver \"authenticate-session-owner\" 2>&1\nfi"}, {"id": "os_world_writable_library_folder_configure", "check": "/usr/bin/find /Library -type d -perm -002 ! -perm -1000 ! -xattrname com.apple.rootless 2>/dev/null | /usr/bin/grep -vE \"/Library/AppStore\" | /usr/bin/wc -l | /usr/bin/xargs", "result": "0", "script": "IFS=$'\\n'\nfor libPermissions in $(/usr/bin/find /Library -type d -perm -002 ! -perm -1000 ! -xattrname com.apple.rootless 2>/dev/null); do\n  /bin/chmod -R o-w \"$libPermissions\"\ndone"}, {"id": "os_world_writable_system_folder_configure", "check": "/usr/bin/find /System/Volumes/Data/System -type d -perm -2 -ls | /usr/bin/grep -vE \"downloadDir|locks\" | /usr/bin/wc -l | /usr/bin/xargs", "result": "0", "script": "IFS=$'\\n'\nfor sysPermissions in $( /usr/bin/find /System/Volumes/Data/System -type d -perm -2 | /usr/bin/grep -vE \"downloadDir|locks\" ); do\n  /bin/chmod -R o-w \"$sysPermissions\"\ndone"}, {"id": "os_writing_tools_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowWritingTools\")) == false && s.objectIsForcedForKey(\"allowWritingTools\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "pwpolicy_account_lockout_enforce", "check": "/usr/bin/pwpolicy -getaccountpolicies 2> /dev/null | /usr/bin/tail +2 | /usr/bin/xmllint --xpath '//dict/key[text()=\"policyAttributeMaximumFailedAuthentications\"]/following-sibling::integer[1]/text()' - | /usr/bin/awk '{ if ($1 <= 5) {print \"pass\"} else {print \"fail\"}}' | /usr/bin/uniq", "result": "pass", "script": ""}, {"id": "pwpolicy_history_enforce", "check": "/usr/bin/pwpolicy -getaccountpolicies 2> /dev/null | /usr/bin/tail +2 | /usr/bin/xmllint --xpath '//dict/key[text()=\"policyAttributePasswordHistoryDepth\"]/following-sibling::*[1]/text()' - | /usr/bin/awk '{ if ($1 >= 24 ) {print \"pass\"} else {print \"fail\"}}' | /usr/bin/uniq", "result": "pass", "script": ""}, {"id": "pwpolicy_max_lifetime_enforce", "check": "/usr/bin/pwpolicy -getaccountpolicies 2> /dev/null | /usr/bin/tail +2 | /usr/bin/xmllint --xpath '//dict/key[text()=\"policyAttributeExpiresEveryNDays\"]/following-sibling::*[1]/text()' - | /usr/bin/awk '{ if ($1 <= 365 ) {print \"pass\"} else {print \"fail\"}}' | /usr/bin/uniq", "result": "pass", "script": ""}, {"id": "pwpolicy_minimum_length_enforce", "check": "/usr/bin/pwpolicy -getaccountpolicies 2>/dev/null | tail +2 | grep -oE \"policyAttributePassword matches '.\\{[0-9]+,\" | awk -F'[{,]' -v ODV=15 '{if ($2 > max) max=$2} END {print (max >= ODV) ? \"pass\" : \"fail\"}'", "result": "pass", "script": ""}, {"id": "system_settings_airplay_receiver_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowAirPlayIncomingRequests\")) == false && s.objectIsForcedForKey(\"allowAirPlayIncomingRequests\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_automatic_login_disable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.loginwindow')\\\n.objectForKey('com.apple.login.mcx.DisableAutoLoginClient').js\nEOS", "result": "true", "script": ""}, {"id": "system_settings_bluetooth_sharing_disable", "check": "/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults -currentHost read com.apple.Bluetooth PrefKeyServicesEnabled", "result": "0", "script": "/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults -currentHost write com.apple.Bluetooth PrefKeyServicesEnabled -bool false"}, {"id": "system_settings_content_caching_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowContentCaching\")) == false && s.objectIsForcedForKey(\"allowContentCaching\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_critical_update_install_enforce", "check": "/usr/bin/plutil -convert json /var/db/softwareupdate/SoftwareUpdateDDMStatePersistence.plist -o - | /usr/bin/jq --raw-output .'SUCorePersistedStatePolicyFields.SUCoreDDMDeclarationGlobalSettings.automaticallyInstallSystemAndSecurityUpdates'", "result": "1", "script": ""}, {"id": "system_settings_diagnostics_reports_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s1 = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.SubmitDiagInfo\"); var s2 = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); var v1 = ObjC.unwrap(s1.objectForKey(\"AutoSubmit\")); var v2 = ObjC.unwrap(s2.objectForKey(\"allowDiagnosticSubmission\")); var f1 = s1.objectIsForcedForKey(\"AutoSubmit\"); var f2 = s2.objectIsForcedForKey(\"allowDiagnosticSubmission\"); (v1 == false && v2 == false && f1 && f2) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_external_intelligence_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowExternalIntelligenceIntegrations\")) == false && s.objectIsForcedForKey(\"allowExternalIntelligenceIntegrations\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_external_intelligence_sign_in_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowExternalIntelligenceIntegrationsSignIn\")) == false && s.objectIsForcedForKey(\"allowExternalIntelligenceIntegrationsSignIn\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_filevault_enforce", "check": "dontAllowDisable=$(/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.MCX')\\\n.objectForKey('dontAllowFDEDisable').js\nEOS\n)\nfileVault=$(/usr/bin/fdesetup status | /usr/bin/grep -c \"FileVault is On.\")\nif [[ \"$dontAllowDisable\" == \"true\" ]] && [[ \"$fileVault\" == 1 ]]; then\n  echo \"1\"\nelse\n  echo \"0\"\nfi", "result": "1", "script": ""}, {"id": "system_settings_firewall_enable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.security.firewall')\\\n.objectForKey('EnableFirewall').js\nEOS", "result": "true", "script": "/usr/bin/defaults write /Library/Preferences/com.apple.alf globalstate -int 1"}, {"id": "system_settings_firewall_stealth_mode_enable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.security.firewall')\\\n.objectForKey('EnableStealthMode').js\nEOS", "result": "true", "script": "/usr/bin/defaults write /Library/Preferences/com.apple.alf stealthenabled -int 1"}, {"id": "system_settings_guest_access_smb_disable", "check": "/usr/sbin/sysadminctl -smbGuestAccess status 2>&1 | /usr/bin/grep -c \"SMB guest access disabled\"", "result": "1", "script": "/usr/sbin/sysadminctl -smbGuestAccess off"}, {"id": "system_settings_guest_account_disable", "check": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\n  let pref1 = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.MCX')\\\n.objectForKey('DisableGuestAccount'))\n  let pref2 = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.MCX')\\\n.objectForKey('EnableGuestAccount'))\n  if ( pref1 == true && pref2 == false ) {\n    return(\"true\")\n  } else {\n    return(\"false\")\n  }\n}\nEOS", "result": "true", "script": ""}, {"id": "system_settings_hot_corners_secure", "check": "bl_corner=\"$(/usr/bin/defaults read /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-bl-corner 2>/dev/null)\"\ntl_corner=\"$(/usr/bin/defaults read /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-tl-corner 2>/dev/null)\"\ntr_corner=\"$(/usr/bin/defaults read /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-tr-corner 2>/dev/null)\"\nbr_corner=\"$(/usr/bin/defaults read /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-br-corner 2>/dev/null)\"\n\nif [[ \"$bl_corner\" != \"6\" ]] && [[ \"$tl_corner\" != \"6\" ]] && [[ \"$tr_corner\" != \"6\" ]] && [[ \"$br_corner\" != \"6\" ]]; then\n  echo \"0\"\nfi", "result": "0", "script": "/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults delete /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-bl-corner 2>/dev/null\n/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults delete /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-tl-corner 2>/dev/null\n/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults delete /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-tr-corner 2>/dev/null\n/usr/bin/sudo -u \"$CURRENT_USER\" /usr/bin/defaults delete /Users/\"$CURRENT_USER\"/Library/Preferences/com.apple.dock wvous-br-corner 2>/dev/null"}, {"id": "system_settings_improve_assistive_voice_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.Accessibility\"); (ObjC.unwrap(s.objectForKey(\"AXSAudioDonationSiriImprovementEnabled\")) == false && s.objectIsForcedForKey(\"AXSAudioDonationSiriImprovementEnabled\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_improve_search_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.assistant.support\"); var v = ObjC.unwrap(s.objectForKey(\"Search Queries Data Sharing Status\")); (v == 2 && s.objectIsForcedForKey(\"Search Queries Data Sharing Status\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_improve_siri_dictation_disable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.assistant.support')\\\n.objectForKey('Siri Data Sharing Opt-In Status').js\nEOS", "result": "2", "script": ""}, {"id": "system_settings_install_macos_updates_enforce", "check": "/usr/bin/plutil -convert json /var/db/softwareupdate/SoftwareUpdateDDMStatePersistence.plist -o - | /usr/bin/jq --raw-output .'SUCorePersistedStatePolicyFields.SUCoreDDMDeclarationGlobalSettings.automaticallyInstallOSUpdates'", "result": "1", "script": ""}, {"id": "system_settings_internet_sharing_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.MCX\"); (ObjC.unwrap(s.objectForKey(\"forceInternetSharingOff\")) == true && s.objectIsForcedForKey(\"forceInternetSharingOff\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_location_services_enable", "check": "/usr/bin/sudo -u _locationd /usr/bin/osascript -l JavaScript << EOS\nObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.locationd')\\\n.objectForKey('LocationServicesEnabled')) == true ? \"true\" : \"false\"\nEOS", "result": "true", "script": "/usr/bin/defaults write /var/db/locationd/Library/Preferences/ByHost/com.apple.locationd LocationServicesEnabled -bool true;\npid=$(/bin/launchctl list | /usr/bin/awk '/com.apple.locationd/ { print $1 }')\nkill -9 $pid"}, {"id": "system_settings_location_services_menu_enforce", "check": "/usr/bin/defaults read /Library/Preferences/com.apple.locationmenu.plist ShowSystemServices", "result": "1", "script": "/usr/bin/defaults write /Library/Preferences/com.apple.locationmenu.plist ShowSystemServices -bool true"}, {"id": "system_settings_loginwindow_loginwindowtext_enable", "check": "/usr/bin/osascript -l JavaScript << EOS | /usr/bin/base64\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.loginwindow')\\\n.objectForKey('LoginwindowText').js\nEOS", "result": "Q2VudGVyIGZvciBJbnRlcm5ldCBTZWN1cml0eSBUZXN0IE1lc3NhZ2U=", "script": ""}, {"id": "system_settings_loginwindow_prompt_username_password_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.loginwindow')\\\n.objectForKey('SHOWFULLNAME').js\nEOS", "result": "true", "script": ""}, {"id": "system_settings_media_sharing_disabled", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowMediaSharingModification\")) == false && s.objectIsForcedForKey(\"allowMediaSharingModification\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_password_hints_disable", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.loginwindow')\\\n.objectForKey('RetriesUntilHint').js\nEOS", "result": "0", "script": ""}, {"id": "system_settings_personalized_advertising_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.applicationaccess\"); (ObjC.unwrap(s.objectForKey(\"allowApplePersonalizedAdvertising\")) == false && s.objectIsForcedForKey(\"allowApplePersonalizedAdvertising\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_printer_sharing_disable", "check": "/usr/sbin/cupsctl | /usr/bin/grep -c \"_share_printers=0\"", "result": "1", "script": "/usr/sbin/cupsctl --no-share-printers\n/usr/bin/lpstat -p | awk '{print $2}'| /usr/bin/xargs -I{} lpadmin -p {} -o printer-is-shared=false"}, {"id": "system_settings_rae_disable", "check": "/bin/launchctl print-disabled system | /usr/bin/grep -c '\"com.apple.AEServer\" => disabled'", "result": "1", "script": "/usr/sbin/systemsetup -setremoteappleevents off\n/bin/launchctl disable system/com.apple.AEServer"}, {"id": "system_settings_remote_management_disable", "check": "/usr/libexec/mdmclient QuerySecurityInfo 2>/dev/null | /usr/bin/grep -c \"RemoteDesktopEnabled = 0\"", "result": "1", "script": "/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -stop"}, {"id": "system_settings_screen_sharing_disable", "check": "result=\"FAIL\"\nenabled=$(/bin/launchctl print-disabled system | /usr/bin/grep '\"com.apple.screensharing\" => enabled')\nrunning=$(/bin/launchctl print system/com.apple.screensharing 2>/dev/null)\n\nif [[ -z \"$running\" ]] && [[ -z \"$enabled\" ]]; then\n  result=\"PASS\"\nelif [[ -n \"$running\" ]]; then\n  result=\"${result}  RUNNING\"\nelif [[ -n \"$enabled\" ]]; then\n  result=\"${result}  ENABLED\"\nfi\necho $result", "result": "PASS", "script": "/bin/launchctl disable system/com.apple.screensharing"}, {"id": "system_settings_screensaver_ask_for_password_delay_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\n  let delay = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.screensaver')\\\n.objectForKey('askForPasswordDelay'))\n  if ( delay <= 5 ) {\n    return(\"true\")\n  } else {\n    return(\"false\")\n  }\n}\nEOS", "result": "true", "script": ""}, {"id": "system_settings_screensaver_password_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.screensaver')\\\n.objectForKey('askForPassword').js\nEOS", "result": "true", "script": ""}, {"id": "system_settings_screensaver_timeout_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\n  let timeout = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.screensaver')\\\n.objectForKey('idleTime'))\n  if ( timeout <= 900 ) {\n    return(\"true\")\n  } else {\n    return(\"false\")\n  }\n}\nEOS", "result": "true", "script": ""}, {"id": "system_settings_siri_disable", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.ironwood.support\"); (ObjC.unwrap(s.objectForKey(\"Assistant Allowed\")) == false && s.objectIsForcedForKey(\"Assistant Allowed\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_smbd_disable", "check": "/bin/launchctl print-disabled system | /usr/bin/grep -c '\"com.apple.smbd\" => disabled'", "result": "1", "script": "/bin/launchctl disable system/com.apple.smbd"}, {"id": "system_settings_software_update_app_update_enforce", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.SoftwareUpdate')\\\n.objectForKey('AutomaticallyInstallAppUpdates').js\nEOS", "result": "true", "script": ""}, {"id": "system_settings_software_update_download_enforce", "check": "/usr/bin/plutil -convert json /var/db/softwareupdate/SoftwareUpdateDDMStatePersistence.plist -o - | /usr/bin/jq --raw-output .'SUCorePersistedStatePolicyFields.SUCoreDDMDeclarationGlobalSettings.automaticallyDownload'", "result": "1", "script": ""}, {"id": "system_settings_softwareupdate_current", "check": "softwareupdate_date_epoch=$(/bin/date -j -f \"%Y-%m-%d\" \"$(/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist LastFullSuccessfulDate | /usr/bin/awk '{print $1}')\" \"+%s\")\nthirty_days_epoch=$(/bin/date -v -30d \"+%s\")\nif [[ $softwareupdate_date_epoch -lt $thirty_days_epoch ]]; then\n  /bin/echo \"0\"\nelse\n  /bin/echo \"1\"\nfi", "result": "1", "script": "/usr/sbin/softwareupdate -i -a"}, {"id": "system_settings_ssh_disable", "check": "result=\"FAIL\"\nenabled=$(/bin/launchctl print-disabled system | /usr/bin/grep '\"com.openssh.sshd\" => enabled')\nrunning=$(/bin/launchctl print system/com.openssh.sshd 2>/dev/null)\n\nif [[ -z \"$running\" ]] && [[ -z \"$enabled\" ]]; then\n  result=\"PASS\"\nelif [[ -n \"$running\" ]]; then\n  result=\"${result}  RUNNING\"\nelif [[ -n \"$enabled\" ]]; then\n  result=\"${result}  ENABLED\"\nfi\necho $result", "result": "PASS", "script": "/usr/sbin/systemsetup -f -setremotelogin off >/dev/null\n/bin/launchctl disable system/com.openssh.sshd"}, {"id": "system_settings_system_wide_preferences_configure", "check": "authDBs=(\"system.preferences\" \"system.preferences.energysaver\" \"system.preferences.network\" \"system.preferences.printing\" \"system.preferences.sharing\" \"system.preferences.softwareupdate\" \"system.preferences.startupdisk\" \"system.preferences.timemachine\")\nresult=\"1\"\nfor section in ${authDBs[@]}; do\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"shared\")]/following-sibling::*[1])' -) != \"false\" ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath '//*[contains(text(), \"group\")]/following-sibling::*[1]/text()' - ) != \"admin\" ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"authenticate-user\")]/following-sibling::*[1])' -) != \"true\" ]]; then\n    result=\"0\"\n  fi\n  if [[ $(/usr/bin/security -q authorizationdb read \"$section\" | /usr/bin/xmllint -xpath 'name(//*[contains(text(), \"session-owner\")]/following-sibling::*[1])' -) != \"false\" ]]; then\n    result=\"0\"\n  fi\ndone\necho $result", "result": "1", "script": "authDBs=(\"system.preferences\" \"system.preferences.energysaver\" \"system.preferences.network\" \"system.preferences.printing\" \"system.preferences.sharing\" \"system.preferences.softwareupdate\" \"system.preferences.startupdisk\" \"system.preferences.timemachine\")\ntmpdir=$(/usr/bin/mktemp -d) || return 1\n/bin/chmod 700 \"$tmpdir\"\nfor section in ${authDBs[@]}; do\n  /usr/bin/security -q authorizationdb read \"$section\" > \"$tmpdir/$section.plist\"\n\n  class_key_value=$(/usr/libexec/PlistBuddy -c \"Print :class\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$class_key_value\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :class string user\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :class user\" \"$tmpdir/$section.plist\"\n  fi\n\n  key_value=$(/usr/libexec/PlistBuddy -c \"Print :shared\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$key_value\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :shared bool false\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :shared false\" \"$tmpdir/$section.plist\"\n  fi\n\n  auth_user_key=$(/usr/libexec/PlistBuddy -c \"Print :authenticate-user\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$auth_user_key\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :authenticate-user bool true\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :authenticate-user true\" \"$tmpdir/$section.plist\"\n  fi\n\n  session_owner_key=$(/usr/libexec/PlistBuddy -c \"Print :session-owner\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$session_owner_key\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :session-owner bool false\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :session-owner false\" \"$tmpdir/$section.plist\"\n  fi\n\n  group_key=$(/usr/libexec/PlistBuddy -c \"Print :group\" \"$tmpdir/$section.plist\" 2>&1)\n  if [[ \"$group_key\" == *\"Does Not Exist\"* ]]; then\n    /usr/libexec/PlistBuddy -c \"Add :group string admin\" \"$tmpdir/$section.plist\"\n  else\n    /usr/libexec/PlistBuddy -c \"Set :group admin\" \"$tmpdir/$section.plist\"\n  fi\n\n  /usr/bin/security -q authorizationdb write \"$section\" < \"$tmpdir/$section.plist\"\ndone\n/bin/rm -rf \"$tmpdir\""}, {"id": "system_settings_time_machine_auto_backup_enable", "check": "/usr/bin/osascript -l JavaScript << EOS\nfunction run() {\n  let pref1 = ObjC.unwrap($.NSUserDefaults.alloc.initWithSuiteName('com.apple.TimeMachine')\\\n  .objectForKey('AutoBackup'))\n  if ( pref1  == null ) {\n    return(\"true\")\n  }  else if ( pref1 == 1 ) {\n    return(\"true\")\n  }  else {\n    return(\"false\")\n  }\n}\nEOS", "result": "true", "script": ""}, {"id": "system_settings_time_machine_encrypted_configure", "check": "/usr/bin/defaults read /Library/Preferences/com.apple.TimeMachine.plist | /usr/bin/grep -c NotEncrypted", "result": "0", "script": ""}, {"id": "system_settings_time_server_configure", "check": "/usr/bin/osascript -l JavaScript << EOS\n$.NSUserDefaults.alloc.initWithSuiteName('com.apple.MCX')\\\n.objectForKey('timeServer').js\nEOS", "result": "time.apple.com", "script": ""}, {"id": "system_settings_time_server_enforce", "check": "/usr/bin/osascript -l JavaScript -e 'var s = $.NSUserDefaults.alloc.initWithSuiteName(\"com.apple.timed\"); (ObjC.unwrap(s.objectForKey(\"TMAutomaticTimeOnlyEnabled\")) == true && s.objectIsForcedForKey(\"TMAutomaticTimeOnlyEnabled\")) ? \"PASS\" : \"FAIL\"'", "result": "PASS", "script": ""}, {"id": "system_settings_wake_network_access_disable", "check": "/usr/bin/pmset -g custom | /usr/bin/awk '/womp/ { sum+=$2 } END {print sum}'", "result": "0", "script": "/usr/bin/pmset -a womp 0"}];
+
+    function highlightStage1Cards() {
+      const cards = [
+        { id: 'wizProtoMdm', badge: 'badgeProtoMdm', mode: 'mdm', defaultLabel: 'Classic XML', defaultCls: 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-800 border border-sky-200/60', activeCard: 'liquid-card-selected', activeBadge: 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-600 text-white shadow-2xs' },
+        { id: 'wizProtoDdm', badge: 'badgeProtoDdm', mode: 'ddm', defaultLabel: 'JSON & .mobileconfig', defaultCls: 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-800 border border-indigo-200/60', activeCard: 'liquid-card-selected-indigo', activeBadge: 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-600 text-white shadow-2xs' },
+        { id: 'wizProtoCis1', badge: 'badgeProtoCis1', mode: 'cis_lvl1', defaultLabel: '97 Controls + Audit .sh', defaultCls: 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-800 border border-emerald-300/60', activeCard: 'liquid-card-selected', activeBadge: 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-2xs' },
+        { id: 'wizProtoCis2', badge: 'badgeProtoCis2', mode: 'cis_lvl2', defaultLabel: '115 Controls + Audit .sh', defaultCls: 'text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-800 border border-purple-300/60', activeCard: 'liquid-card-selected-indigo', activeBadge: 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-600 text-white shadow-2xs' }
+      ];
+
+      cards.forEach(c => {
+        const cardEl = document.getElementById(c.id);
+        const badgeEl = document.getElementById(c.badge);
+        if (!cardEl || !badgeEl) return;
+        if (selectedBaselineMode === c.mode) {
+          cardEl.className = `${c.activeCard} p-4 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer`;
+          badgeEl.textContent = 'Selected';
+          badgeEl.className = c.activeBadge;
+        } else {
+          cardEl.className = 'liquid-card p-4 rounded-3xl text-left transition flex items-start gap-3.5 cursor-pointer';
+          badgeEl.textContent = c.defaultLabel;
+          badgeEl.className = c.defaultCls;
+        }
+      });
+
+      const s1Btn = document.getElementById('stage1NextBtnText');
+      if (s1Btn) {
+        if (selectedBaselineMode === 'cis_lvl1') s1Btn.textContent = 'Continue with CIS Level 1 (14 Payloads) →';
+        else if (selectedBaselineMode === 'cis_lvl2') s1Btn.textContent = 'Continue with CIS Level 2 (16 Payloads) →';
+        else s1Btn.textContent = 'Next: Choose Policies →';
       }
 
       document.querySelectorAll('.os-card').forEach(btn => {
@@ -2884,6 +2727,13 @@
           if (iconBox) iconBox.className = 'w-11 h-11 rounded-2xl bg-white/80 text-slate-700 border border-white group-hover:bg-sky-600 group-hover:text-white flex items-center justify-center mb-2.5 text-lg shadow-2xs transition';
         }
       });
+    }
+
+    function getHeaderModeBadgeText() {
+      const osLabel = state.selectedOS === 'All' ? 'All OS' : state.selectedOS;
+      if (selectedBaselineMode === 'cis_lvl1') return `${osLabel} • CIS Level 1 (.mobileconfig + .sh)`;
+      if (selectedBaselineMode === 'cis_lvl2') return `${osLabel} • CIS Level 2 (.mobileconfig + .sh)`;
+      return `${osLabel} • ${state.protocol === 'mdm' ? '.mobileconfig' : 'DDM'}`;
     }
 
     function goToStep(stepNum) {
@@ -2906,7 +2756,7 @@
 
       const pill = document.getElementById('activeOsPill');
       if (stepNum > 1) {
-        pill.textContent = `${state.selectedOS === 'All' ? 'All OS' : state.selectedOS} • ${state.protocol === 'mdm' ? '.mobileconfig' : 'DDM'}`;
+        pill.textContent = getHeaderModeBadgeText();
         pill.classList.remove('hidden');
       } else {
         pill.classList.add('hidden');
@@ -2920,8 +2770,171 @@
       }
     }
 
+    function addCustomConfiguredPayload(payloadType, title, valuesObj) {
+      const matched = state.schemas.find(s => s.protocol === 'mdm' && s.payloadType === payloadType) || {
+        protocol: 'mdm',
+        category: 'Security & Privacy',
+        title,
+        payloadType,
+        platforms: ['macOS'],
+        supervision: 'none',
+        description: 'mSCP macOS 27.0 CIS Benchmark Policy',
+        supportedOS: 'macOS 27.0',
+        rootKvMap: true,
+        keys: []
+      };
+      const instanceId = 'inst_' + Math.random().toString(36).slice(2, 9);
+      const uuid = uuidv4();
+      state.activeItems.push({
+        instanceId,
+        uuid,
+        identifier: `${payloadType}.${uuid}`,
+        displayName: title,
+        showTechMeta: false,
+        schema: matched,
+        values: JSON.parse(JSON.stringify(valuesObj))
+      });
+    }
+
+    function populateCisMacOS27Items(level) {
+      const isL2 = level === 'cis_lvl2';
+      state.activeItems = [];
+      state.protocol = 'mdm';
+
+      document.getElementById('metaDisplayName').value = isL2
+        ? 'macOS 27.0 CIS Level 2 Security Baseline'
+        : 'macOS 27.0 CIS Level 1 Security Baseline';
+      document.getElementById('metaIdentifier').value = isL2
+        ? 'com.rgm.mscp.cis-lvl2-macos-27'
+        : 'com.rgm.mscp.cis-lvl1-macos-27';
+      document.getElementById('metaDescription').value = isL2
+        ? 'mSCP Release 27.0 — CIS Benchmark Level 2 Profile (115 controls: MDM payloads + companion audit script)'
+        : 'mSCP Release 27.0 — CIS Benchmark Level 1 Profile (97 controls: MDM payloads + companion audit script)';
+      document.getElementById('metaTargetDeviceType').value = '5';
+
+      const appAccessVals = {
+        allowAirDrop: false,
+        allowAirPlayIncomingRequests: false,
+        allowAssistant: false,
+        allowDiagnosticSubmission: false,
+        allowApplePersonalizedAdvertising: false,
+        allowWritingTools: false,
+        allowMailSummary: false,
+        allowMailSmartReplies: false,
+        allowNotesTranscription: false,
+        allowNotesTranscriptionSummary: false,
+        allowSafariSummary: false,
+        forceOnDeviceOnlyDictation: true,
+        allowExternalIntelligenceIntegrations: false,
+        allowExternalIntelligenceIntegrationsSignIn: false
+      };
+      if (isL2) {
+        appAccessVals.allowCloudDesktopAndDocuments = false;
+        appAccessVals.allowContentCaching = false;
+        appAccessVals.allowMediaSharingModification = false;
+      }
+      addCustomConfiguredPayload('com.apple.applicationaccess', 'Restrictions & Apple Intelligence (CIS 27.0)', appAccessVals);
+
+      addCustomConfiguredPayload('com.apple.mobiledevice.passwordpolicy', 'Password Policy (CIS 5.2.1–5.2.8)', {
+        forcePIN: true,
+        minLength: 15,
+        maxFailedAttempts: 5,
+        maxPINAgeInDays: 365,
+        pinHistory: 24
+      });
+
+      addCustomConfiguredPayload('com.apple.SoftwareUpdate', 'Software Update & XProtect (CIS 1.2–1.5)', {
+        AutomaticDownload: true,
+        AutomaticallyInstallAppUpdates: true,
+        ConfigDataInstall: true
+      });
+
+      addCustomConfiguredPayload('com.apple.security.firewall', 'Application Firewall & Stealth Mode (CIS 2.2.1–2.2.2)', {
+        EnableFirewall: true,
+        EnableStealthMode: true
+      });
+
+      addCustomConfiguredPayload('com.apple.systempolicy.control', 'Gatekeeper Assessment (CIS 2.6.5)', {
+        EnableAssessment: true
+      });
+
+      addCustomConfiguredPayload('com.apple.MCX', 'System Security, FileVault & Time Server (CIS 2.3.2, 2.6.6, 2.13.1)', {
+        dontAllowFDEDisable: true,
+        DisableGuestAccount: true,
+        EnableGuestAccount: false,
+        forceInternetSharingOff: true,
+        timeServer: 'time.apple.com'
+      });
+
+      addCustomConfiguredPayload('com.apple.ManagedClient.preferences', 'Enforce Time Synchronization Daemon (CIS 2.3.2.1)', {
+        PayloadContent: {
+          'com.apple.timed': {
+            Forced: [{ mcx_preference_settings: { TMAutomaticTimeOnlyEnabled: true } }]
+          }
+        }
+      });
+
+      const loginVals = {
+        'com.apple.login.mcx.DisableAutoLoginClient': true,
+        LoginwindowText: 'Authorized Corporate Use Only.',
+        SHOWFULLNAME: true,
+        RetriesUntilHint: 0,
+        screenUnlockMode: 1
+      };
+      if (isL2) {
+        loginVals.AdminMayDisableMCX = false;
+      }
+      addCustomConfiguredPayload('com.apple.loginwindow', 'Login Window & Session Lock (CIS 2.11.3–2.13.3)', loginVals);
+
+      addCustomConfiguredPayload('com.apple.screensaver', 'Screen Saver Timeout & Lock (CIS 2.11.1–2.11.2)', {
+        moduleName: 'Flurry',
+        idleTime: 900,
+        askForPassword: true,
+        askForPasswordDelay: 5
+      });
+
+      addCustomConfiguredPayload('com.apple.Safari', 'Safari Privacy & Security (CIS 6.3.1–6.3.10)', {
+        AutoOpenSafeDownloads: false,
+        WarnAboutFraudulentWebsites: true,
+        'WebKitPreferences.storageBlockingPolicy': 1,
+        WebKitStorageBlockingPolicy: 1,
+        BlockStoragePolicy: 2,
+        'WebKitPreferences.privateClickMeasurementEnabled': true,
+        ShowFullURLInSmartSearchField: true,
+        ShowOverlayStatusBar: true
+      });
+
+      addCustomConfiguredPayload('com.apple.Terminal', 'Terminal Secure Keyboard Entry (CIS 6.4.1)', {
+        SecureKeyboardEntry: true
+      });
+
+      addCustomConfiguredPayload('com.apple.SubmitDiagInfo', 'Disable Diagnostic Reports (CIS 2.6.3.1)', {
+        AutoSubmit: false
+      });
+
+      addCustomConfiguredPayload('com.apple.assistant.support', 'Disable Siri & Search Data Sharing (CIS 2.6.3.2, 2.9.1)', {
+        'Search Queries Data Sharing Status': 2,
+        'Siri Data Sharing Opt-In Status': 2
+      });
+
+      addCustomConfiguredPayload('com.apple.Accessibility', 'Disable Assistive Voice Audio Donation (CIS 2.6.3.3)', {
+        AXSAudioDonationSiriImprovementEnabled: false
+      });
+
+      if (isL2) {
+        addCustomConfiguredPayload('com.apple.mDNSResponder', 'Disable Bonjour Multicast (CIS 4.1 Level 2)', {
+          NoMulticastAdvertisements: true
+        });
+        addCustomConfiguredPayload('com.apple.TimeMachine', 'Enforce Time Machine Auto-Backup (CIS 2.3.4.1 Level 2)', {
+          AutoBackup: true
+        });
+      }
+    }
+
     function selectWizardProtocol(mode) {
-      state.protocol = mode;
+      selectedBaselineMode = mode;
+      const isCis = mode === 'cis_lvl1' || mode === 'cis_lvl2';
+      state.protocol = isCis ? 'mdm' : mode;
       state.selectedCategory = 'All';
       state.outputFormat = 'primary';
 
@@ -2930,7 +2943,7 @@
       const advBtn = document.getElementById('toggleAdvancedTopLevelBtn');
       const ddmBanner = document.getElementById('ddmMobileconfigBanner');
 
-      if (mode === 'mdm') {
+      if (state.protocol === 'mdm') {
         document.getElementById('metaNameLabel').textContent = 'Profile Name (Shown on Device)';
         document.getElementById('metaIdentLabel').textContent = 'Unique Identifier (Reverse-DNS)';
         document.getElementById('metaExtraLabel').textContent = 'Install Scope (System / User)';
@@ -2950,6 +2963,13 @@
         advBtn.classList.add('hidden');
       }
 
+      if (isCis) {
+        state.selectedOS = 'macOS';
+        const targetEl = document.getElementById('metaTargetDeviceType');
+        if (targetEl) targetEl.value = '5';
+        populateCisMacOS27Items(mode);
+      }
+
       highlightStage1Cards();
     }
 
@@ -2963,6 +2983,144 @@
       goToStep(2);
     }
 
+    function runPreExportValidation() {
+      const issues = [];
+      const ident = (document.getElementById('metaIdentifier').value || '').trim();
+      const dispName = (document.getElementById('metaDisplayName').value || '').trim();
+      const removalDate = (document.getElementById('metaRemovalDate')?.value || '').trim();
+
+      if (!dispName) issues.push('Profile Name is empty.');
+      if (!ident || !ident.includes('.')) issues.push('Identifier should use reverse-DNS notation (e.g., com.org.profile).');
+      if (removalDate && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(removalDate)) {
+        issues.push('Auto-Removal Date must match ISO-8601 UTC format (YYYY-MM-DDTHH:MM:SSZ).');
+      }
+
+      const items = state.activeItems.filter(i => i.schema.protocol === state.protocol);
+      if (items.length === 0) {
+        issues.push('No policies added yet — output contains an empty payload list.');
+      }
+
+      const seenPayloads = {};
+      items.forEach(item => {
+        const pt = item.schema.payloadType;
+        seenPayloads[pt] = (seenPayloads[pt] || 0) + 1;
+        const vals = cleanObject(item.values);
+
+        (item.schema.keys || []).forEach(k => {
+          if (k.required && (vals[k.key] === undefined || vals[k.key] === '')) {
+            issues.push(`${item.schema.title}: Missing required field "${k.key}".`);
+          }
+        });
+
+        if (pt === 'com.apple.mobiledevice.passwordpolicy' || pt === 'com.apple.configuration.passcode.settings') {
+          const minLen = vals.minLength ?? vals.MinimumLength;
+          if (minLen !== undefined && (minLen < 0 || minLen > 16)) {
+            issues.push(`${item.schema.title}: Minimum length (${minLen}) must be between 0 and 16.`);
+          }
+          const maxFail = vals.maxFailedAttempts ?? vals.MaximumFailedAttempts;
+          if (maxFail !== undefined && (maxFail < 2 || maxFail > 11)) {
+            issues.push(`${item.schema.title}: Max failed attempts (${maxFail}) must be between 2 and 11.`);
+          }
+        }
+        if (pt === 'com.apple.security.scep' && vals.PayloadContent?.URL && !vals.PayloadContent.URL.startsWith('http')) {
+          issues.push(`${item.schema.title}: SCEP URL should start with https:// or http://.`);
+        }
+        if (pt === 'com.apple.security.acme' && vals.DirectoryURL && !vals.DirectoryURL.startsWith('https://')) {
+          issues.push(`${item.schema.title}: ACME DirectoryURL must start with https://.`);
+        }
+      });
+
+      const multiAllowed = ['com.apple.wifi.managed', 'com.apple.vpn.managed', 'com.apple.security.root', 'com.apple.security.pkcs12', 'com.apple.security.scep', 'com.apple.webClip.managed', 'com.apple.font', 'com.apple.ManagedClient.preferences'];
+      Object.entries(seenPayloads).forEach(([pt, count]) => {
+        if (count > 1 && !multiAllowed.includes(pt)) {
+          issues.push(`Duplicate payload domain "${pt}" (${count} instances) may cause MDM merge conflicts.`);
+        }
+      });
+
+      const statusText = document.getElementById('validationStatusText');
+      const issuesPanel = document.getElementById('validationIssuesPanel');
+      if (issues.length === 0) {
+        statusText.textContent = '✓ Validated & Ready to Export';
+        statusText.className = 'text-emerald-400 font-semibold';
+        issuesPanel.classList.add('hidden');
+        issuesPanel.innerHTML = '';
+      } else {
+        statusText.textContent = `⚠ ${issues.length} Validation Notice${issues.length === 1 ? '' : 's'}`;
+        statusText.className = 'text-amber-300 font-semibold';
+        issuesPanel.classList.remove('hidden');
+        issuesPanel.innerHTML = issues.map(msg => `<div>• ${escapeHtml(msg)}</div>`).join('');
+      }
+
+      // Companion Audit & Remediation Script Banner (only for CIS Level 1 / Level 2 baselines)
+      const scriptBanner = document.getElementById('companionScriptBanner');
+      const scriptLabel = document.getElementById('companionScriptLabel');
+      const scriptSub = document.getElementById('companionScriptSub');
+      const isCis = selectedBaselineMode === 'cis_lvl1' || selectedBaselineMode === 'cis_lvl2';
+      if (isCis) {
+        scriptBanner.classList.remove('hidden');
+        if (selectedBaselineMode === 'cis_lvl2') {
+          scriptLabel.textContent = 'CIS Level 2 Companion Audit & Fix (.sh)';
+          scriptSub.textContent = 'Full mSCP 27.0 L2 script (115 controls: --check / --fix / --cfc)';
+        } else {
+          scriptLabel.textContent = 'CIS Level 1 Companion Audit & Fix (.sh)';
+          scriptSub.textContent = 'Full mSCP 27.0 L1 script (97 controls: --check / --fix / --cfc)';
+        }
+      } else {
+        scriptBanner.classList.add('hidden');
+      }
+    }
+
+    function downloadCompanionAuditScript() {
+      const isL2 = selectedBaselineMode === 'cis_lvl2';
+      const rules = isL2 ? CIS_LVL2_RULES_COMPACT : CIS_LVL1_RULES_COMPACT;
+      const baseline = isL2 ? 'cis_lvl2_macos_27.0' : 'cis_lvl1_macos_27.0';
+      const filename = `${baseline}_compliance.sh`;
+
+      const checkBlocks = rules.map(r => `
+  # Rule: ${r.id}
+  result_value=$(${r.check}
+  )
+  if [[ "$result_value" == ${JSON.stringify(r.result)} ]]; then
+    echo "[PASS] ${r.id}"
+    ((passed++))
+  else
+    echo "[FAIL] ${r.id} (Result: $result_value | Expected: ${r.result})"
+    ((failed++))
+  fi`).join('\n');
+
+      const fixBlocks = rules.filter(r => r.script).map(r => `
+  echo "Applying fix for ${r.id}..."
+  ${r.script}`).join('\n');
+
+      const scriptContent = `#!/bin/zsh --no-rcs
+# mSCP Release 27.0 Compliance Audit & Remediation Script (${baseline})
+# Generated by RGM Profile Editor
+
+if [[ $EUID -ne 0 ]]; then
+  echo "ERROR: This script must be run as root (sudo)."
+  exit 1
+fi
+
+MODE="\${1:---check}"
+passed=0
+failed=0
+
+if [[ "$MODE" == "--check" ]]; then
+  echo "=== Running ${baseline} Compliance Scan ==="
+${checkBlocks}
+  echo "-------------------------------------------"
+  echo "PASSED: $passed | FAILED: $failed"
+elif [[ "$MODE" == "--fix" ]]; then
+  echo "=== Applying ${baseline} OS Remediations ==="
+${fixBlocks}
+  echo "Remediation complete. Re-run with --check to verify."
+else
+  echo "Usage: sudo $0 [--check | --fix]"
+fi
+`;
+      triggerFileDownload(scriptContent, filename, 'text/x-shellscript');
+    }
+
     function switchStage2OS(osId) {
       state.selectedOS = osId;
       state.selectedCategory = 'All';
@@ -2970,7 +3128,7 @@
       const targetEl = document.getElementById('metaTargetDeviceType');
       if (targetEl) targetEl.value = targetVal;
       const pill = document.getElementById('activeOsPill');
-      if (pill) pill.textContent = `${osId === 'All' ? 'All OS' : osId} • ${state.protocol === 'mdm' ? '.mobileconfig' : 'DDM'}`;
+      if (pill) pill.textContent = getHeaderModeBadgeText();
       renderStage2Catalog();
     }
 
@@ -2982,6 +3140,7 @@
         state.schemas = [...BUILTIN_SCHEMAS];
       }
       state.activeItems = [];
+      state.protocol = 'mdm';
       state.selectedOS = 'All';
       state.selectedCategory = 'All';
       state.outputFormat = 'primary';
@@ -3008,13 +3167,52 @@
       goToStep(3);
     }
 
+    function loadMergedMacOSBundle() {
+      selectWizardProtocol('mdm');
+      state.selectedOS = 'macOS';
+      state.activeItems = [];
+      document.getElementById('metaDisplayName').value = 'Merged macOS Security & Device Policy';
+      document.getElementById('metaIdentifier').value = 'com.rgm.macos.merged-profile';
+      document.getElementById('metaTargetDeviceType').value = '5';
+      const targetTitles = [
+        '802.1X: Ethernet (Global, First/Second/Third & Active)',
+        'FileVault Encryption, Escrow & Recovery (FDE)',
+        'Gatekeeper, Finder Override & spctl Rules',
+        'Screensaver, Lock Grace Period & User Settings (macOS)',
+        'Xsan Client & Volume Mount Preferences (macOS)',
+        'Login Window, Shift-Key, Login Items & Scripts (macOS)'
+      ];
+      targetTitles.forEach(t => {
+        const idx = state.schemas.findIndex(s => s.protocol === 'mdm' && s.title === t);
+        if (idx !== -1) addSchemaToBuilder(idx, true);
+      });
+      goToStep(3);
+    }
+
     function loadEnterpriseAppsPreset() {
       selectWizardProtocol('mdm');
       state.selectedOS = 'macOS';
+      state.activeItems = [];
       ['com.google.Chrome', 'com.microsoft.Edge', 'org.mozilla.firefox', 'com.microsoft.Outlook', 'com.google.drivefs.settings', 'com.anthropic.claudefordesktop'].forEach(domain => {
         const idx = state.schemas.findIndex(s => s.protocol === 'mdm' && s.payloadType === domain);
         if (idx !== -1) addSchemaToBuilder(idx, true);
       });
+      const chromeItem = state.activeItems.find(i => i.schema.payloadType === 'com.google.Chrome');
+      if (chromeItem) {
+        chromeItem.values = {
+          ...chromeItem.values,
+          AdsSettingForIntrusiveAdsSites: 2,
+          AllowOutdatedPlugins: false,
+          AllowedDomainsForApps: 'demo.com',
+          BlockExternalExtensions: true,
+          CloudPrintProxyEnabled: false,
+          CloudPrintSubmitEnabled: false,
+          DefaultBrowserSettingEnabled: true,
+          PasswordLeakDetectionEnabled: true,
+          ExtensionInstallBlocklist: ['*'],
+          ExtensionInstallAllowlist: []
+        };
+      }
       goToStep(3);
     }
 
@@ -3045,7 +3243,8 @@
         state.schemas = [...BUILTIN_SCHEMAS];
       }
 
-      document.getElementById('stage2Title').textContent = `Select Policies (${state.protocol === 'mdm' ? 'Standard Profile' : 'Declarative DDM'})`;
+      const modeLabel = selectedBaselineMode === 'cis_lvl1' ? 'CIS Level 1 Baseline' : (selectedBaselineMode === 'cis_lvl2' ? 'CIS Level 2 Baseline' : (state.protocol === 'mdm' ? 'Standard Profile' : 'Declarative DDM'));
+      document.getElementById('stage2Title').textContent = `Select Policies (${modeLabel})`;
 
       document.getElementById('stage2OsSwitcher').innerHTML = OS_PILL_OPTIONS.map(os => {
         const active = state.selectedOS === os;
@@ -3906,6 +4105,7 @@
           dlText.textContent = 'Download .mobileconfig';
         }
       }
+      runPreExportValidation();
     }
 
     // =========================================================================
@@ -4146,15 +4346,23 @@
               rootKvMap: true,
               keys: []
             };
-            state.activeItems.push({
-              instanceId: 'inst_' + Math.random().toString(36).slice(2, 9),
-              uuid: PayloadUUID || uuidv4(),
-              identifier: PayloadIdentifier || PayloadType,
-              displayName: PayloadDisplayName || matched.title,
-              showTechMeta: false,
-              schema: matched,
-              values: rest
-            });
+            // Merge into existing active item for singleton domains like com.google.Chrome
+            const existing = (PayloadType === 'com.google.Chrome')
+              ? state.activeItems.find(i => i.schema.protocol === 'mdm' && i.schema.payloadType === 'com.google.Chrome')
+              : null;
+            if (existing) {
+              existing.values = { ...existing.values, ...rest };
+            } else {
+              state.activeItems.push({
+                instanceId: 'inst_' + Math.random().toString(36).slice(2, 9),
+                uuid: PayloadUUID || uuidv4(),
+                identifier: PayloadIdentifier || PayloadType,
+                displayName: PayloadDisplayName || matched.title,
+                showTechMeta: false,
+                schema: matched,
+                values: rest
+              });
+            }
           });
           closeModal('importModal');
           goToStep(3);
